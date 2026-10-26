@@ -40,9 +40,10 @@ def hillshade(z: np.ndarray, step: float, azimuth=315.0, altitude=40.0, exaggera
     return np.clip(hs, 0, 1)
 
 
-def relief_rgb(z: np.ndarray, step: float) -> np.ndarray:
+def relief_rgb(z: np.ndarray, step: float, zmax: float | None = None, sea=SEA) -> np.ndarray:
     land = ~np.isnan(z)
-    zmax = np.nanmax(z) if land.any() else 1.0
+    if zmax is None:
+        zmax = np.nanmax(z) if land.any() else 1.0
     t = np.clip(np.where(land, z, 0) / max(zmax, 1.0), 0, 1)[..., None]
     stops = [(0.0, LOW), (0.35, MID), (0.75, HIGH), (1.0, PEAK)]
     col = np.zeros(z.shape + (3,))
@@ -53,7 +54,7 @@ def relief_rgb(z: np.ndarray, step: float) -> np.ndarray:
     hs = hillshade(z, step)[..., None]
     shade = 0.55 + 0.6 * hs
     rgb = np.clip(col * shade, 0, 255)
-    rgb = np.where(land[..., None], rgb, SEA)
+    rgb = np.where(land[..., None], rgb, np.asarray(sea))
     return rgb.astype(np.uint8)
 
 

@@ -78,7 +78,8 @@ def _terrain(name: str, texture_k: int):
         raise HTTPException(404, "terreno desconocido")
     g = load_grid_npz(files[name])
     zt = upsample(g.elev, texture_k) if texture_k > 1 else g.elev
-    tex = relief_rgb(zt, g.step / texture_k)
+    tex = relief_rgb(zt, g.step / texture_k, zmax=2200.0 if name == 'archipelago' else None,
+                     sea=(203, 211, 214) if name == 'archipelago' else (214, 219, 221))
     return dict(name=name, crs="EPSG:4083", west=g.west, north=g.north, step=g.step, rows=g.shape[0], cols=g.shape[1],
                 heights_i16_b64=heights_b64(g.elev), nodata=-32768, texture=png_data_url(tex, "RGB"),
                 max_elev=float(np.nanmax(g.elev)),
