@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { api, fmt, type Quake, type Terrain, type Zone } from '../api'
+import { api, fmt, STATIC, type Quake, type Terrain, type Zone } from '../api'
 import Atlas3D, { type Label, type QuakePoint } from '../three/Atlas3D'
 
 // UTM 28N approximation of zone centroids via the quakes we already have, falling back to fixed points
@@ -45,7 +45,7 @@ export default function CanariasLive() {
         <div className="canvas-wrap">
           <Atlas3D terrain={terrain} quakes={pts} labels={labels} exaggeration={4} depthScale={1.2} terrainOpacity={0.9} maxDepthKm={40} focus={focus} quakeScale={6} />
           <div className="corner tl">Archipiélago · relieve 500 m ×4 · sismos IGN a su profundidad (×1,2)</div>
-          <div className="obs-card"><div className="k">En directo</div><div className="v"><span className="dot ok" />catálogo IGN · {at ? fmt.dateTime(at) : '—'}</div></div>
+          <div className="obs-card"><div className="k">{STATIC ? 'Instantánea' : 'En directo'}</div><div className="v"><span className="dot ok" />catálogo IGN · {at ? fmt.dateTime(at) : '—'}</div></div>
           <div className="legend-strip"><div className="item"><b style={{ color: '#e23d14' }}>●</b> 24 h <b style={{ color: '#f08a35' }}>●</b> 7 días <b style={{ color: '#8f8577' }}>●</b> {days} días · tamaño = magnitud</div></div>
           <div className="controls-row">
             {[7, 30, 90, 365].map((d) => <button key={d} className={`btn ${d === days ? 'primary' : ''}`} onClick={() => setDays(d)}>{d === 365 ? '1 año' : `${d} d`}</button>)}
@@ -76,7 +76,7 @@ export default function CanariasLive() {
             ))}
           </div>
           <p className="note">El índice (0–10) compara los últimos 7 días con el año anterior de cada zona: tasa, energía y somerización. <b>No es una probabilidad de erupción</b>. El semáforo oficial lo gestiona el PEVOLCA.</p>
-          <button className="btn olive" disabled={refreshing} onClick={() => { setRefreshing(true); api.refresh().finally(() => { setRefreshing(false); load() }) }}>{refreshing ? 'Actualizando desde IGN…' : 'Actualizar desde IGN'}</button>
+          {!STATIC && <button className="btn olive" disabled={refreshing} onClick={() => { setRefreshing(true); api.refresh().finally(() => { setRefreshing(false); load() }) }}>{refreshing ? 'Actualizando desde IGN…' : 'Actualizar desde IGN'}</button>}
         </section>
         <section>
           <h3>Últimos sismos</h3>

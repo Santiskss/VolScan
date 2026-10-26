@@ -34,12 +34,32 @@ export type Status = {
 }
 export type Citation = { n: number; doc: string; section: string; kind: string; excerpt: string }
 
+/** Static snapshot (no server): the API is read from pre-generated JSON next to the page. */
+export const STATIC = import.meta.env.VITE_STATIC === '1'
+
+function staticUrl(url: string): string {
+  const [path, qs] = url.split('?')
+  const q = new URLSearchParams(qs ?? '')
+  let p = path.replace(/^\/api\//, 'api/')
+  if (p === 'api/canarias/quakes') p += `-${q.get('days') ?? '30'}`
+  if (p === 'api/solunar') p += `/${q.get('zone') ?? 'la_palma'}`
+  if (p.startsWith('api/lapalma2021/briefing/')) p = p.replace('briefing', 'briefing-static')
+  return `${p}.json`
+}
+
 async function get<T>(url: string): Promise<T> {
-  const r = await fetch(url)
+  const r = await fetch(STATIC ? staticUrl(url) : url)
   if (!r.ok) throw new Error(`${r.status} ${url}`)
   return r.json() as Promise<T>
 }
 async function post<T>(url: string, body: unknown): Promise<T> {
+  if (STATIC) {
+    if (url.includes('/briefing/')) return get<T>(url)
+    if (url === '/api/chat') {
+      return { answer: null, ai: false, error: 'esta es una instantánea estática; el asistente con IA funciona en la versión local (VolScan.command)', model: { ok: false, provider: 'local', model: '—' }, citations: [] } as T
+    }
+    if (url === '/api/canarias/refresh') return get<T>('/api/status').then((s: any) => s.catalog)
+  }
   const r = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })
   if (!r.ok) throw new Error(`${r.status} ${url}`)
   return r.json() as Promise<T>

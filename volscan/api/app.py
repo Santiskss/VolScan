@@ -236,7 +236,7 @@ def _lp_day(date: str):
         out["overlay"] = dict(png=png_data_url(lava_overlay_rgba(fc.probability(horizon), obs), "RGBA"),
                               horizon_h=72, west=r.grid.west, north=r.grid.north, step=r.grid.step,
                               rows=r.grid.shape[0], cols=r.grid.shape[1],
-                              legend="Probabilidad de cubrimiento en las próximas 72 h · contorno oscuro = colada observada (CEMS)")
+                              legend="Probabilidad de cubrimiento en las próximas 72 h · mancha oscura con borde naranja = colada observada (CEMS)")
         out["observed"] = r.observed_geojson(now)
     return _clean(out)
 

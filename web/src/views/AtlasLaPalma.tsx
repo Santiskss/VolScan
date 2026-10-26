@@ -102,7 +102,7 @@ export default function AtlasLaPalma() {
           )}
           <div className="legend-strip">
             {showQuakes && <div className="item">Sismos IGN bajo la isla · <b style={{ color: '#e23d14' }}>●</b> 24 h <b style={{ color: '#f08a35' }}>●</b> 7 d <b style={{ color: '#8f8577' }}>●</b> anteriores · tamaño = magnitud</div>}
-            {showLava && eruptive && <div className="item">Probabilidad de colada (72 h)<span className="grad" />· contorno oscuro = colada observada CEMS</div>}
+            {showLava && eruptive && <div className="item">Probabilidad de colada (72 h)<span className="grad" />· mancha oscura con borde naranja = colada observada CEMS</div>}
             <div className="item">Reconstrucción con datos reales · usa solo lo disponible ese día</div>
           </div>
           <div className="controls-row">
@@ -167,7 +167,7 @@ export default function AtlasLaPalma() {
       <aside className="side">
         <section className="incident">
           <h3>Parte de situación · IA</h3>
-          {!brief && <button className="btn olive" disabled={briefLoading || !date} onClick={() => loadBrief()}>{briefLoading ? 'Redactando…' : 'Generar parte de este día'}</button>}
+          {!brief && <button className="btn olive" disabled={briefLoading || !date} onClick={() => loadBrief()}>{briefLoading ? 'Redactando…' : 'Ver parte de este día'}</button>}
           {brief && <>
             <div className={`brief ${brief.ai ? '' : 'na'}`}>{brief.text}</div>
             <div className="brief-meta">

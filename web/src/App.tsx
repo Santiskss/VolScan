@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { api, fmt, type Status } from './api'
+import { api, fmt, STATIC, type Status } from './api'
 import AtlasLaPalma from './views/AtlasLaPalma'
 import Assistant from './views/Assistant'
 import CanariasLive from './views/CanariasLive'
@@ -46,8 +46,9 @@ export default function App() {
       <div className="topbar">
         {TABS.map(([k, label]) => <button key={k} className={`tab ${tab === k ? 'active' : ''}`} onClick={() => setTab(k)}>{label}</button>)}
         <span className="spacer" />
-        <span className="chip"><span className={`dot ${llm?.ok ? 'ok' : 'warn'}`} />IA: {llm ? (llm.provider === 'meta' ? 'Meta · ' : 'Local · ') + llm.model : '—'}{llm && !llm.ok ? ' (sin conexión)' : ''}</span>
+        <span className="chip"><span className={`dot ${llm?.ok ? 'ok' : 'warn'}`} />{STATIC ? 'IA: solo en versión local' : <>IA: {llm ? (llm.provider === 'meta' ? 'Meta · ' : 'Local · ') + llm.model : '—'}{llm && !llm.ok ? ' (sin conexión)' : ''}</>}</span>
         <span className="chip"><span className={`dot ${status?.catalog.refresh_error ? 'warn' : 'ok'}`} />IGN: {status ? `${fmt.int(status.catalog.n_events)} sismos` : '—'}</span>
+        {STATIC && status && <span className="chip"><span className="dot warn" />Instantánea · {fmt.dateTime(status.now)}</span>}
       </div>
       <div className="header">
         <Logo />
