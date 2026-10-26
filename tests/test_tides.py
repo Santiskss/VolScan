@@ -1,0 +1,93 @@
+import datetime as dt
+
+import numpy as np
+import pytest
+
+from volscan.tides import decluster, lunar_elongation, schuster, tidal_phase, tidal_potential
+
+
+def ts(s):
+    return dt.datetime.fromisoformat(s.replace("Z", "+00:00")).timestamp()
+
+
+def ang_diff(a, b):
+    return abs((a - b + 180) % 360 - 180)
+
+
+@pytest.mark.parametrize("when,expected", [
+    ("2021-09-20T23:55:00Z", 180.0),   # full moon (USNO)
+    ("2021-10-06T11:05:00Z", 0.0),     # new moon
+    ("2011-10-12T02:06:00Z", 180.0),   # full moon two days after the El Hierro eruption began
+])
+def test_lunar_elongation_matches_published_phases(when, expected):
+    assert ang_diff(float(lunar_elongation(ts(when))), expected) < 1.5
+
+
+def test_tidal_potential_is_semidiurnal_lunar():
+    t = np.arange(ts("2021-09-01T00:00:00Z"), ts("2021-10-01T00:00:00Z"), 300.0)
+    w = tidal_potential(t, 28.6, -17.9)
+    peaks = np.flatnonzero((w[1:-1] > w[:-2]) & (w[1:-1] >= w[2:])) + 1
+    gaps_h = np.diff(t[peaks]) / 3600
+    assert np.mean(gaps_h) == pytest.approx(12.42, abs=0.15)
+
+
+def test_phase_is_zero_at_a_maximum_and_in_range():
+    t = np.arange(ts("2021-09-10T00:00:00Z"), ts("2021-09-12T00:00:00Z"), 60.0)
+    w = tidal_potential(t, 28.6, -17.9)
+    k = int(np.argmax(w[: 13 * 60]))
+    ph = tidal_phase([t[k] + 1, t[k] + 6.2 * 3600], 28.6, -17.9)
+    assert ph[0] < 2 or ph[0] > 358
+    assert 160 < ph[1] < 200          # about half a cycle later
+    rand = tidal_phase(np.random.default_rng(0).uniform(t[0], t[-1], 200), 28.6, -17.9)
+    assert np.nanmin(rand) >= 0 and np.nanmax(rand) < 360
+
+
+def test_schuster_uniform_is_not_significant_and_clustered_is():
+    rng = np.random.default_rng(1)
+    assert schuster(rng.uniform(0, 360, 2000))["p"] > 0.01
+    s = schuster(rng.normal(90, 20, 300) % 360)
+    assert s["p"] < 1e-10 and ang_diff(s["mean_phase_deg"], 90) < 5
+
+
+def test_schuster_ignores_nan_and_handles_empty():
+    assert schuster([np.nan, 10, 10])["n"] == 2
+    assert np.isnan(schuster([])["p"])
+
+
+def test_decluster_keeps_largest_per_window():
+    t = np.array([0, 100, 200, 7 * 3600, 7 * 3600 + 5], float)
+    m = np.array([1.0, 3.0, 2.0, np.nan, 0.5])
+    keep = decluster(t, m, hours=6)
+    assert keep.tolist() == [False, True, False, False, True]
+
+
+def test_tidal_clock_matches_tidal_phase():
+    from volscan.tides import TidalClock
+    t0, t1 = ts("2021-09-01T00:00:00Z"), ts("2021-09-10T00:00:00Z")
+    ev = np.random.default_rng(2).uniform(t0, t1, 50)
+    clk = TidalClock(28.6, -17.9, t0, t1)
+    assert np.allclose(clk.phase(ev), tidal_phase(ev, 28.6, -17.9), atol=0.5, equal_nan=True)
+
+
+def test_permutation_null_removes_false_fortnightly_signal_from_rate_changes():
+    from volscan.tides import SPRING_NEAP_S, alignment_shift_test
+    rng = np.random.default_rng(5)
+    t0 = ts("2021-09-11T00:00:00Z")
+    # a swarm whose rate simply decays: no lunar modulation at all
+    t = t0 + rng.exponential(10 * 86400, 3000)
+    fn = lambda x: (2 * lunar_elongation(x)) % 360
+    raw_p = schuster(fn(t))["p"]
+    perm = alignment_shift_test(t, fn, SPRING_NEAP_S, n_perm=100)
+    assert raw_p < 1e-6                 # naive test is fooled
+    assert perm["p_shift"] > 0.05       # shift null is not
+
+
+def test_permutation_null_still_detects_a_real_modulation():
+    from volscan.tides import SPRING_NEAP_S, alignment_shift_test
+    rng = np.random.default_rng(6)
+    t0 = ts("2015-01-01T00:00:00Z")
+    cand = t0 + rng.uniform(0, 3 * 365 * 86400, 40000)
+    fn = lambda x: (2 * lunar_elongation(x)) % 360
+    keep = rng.uniform(0, 1, cand.size) < 0.5 * (1 + 0.6 * np.cos(np.radians(fn(cand))))   # spring-tide preference
+    perm = alignment_shift_test(cand[keep], fn, SPRING_NEAP_S, n_perm=100)
+    assert perm["p_shift"] < 0.02

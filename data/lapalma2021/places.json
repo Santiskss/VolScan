@@ -1,0 +1,78 @@
+{
+ "attribution": "© OpenStreetMap contributors (ODbL), geocoded with Nominatim on 2026-10-26",
+ "note": "Point locations (centroids or a representative node), not neighbourhood outlines.",
+ "places": [
+  {
+   "name": "Todoque",
+   "lat": 28.6191208,
+   "lon": -17.9047502,
+   "osm_note": "node/locality"
+  },
+  {
+   "name": "La Laguna",
+   "lat": 28.6318373,
+   "lon": -17.9080528,
+   "osm_note": "hamlet"
+  },
+  {
+   "name": "Las Manchas (aprox.)",
+   "lat": 28.602707,
+   "lon": -17.8811767,
+   "osm_note": "pharmacy in Las Manchas"
+  },
+  {
+   "name": "Los Llanos de Aridane",
+   "lat": 28.6592222,
+   "lon": -17.9151945,
+   "osm_note": "admin centroid"
+  },
+  {
+   "name": "Tazacorte",
+   "lat": 28.642858,
+   "lon": -17.9326028,
+   "osm_note": "admin centroid"
+  },
+  {
+   "name": "Puerto Naos",
+   "lat": 28.5858953,
+   "lon": -17.910201,
+   "osm_note": "hamlet"
+  },
+  {
+   "name": "El Paso",
+   "lat": 28.6514036,
+   "lon": -17.8799155,
+   "osm_note": "admin centroid"
+  },
+  {
+   "name": "Puerto de Tazacorte",
+   "lat": 28.6516505,
+   "lon": -17.9459682,
+   "osm_note": "village"
+  },
+  {
+   "name": "El Remo",
+   "lat": 28.5529423,
+   "lon": -17.8885664,
+   "osm_note": "hamlet"
+  },
+  {
+   "name": "Las Norias",
+   "lat": 28.6071287,
+   "lon": -17.908507,
+   "osm_note": "hamlet"
+  },
+  {
+   "name": "Jedey",
+   "lat": 28.5857276,
+   "lon": -17.8799969,
+   "osm_note": "hamlet"
+  },
+  {
+   "name": "Los Guirres (Tazacorte)",
+   "lat": 28.6074026,
+   "lon": -17.9227804,
+   "osm_note": "locality; first sea entry 28 Sep 2021"
+  }
+ ]
+}

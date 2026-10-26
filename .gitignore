@@ -6,3 +6,6 @@ __pycache__/
 out/
 *.npz
 .DS_Store
+!data/**/*.npz
+web/node_modules/
+web/dist/

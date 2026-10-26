@@ -1,0 +1,3 @@
+evid,time_utc,lat,lon,depth_km,mag,mag_type,int_max,location
+1033942,2010-12-13T18:38:11Z,29.3121,-15.6156,0.0,2.1,mbLg,,ATLÁNTICO-CANARIAS
+1035660,2010-12-21T21:00:14Z,28.7639,-14.3119,0.0,2.9,mbLg,3,ATLÁNTICO-CANARIAS
