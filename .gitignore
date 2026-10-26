@@ -9,3 +9,4 @@ out/
 !data/**/*.npz
 web/node_modules/
 web/dist/
+web/tsconfig.tsbuildinfo
