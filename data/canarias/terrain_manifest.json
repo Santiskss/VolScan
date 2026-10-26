@@ -1,0 +1,75 @@
+{
+ "licence": "Copernicus DEM GLO-30 \u00a9 DLR e.V. 2010-2014 and \u00a9 Airbus Defence and Space GmbH 2014-2018, provided under COPERNICUS by the European Union and ESA",
+ "tiles": {
+  "28_-18": {
+   "dem": "https://copernicus-dem-30m.s3.amazonaws.com/Copernicus_DSM_COG_10_N28_00_W018_00_DEM/Copernicus_DSM_COG_10_N28_00_W018_00_DEM.tif",
+   "sha256": "1db0ade007bd132c0e07035d9060e35192c577c9acbd41c5a2ffc44c10719109"
+  },
+  "27_-19": {
+   "dem": "https://copernicus-dem-30m.s3.amazonaws.com/Copernicus_DSM_COG_10_N27_00_W019_00_DEM/Copernicus_DSM_COG_10_N27_00_W019_00_DEM.tif",
+   "sha256": "6aa48c88eba1904858afb64b4d9549c94804ffdaa1d9caf3708206aac994d22f"
+  },
+  "27_-18": {
+   "dem": "https://copernicus-dem-30m.s3.amazonaws.com/Copernicus_DSM_COG_10_N27_00_W018_00_DEM/Copernicus_DSM_COG_10_N27_00_W018_00_DEM.tif",
+   "sha256": "a53787956a1a475fb4f014eb16a7ab1ac501cf13558c25c4fc5413216941ede1"
+  },
+  "27_-17": {
+   "dem": "https://copernicus-dem-30m.s3.amazonaws.com/Copernicus_DSM_COG_10_N27_00_W017_00_DEM/Copernicus_DSM_COG_10_N27_00_W017_00_DEM.tif",
+   "sha256": "a669fadce0d6c3075b98c94568547a12842befc7dfa12dfc29faf7bae4c89e8d"
+  },
+  "27_-16": {
+   "dem": "https://copernicus-dem-30m.s3.amazonaws.com/Copernicus_DSM_COG_10_N27_00_W016_00_DEM/Copernicus_DSM_COG_10_N27_00_W016_00_DEM.tif",
+   "sha256": "1d28cbade8135894a9a83eb389226c2d62e2ac232ed3875a8e4db4bdcebcdd76"
+  },
+  "27_-15": "absent (open ocean)",
+  "27_-14": {
+   "dem": "https://copernicus-dem-30m.s3.amazonaws.com/Copernicus_DSM_COG_10_N27_00_W014_00_DEM/Copernicus_DSM_COG_10_N27_00_W014_00_DEM.tif",
+   "sha256": "8616316bc7cf7c60a14ed3406e9bde8c2be44230c5866862a45a9cb8e9231422"
+  },
+  "28_-19": {
+   "dem": "https://copernicus-dem-30m.s3.amazonaws.com/Copernicus_DSM_COG_10_N28_00_W019_00_DEM/Copernicus_DSM_COG_10_N28_00_W019_00_DEM.tif",
+   "sha256": "191af4dd8896f48b5936e44299f9f88d7e66dd0a1e50c3bdd2e3bbf6a1280a8b"
+  },
+  "28_-17": {
+   "dem": "https://copernicus-dem-30m.s3.amazonaws.com/Copernicus_DSM_COG_10_N28_00_W017_00_DEM/Copernicus_DSM_COG_10_N28_00_W017_00_DEM.tif",
+   "sha256": "80c5f2b4f202d87403251dfbcab241a66d7061e564242bda65d2577ab44b4e4b"
+  },
+  "28_-16": {
+   "dem": "https://copernicus-dem-30m.s3.amazonaws.com/Copernicus_DSM_COG_10_N28_00_W016_00_DEM/Copernicus_DSM_COG_10_N28_00_W016_00_DEM.tif",
+   "sha256": "4865311aef64a84053ea52bb5128660d25e2353e055ce02ac94d1518a5d3d9f9"
+  },
+  "28_-15": {
+   "dem": "https://copernicus-dem-30m.s3.amazonaws.com/Copernicus_DSM_COG_10_N28_00_W015_00_DEM/Copernicus_DSM_COG_10_N28_00_W015_00_DEM.tif",
+   "sha256": "116cfdc7f544495c3110a5454f3a0f2caf929eac587751d7d6b27f8a987fe904"
+  },
+  "28_-14": {
+   "dem": "https://copernicus-dem-30m.s3.amazonaws.com/Copernicus_DSM_COG_10_N28_00_W014_00_DEM/Copernicus_DSM_COG_10_N28_00_W014_00_DEM.tif",
+   "sha256": "fffeb0362120bdb11ce003ada93f6e90cfa64c4a6a193febd6cfe2246f6f60d6"
+  },
+  "29_-19": "absent (open ocean)",
+  "29_-18": "absent (open ocean)",
+  "29_-17": "absent (open ocean)",
+  "29_-16": "absent (open ocean)",
+  "29_-15": "absent (open ocean)",
+  "29_-14": {
+   "dem": "https://copernicus-dem-30m.s3.amazonaws.com/Copernicus_DSM_COG_10_N29_00_W014_00_DEM/Copernicus_DSM_COG_10_N29_00_W014_00_DEM.tif",
+   "sha256": "7ecc9e725f5d4e9eb81b33a926b40912d19b8f83e97fb91ba4bbea7555c5919a"
+  }
+ },
+ "products": {
+  "terrain_lapalma_100m": {
+   "west": 208000.0,
+   "east": 236000.0,
+   "south": 3146000.0,
+   "north": 3196000.0,
+   "step": 100.0
+  },
+  "terrain_archipelago_500m": {
+   "west": 170000.0,
+   "east": 670000.0,
+   "south": 3055000.0,
+   "north": 3262000.0,
+   "step": 500.0
+  }
+ }
+}
