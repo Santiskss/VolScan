@@ -25,7 +25,8 @@ from ..datasets import DATA, LAPALMA_2021_ONSET, load_grid_npz
 from ..geo import lonlat_to_utm28
 from ..seismic import DAY, Catalog, unrest
 from ..textures import heights_b64, lava_overlay_rgba, png_data_url, relief_rgb, upsample
-from ..tides import decluster, lunar_elongation, schuster, tidal_phase
+from ..tides import (SEMIDIURNAL_S, SPRING_NEAP_S, TidalClock, alignment_shift_test, decluster,
+                     lunar_elongation, schuster, tidal_phase)
 from ..zones import BY_KEY, ZONES
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -154,17 +155,20 @@ def solunar(zone: str = "la_palma", start: str = "2011-01-01", end: str | None =
     lat, lon = BY_KEY[zone].centroid
     res = dict(zone=zone, n=len(w), start=start, end=end)
     if len(w) >= 20:
-        ph = tidal_phase(w.t, lat, lon)
-        el = lunar_elongation(w.t)
-        fort = (2 * el) % 360
+        year = 365.25 * DAY
+        clock = TidalClock(lat, lon, w.t.min() - year, w.t.max() + year)
+        fns = dict(semidiurnal=(clock.phase, SEMIDIURNAL_S), fortnightly=(lambda t: (2 * lunar_elongation(t)) % 360, SPRING_NEAP_S))
         keep = decluster(w.t, w.mag, hours=6)
-        for name, arr in (("semidiurnal", ph), ("fortnightly", fort)):
+        for name, (fn, period) in fns.items():
+            arr = fn(w.t)
             h, _ = np.histogram(arr[~np.isnan(arr)], bins=12, range=(0, 360))
-            res[name] = dict(raw=schuster(arr), declustered=schuster(arr[keep]), hist12=h.tolist())
+            res[name] = dict(raw=schuster(arr), declustered=schuster(arr[keep]), hist12=h.tolist(),
+                             shift_test=alignment_shift_test(w.t[keep], fn, period, n_perm=200))
     now = time.time()
     res["now"] = dict(tidal_phase=float(tidal_phase([now], lat, lon)[0]), lunar_elongation=float(lunar_elongation(now)))
-    res["note"] = ("Test de Schuster: p<0,05 indica fases no uniformes, no causalidad. "
-                   "Los enjambres no son independientes; mira también el resultado desagrupado (1 sismo/6 h).")
+    res["note"] = ("Schuster: p<0,05 = fases no uniformes (no prueba causalidad); los enjambres inflan la significación. "
+                   "La prueba robusta es 'shift_test': exceso de sismos en fase 0 (máximo de marea / mareas vivas) frente a "
+                   "200 desplazamientos temporales del propio catálogo desagrupado (1 sismo/6 h).")
     return J(res)
 
 

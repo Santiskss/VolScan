@@ -59,3 +59,35 @@ def test_decluster_keeps_largest_per_window():
     m = np.array([1.0, 3.0, 2.0, np.nan, 0.5])
     keep = decluster(t, m, hours=6)
     assert keep.tolist() == [False, True, False, False, True]
+
+
+def test_tidal_clock_matches_tidal_phase():
+    from volscan.tides import TidalClock
+    t0, t1 = ts("2021-09-01T00:00:00Z"), ts("2021-09-10T00:00:00Z")
+    ev = np.random.default_rng(2).uniform(t0, t1, 50)
+    clk = TidalClock(28.6, -17.9, t0, t1)
+    assert np.allclose(clk.phase(ev), tidal_phase(ev, 28.6, -17.9), atol=0.5, equal_nan=True)
+
+
+def test_permutation_null_removes_false_fortnightly_signal_from_rate_changes():
+    from volscan.tides import SPRING_NEAP_S, alignment_shift_test
+    rng = np.random.default_rng(5)
+    t0 = ts("2021-09-11T00:00:00Z")
+    # a swarm whose rate simply decays: no lunar modulation at all
+    t = t0 + rng.exponential(10 * 86400, 3000)
+    fn = lambda x: (2 * lunar_elongation(x)) % 360
+    raw_p = schuster(fn(t))["p"]
+    perm = alignment_shift_test(t, fn, SPRING_NEAP_S, n_perm=100)
+    assert raw_p < 1e-6                 # naive test is fooled
+    assert perm["p_shift"] > 0.05       # shift null is not
+
+
+def test_permutation_null_still_detects_a_real_modulation():
+    from volscan.tides import SPRING_NEAP_S, alignment_shift_test
+    rng = np.random.default_rng(6)
+    t0 = ts("2015-01-01T00:00:00Z")
+    cand = t0 + rng.uniform(0, 3 * 365 * 86400, 40000)
+    fn = lambda x: (2 * lunar_elongation(x)) % 360
+    keep = rng.uniform(0, 1, cand.size) < 0.5 * (1 + 0.6 * np.cos(np.radians(fn(cand))))   # spring-tide preference
+    perm = alignment_shift_test(cand[keep], fn, SPRING_NEAP_S, n_perm=100)
+    assert perm["p_shift"] < 0.02
