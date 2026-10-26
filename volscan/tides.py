@@ -157,3 +157,65 @@ def decluster(ts, mags, hours: float = 6.0) -> np.ndarray:
     first = np.r_[True, bins[order][1:] != bins[order][:-1]]
     keep[order[first]] = True
     return keep
+
+
+class TidalClock:
+    """Tidal-potential maxima precomputed once for a point and a time span. `phase(ts)` is cheap afterwards.
+
+    Used for the permutation null hypothesis, which needs to recompute
+    thousands of phases.
+    """
+
+    def __init__(self, lat, lon, t_min, t_max, step_s: float = 300.0):
+        t = np.arange(t_min - 2 * 86400, t_max + 2 * 86400 + step_s, step_s)
+        w = tidal_potential(t, lat, lon)
+        pk = np.flatnonzero((w[1:-1] > w[:-2]) & (w[1:-1] >= w[2:])) + 1
+        a, b, c = w[pk - 1], w[pk], w[pk + 1]
+        den = a - 2 * b + c
+        self.peaks = t[pk] + np.where(den != 0, 0.5 * (a - c) / den, 0.0) * step_s
+
+    def phase(self, ts) -> np.ndarray:
+        ev = np.asarray(ts, float)
+        k = np.searchsorted(self.peaks, ev, side="right")
+        ok = (k > 0) & (k < self.peaks.size)
+        ph = np.full(ev.size, np.nan)
+        prev = self.peaks[np.clip(k - 1, 0, self.peaks.size - 1)]
+        nxt = self.peaks[np.clip(k, 0, self.peaks.size - 1)]
+        ph[ok] = 360.0 * (ev[ok] - prev[ok]) / (nxt[ok] - prev[ok])
+        return ph
+
+
+SEMIDIURNAL_S = 12.4206 * 3600
+SPRING_NEAP_S = 14.7653 * 86400
+
+
+def alignment_shift_test(ts, phase_fn, period_s: float, n_perm: int = 200, seed: int = 0,
+                         max_shift_s: float = 365.25 * 86400) -> dict:
+    """Is there an excess of events near phase 0 (maximum tidal potential, or spring tides)?
+
+    Statistic: C = mean(cos θ). It is +1 if everything happens at phase 0,
+    0 with no preference.
+    Null hypothesis: shift the WHOLE catalogue by a random offset u (|u|
+    between one period and `max_shift_s`). That keeps all its internal
+    structure (swarms, rate changes) and only changes its alignment with the
+    Moon/tide. Schuster's D² can't be used with this null because it doesn't
+    change under a common rotation of the phases; C does.
+    p_shift = (1 + #{C_null ≥ C_obs}) / (1 + n_perm). Without this, a swarm
+    whose rate simply changes over a few weeks looks "modulated".
+    """
+    ts = np.asarray(ts, float)
+    if ts.size < 20:
+        return dict(n=int(ts.size), c=float("nan"), p_shift=float("nan"), n_perm=0)
+
+    def c(t):
+        ph = np.radians(phase_fn(t))
+        ph = ph[~np.isnan(ph)]
+        return float(np.cos(ph).mean()) if ph.size else float("nan")
+
+    obs = c(ts)
+    rng = np.random.default_rng(seed)
+    ge = 0
+    for _ in range(n_perm):
+        u = rng.uniform(period_s, max_shift_s) * rng.choice([-1, 1])
+        ge += c(ts + u) >= obs
+    return dict(n=int(ts.size), c=obs, p_shift=float((1 + ge) / (1 + n_perm)), n_perm=n_perm)
