@@ -1,0 +1,295 @@
+{
+  "retrieved_at": "2026-10-26T20:31:08Z",
+  "licences": {
+    "dem": "Copernicus DEM GLO-30 © DLR e.V. 2010-2014 and © Airbus Defence and Space GmbH 2014-2018, provided under COPERNICUS by the European Union and ESA; all rights reserved (free licence).",
+    "lava": "Copernicus Emergency Management Service (© 2021 European Union), EMSR546. Served by IGME.",
+    "seismic": "EMSC-CSEM FDSN event service; locations authored by IGN (MDD) where stated."
+  },
+  "sources": {
+    "dem": {
+      "url": "https://copernicus-dem-30m.s3.amazonaws.com/Copernicus_DSM_COG_10_N28_00_W018_00_DEM/Copernicus_DSM_COG_10_N28_00_W018_00_DEM.tif",
+      "sha256": "1db0ade007bd132c0e07035d9060e35192c577c9acbd41c5a2ffc44c10719109"
+    },
+    "wbm": {
+      "url": "https://copernicus-dem-30m.s3.amazonaws.com/Copernicus_DSM_COG_10_N28_00_W018_00_DEM/AUXFILES/Copernicus_DSM_COG_10_N28_00_W018_00_WBM.tif",
+      "sha256": "a2c44e5f4f01687e03d129a0ac3754ca64b4369835189f5838f23dd1911d77bd"
+    },
+    "lava_layer_5": {
+      "url": "https://mapas.igme.es/gis/rest/services/Copernicus/Copernicus_EMSR546/MapServer/5/query",
+      "sha256": "bd66775483cd9171bc44a9ff50224fb15f4c964332e76569336e6dbb10e301d3"
+    },
+    "lava_layer_6": {
+      "url": "https://mapas.igme.es/gis/rest/services/Copernicus/Copernicus_EMSR546/MapServer/6/query",
+      "sha256": "f15c333a3a055a1ad262830dbfd52845f64f4ddb58c82fb1e7cfa8aa07a226ae"
+    },
+    "lava_layer_7": {
+      "url": "https://mapas.igme.es/gis/rest/services/Copernicus/Copernicus_EMSR546/MapServer/7/query",
+      "sha256": "825c6b9d094a95efd5fa317c46bdf880f79c61863c08b9ef18dde0df47628bdb"
+    },
+    "lava_layer_8": {
+      "url": "https://mapas.igme.es/gis/rest/services/Copernicus/Copernicus_EMSR546/MapServer/8/query",
+      "sha256": "4b1e69970c929dd6eddcbdc3493e85c26cedbc18c34519840beebbfea9297431"
+    },
+    "lava_layer_9": {
+      "url": "https://mapas.igme.es/gis/rest/services/Copernicus/Copernicus_EMSR546/MapServer/9/query",
+      "sha256": "6b960aecfbfcf14104fd6c7c3caf0ca6b4cfded2b48c28cbf04791c5429fb4dc"
+    },
+    "lava_layer_10": {
+      "url": "https://mapas.igme.es/gis/rest/services/Copernicus/Copernicus_EMSR546/MapServer/10/query",
+      "sha256": "4fa0225276a6f9bdf79401576c53be5b3a521fe872c9aef6941813908c4f3830"
+    },
+    "lava_layer_11": {
+      "url": "https://mapas.igme.es/gis/rest/services/Copernicus/Copernicus_EMSR546/MapServer/11/query",
+      "sha256": "2ad9bc2165ba963cf46733cba8d459d1a18a89b8b9f8871d0b46cd209f37c96b"
+    },
+    "lava_layer_12": {
+      "url": "https://mapas.igme.es/gis/rest/services/Copernicus/Copernicus_EMSR546/MapServer/12/query",
+      "sha256": "724cbf6b3782d38a1422915e29d975c4fd14318e0c4295be569903e5d4db908d"
+    },
+    "lava_layer_13": {
+      "url": "https://mapas.igme.es/gis/rest/services/Copernicus/Copernicus_EMSR546/MapServer/13/query",
+      "sha256": "2560263abe130ac067fedf7e26018fd7b42a1e17b47e762e0398ae45c08cceaa"
+    },
+    "lava_layer_14": {
+      "url": "https://mapas.igme.es/gis/rest/services/Copernicus/Copernicus_EMSR546/MapServer/14/query",
+      "sha256": "26db9ad09a69ee3c462bfd50da4ec0ea0c41a203a7ca2688722b50e30b861c0b"
+    },
+    "lava_layer_15": {
+      "url": "https://mapas.igme.es/gis/rest/services/Copernicus/Copernicus_EMSR546/MapServer/15/query",
+      "sha256": "292fe75f78897b097679003439450938a542dee61d21519c89270abd1541e454"
+    },
+    "lava_layer_16": {
+      "url": "https://mapas.igme.es/gis/rest/services/Copernicus/Copernicus_EMSR546/MapServer/16/query",
+      "sha256": "ad84c21913116ad0ad660d7e7f366f047708298ac69aedeca6ca501d3736312c"
+    },
+    "lava_layer_17": {
+      "url": "https://mapas.igme.es/gis/rest/services/Copernicus/Copernicus_EMSR546/MapServer/17/query",
+      "sha256": "bcf351938c49153517750278e7fa1c90381612df89817200db2e6cc6c6979333"
+    },
+    "lava_layer_18": {
+      "url": "https://mapas.igme.es/gis/rest/services/Copernicus/Copernicus_EMSR546/MapServer/18/query",
+      "sha256": "a58f58eea03b8ff8c69ee670aaa064c197f775e94ed9d3619fdc06ca64d534e9"
+    },
+    "lava_layer_19": {
+      "url": "https://mapas.igme.es/gis/rest/services/Copernicus/Copernicus_EMSR546/MapServer/19/query",
+      "sha256": "0f0cec91fe3bf461476d1d18398df7d9da961d5559f351c7d9622679b5775c3e"
+    },
+    "lava_layer_20": {
+      "url": "https://mapas.igme.es/gis/rest/services/Copernicus/Copernicus_EMSR546/MapServer/20/query",
+      "sha256": "c38995233dd0daed61cb2024b5d80859844b2d09ce65c297bc0a91f37279cd7d"
+    },
+    "lava_layer_21": {
+      "url": "https://mapas.igme.es/gis/rest/services/Copernicus/Copernicus_EMSR546/MapServer/21/query",
+      "sha256": "f6eb5623a61976779e82b17b63b2752196dd66739ea911097f3528e6199319b2"
+    },
+    "lava_layer_22": {
+      "url": "https://mapas.igme.es/gis/rest/services/Copernicus/Copernicus_EMSR546/MapServer/22/query",
+      "sha256": "c54ba0e68ad7fd4386d6f4e828a317ff6d5bafdbbc004eb1bfedcbd24b54df6f"
+    },
+    "lava_layer_23": {
+      "url": "https://mapas.igme.es/gis/rest/services/Copernicus/Copernicus_EMSR546/MapServer/23/query",
+      "sha256": "d230b65c78e0feb5199ab8ae27a2803665803c0f727affa23f40c7048fd2e595"
+    },
+    "lava_layer_24": {
+      "url": "https://mapas.igme.es/gis/rest/services/Copernicus/Copernicus_EMSR546/MapServer/24/query",
+      "sha256": "7977f08ae291cfb98a46b5a2d5862c8362571bee508cc97305351af21675460d"
+    },
+    "lava_layer_25": {
+      "url": "https://mapas.igme.es/gis/rest/services/Copernicus/Copernicus_EMSR546/MapServer/25/query",
+      "sha256": "f3002fe375d2bfeccba6ba852e6bb3be3d215d96099bd50f03a2b6c49dea0c76"
+    },
+    "lava_layer_26": {
+      "url": "https://mapas.igme.es/gis/rest/services/Copernicus/Copernicus_EMSR546/MapServer/26/query",
+      "sha256": "a96fbba31ee58e86feed397c62237338bdfdc39d7a21cc2e46d2e04d899420c0"
+    },
+    "lava_layer_27": {
+      "url": "https://mapas.igme.es/gis/rest/services/Copernicus/Copernicus_EMSR546/MapServer/27/query",
+      "sha256": "8c45466569ca3b51dc398c1f4ce48cfa1d8073c994b877c53921cf22c8a0009b"
+    },
+    "lava_layer_28": {
+      "url": "https://mapas.igme.es/gis/rest/services/Copernicus/Copernicus_EMSR546/MapServer/28/query",
+      "sha256": "c8d82350287689498effc6329bba4cbdadd4790e0d0127be1b34a23b6f2cf75f"
+    },
+    "lava_layer_29": {
+      "url": "https://mapas.igme.es/gis/rest/services/Copernicus/Copernicus_EMSR546/MapServer/29/query",
+      "sha256": "5b639f065e1a62f06721f2fc69457a54fd8243bd1eb4c60b18a070630dfcf6aa"
+    },
+    "lava_layer_30": {
+      "url": "https://mapas.igme.es/gis/rest/services/Copernicus/Copernicus_EMSR546/MapServer/30/query",
+      "sha256": "a8cadc853471bd7af850bdb1e5906fc84d61957bdad6d9565a1022daed6611ce"
+    },
+    "lava_layer_31": {
+      "url": "https://mapas.igme.es/gis/rest/services/Copernicus/Copernicus_EMSR546/MapServer/31/query",
+      "sha256": "3deb7f7a6c712f221acc0f3a99181bee194c42b7e5580e5fd70eaa261dda6b96"
+    },
+    "lava_layer_32": {
+      "url": "https://mapas.igme.es/gis/rest/services/Copernicus/Copernicus_EMSR546/MapServer/32/query",
+      "sha256": "41e53c172c5bc766c434aacb8c4b84c373077b3c6cbc2acc4fd8c036f0807182"
+    },
+    "lava_layer_33": {
+      "url": "https://mapas.igme.es/gis/rest/services/Copernicus/Copernicus_EMSR546/MapServer/33/query",
+      "sha256": "87771f9b3481e95b51542173f1c077a4c766edf38aee73b1158aa44692a28ea0"
+    },
+    "lava_layer_34": {
+      "url": "https://mapas.igme.es/gis/rest/services/Copernicus/Copernicus_EMSR546/MapServer/34/query",
+      "sha256": "1b0ebf0408bca9a81540e6ee507eab3b0b3de6b589bc6db67730d9ffcbe834a2"
+    },
+    "lava_layer_35": {
+      "url": "https://mapas.igme.es/gis/rest/services/Copernicus/Copernicus_EMSR546/MapServer/35/query",
+      "sha256": "3d02819c91a6786040569a1307e21dcac2489bf5811497bc865c0fe7e85d6580"
+    },
+    "lava_layer_36": {
+      "url": "https://mapas.igme.es/gis/rest/services/Copernicus/Copernicus_EMSR546/MapServer/36/query",
+      "sha256": "107c81b39586262013bbada5ec0519e3bfe4c4d4cad223889d589691438f0371"
+    },
+    "lava_layer_37": {
+      "url": "https://mapas.igme.es/gis/rest/services/Copernicus/Copernicus_EMSR546/MapServer/37/query",
+      "sha256": "bedb6cda98e5488cf475c19171e37d2327dd86995671ab06535f37b3b0d6b6bb"
+    },
+    "lava_layer_38": {
+      "url": "https://mapas.igme.es/gis/rest/services/Copernicus/Copernicus_EMSR546/MapServer/38/query",
+      "sha256": "835cea3623b32111c705ce08610e065e1b8b0b55014ee26ffec0034e0fa7334f"
+    },
+    "lava_layer_39": {
+      "url": "https://mapas.igme.es/gis/rest/services/Copernicus/Copernicus_EMSR546/MapServer/39/query",
+      "sha256": "47ac4a2f747d30bfc73addb98d0bd8def393772e6bbf8dc68a83d04b6a6f17d9"
+    },
+    "lava_layer_40": {
+      "url": "https://mapas.igme.es/gis/rest/services/Copernicus/Copernicus_EMSR546/MapServer/40/query",
+      "sha256": "0cb352513fe19b8d6391c4e60c0d14bdc7acb05a652bdf828dc5a3a283e9ee49"
+    },
+    "lava_layer_41": {
+      "url": "https://mapas.igme.es/gis/rest/services/Copernicus/Copernicus_EMSR546/MapServer/41/query",
+      "sha256": "6cab532c1d5d3a42eb41542ae1cffbd5ee4a5bdcb51730ee1c4578823ec6913c"
+    },
+    "lava_layer_42": {
+      "url": "https://mapas.igme.es/gis/rest/services/Copernicus/Copernicus_EMSR546/MapServer/42/query",
+      "sha256": "5e17e90f0de41cd6676c0d3f005f41213ed19d984f202e2d20ba4d8546ed5f32"
+    },
+    "lava_layer_43": {
+      "url": "https://mapas.igme.es/gis/rest/services/Copernicus/Copernicus_EMSR546/MapServer/43/query",
+      "sha256": "468dedcd7547a64a7ab40268c92dea2ceee32350845e97bb68c80ebedfaf201c"
+    },
+    "lava_layer_44": {
+      "url": "https://mapas.igme.es/gis/rest/services/Copernicus/Copernicus_EMSR546/MapServer/44/query",
+      "sha256": "7794c826abad1f9d320c1b405aee01126ea1f47c73c8357286517ecb2b93d166"
+    },
+    "lava_layer_45": {
+      "url": "https://mapas.igme.es/gis/rest/services/Copernicus/Copernicus_EMSR546/MapServer/45/query",
+      "sha256": "897e52d27cb2cc2f88d3c96a997b91b6315cf836c279da970d33c451cff8aa09"
+    },
+    "lava_layer_46": {
+      "url": "https://mapas.igme.es/gis/rest/services/Copernicus/Copernicus_EMSR546/MapServer/46/query",
+      "sha256": "2245d5bcdd83d60920423511c4576e3b4971d238d62b8e9d4a22870155a9cc6c"
+    },
+    "lava_layer_47": {
+      "url": "https://mapas.igme.es/gis/rest/services/Copernicus/Copernicus_EMSR546/MapServer/47/query",
+      "sha256": "43f9a75bd5d7062085ed8a45a00c93f1586e5af5ca034c95636adac418d4f9b2"
+    },
+    "lava_layer_48": {
+      "url": "https://mapas.igme.es/gis/rest/services/Copernicus/Copernicus_EMSR546/MapServer/48/query",
+      "sha256": "3a193b3b6d1e3aab84a2dcc4601a715940afb26fe598a5a8b5ffa44226504426"
+    },
+    "lava_layer_49": {
+      "url": "https://mapas.igme.es/gis/rest/services/Copernicus/Copernicus_EMSR546/MapServer/49/query",
+      "sha256": "28a4fc658bbe65800af2fda14b8b153795af363a3fc78caaee2d8639f73fd410"
+    },
+    "lava_layer_50": {
+      "url": "https://mapas.igme.es/gis/rest/services/Copernicus/Copernicus_EMSR546/MapServer/50/query",
+      "sha256": "e84cda76ef8045021567184a1f8a981757da58f25fc3f4014c1a84c0f81d0040"
+    },
+    "lava_layer_51": {
+      "url": "https://mapas.igme.es/gis/rest/services/Copernicus/Copernicus_EMSR546/MapServer/51/query",
+      "sha256": "104449a5f882eaa20c30d4792ca526cb6d03e0b15de68b4692f18b940004ab90"
+    },
+    "lava_layer_52": {
+      "url": "https://mapas.igme.es/gis/rest/services/Copernicus/Copernicus_EMSR546/MapServer/52/query",
+      "sha256": "ac6d7d6c973d56d4421ba30e1968e598a61166f69abb8fce3b2a6eb8a7eb5aef"
+    },
+    "lava_layer_53": {
+      "url": "https://mapas.igme.es/gis/rest/services/Copernicus/Copernicus_EMSR546/MapServer/53/query",
+      "sha256": "711902c10077295b1e9610186bf4483b96b65c5ddfbd9ed882b7f8b26b100bae"
+    },
+    "lava_layer_54": {
+      "url": "https://mapas.igme.es/gis/rest/services/Copernicus/Copernicus_EMSR546/MapServer/54/query",
+      "sha256": "c3bd720c9f62c8eeb6d2a636378dfd74a476f061f9b2dedafcaf22b4abcaf2e9"
+    },
+    "lava_layer_55": {
+      "url": "https://mapas.igme.es/gis/rest/services/Copernicus/Copernicus_EMSR546/MapServer/55/query",
+      "sha256": "4728d1de34d411218bbb794bfa97e31a8111bdd28b7d8bfa1c513a2bed913fcf"
+    },
+    "lava_layer_56": {
+      "url": "https://mapas.igme.es/gis/rest/services/Copernicus/Copernicus_EMSR546/MapServer/56/query",
+      "sha256": "f54d1ac84420c493da90f62cc7f0d459fccd6de8cabc92dc73d8f7ce5b133024"
+    },
+    "lava_layer_57": {
+      "url": "https://mapas.igme.es/gis/rest/services/Copernicus/Copernicus_EMSR546/MapServer/57/query",
+      "sha256": "b4acd1556eac356ce95beecb43cfc2871a50cafbdde80b7d4f4e1586ade9038d"
+    },
+    "lava_layer_58": {
+      "url": "https://mapas.igme.es/gis/rest/services/Copernicus/Copernicus_EMSR546/MapServer/58/query",
+      "sha256": "f76c8f0aaadcf5da11974852388664afcc7a739051a97e5405f1b6f9fd20d298"
+    },
+    "lava_layer_59": {
+      "url": "https://mapas.igme.es/gis/rest/services/Copernicus/Copernicus_EMSR546/MapServer/59/query",
+      "sha256": "9da1c72e7f95e1ee7d3e8b02c9cfc18cd90d312091ae4e9e43ee6511c199543e"
+    },
+    "lava_layer_60": {
+      "url": "https://mapas.igme.es/gis/rest/services/Copernicus/Copernicus_EMSR546/MapServer/60/query",
+      "sha256": "9d133c1255d6760b3ea3526a62a63e4c038374b65bca9de6d2a9df17def0935d"
+    },
+    "lava_layer_61": {
+      "url": "https://mapas.igme.es/gis/rest/services/Copernicus/Copernicus_EMSR546/MapServer/61/query",
+      "sha256": "12eea43199ee68663cd556e6a619f0b201f0f5ac2a3b1ba7633995dddc306bd2"
+    },
+    "lava_layer_62": {
+      "url": "https://mapas.igme.es/gis/rest/services/Copernicus/Copernicus_EMSR546/MapServer/62/query",
+      "sha256": "e41914e5713a8fed6103d828dc5a243a815928b3811b007004571e6f5db81255"
+    },
+    "lava_layer_63": {
+      "url": "https://mapas.igme.es/gis/rest/services/Copernicus/Copernicus_EMSR546/MapServer/63/query",
+      "sha256": "3e158207068262189b7900b4a289f0a08c2c07131fcd7ba17689716d41c4b07b"
+    },
+    "lava_layer_64": {
+      "url": "https://mapas.igme.es/gis/rest/services/Copernicus/Copernicus_EMSR546/MapServer/64/query",
+      "sha256": "005ed0254d730e7d864b6e32d3cf15794aa7f664cc69300528a496dab6f7cb96"
+    },
+    "lava_layer_65": {
+      "url": "https://mapas.igme.es/gis/rest/services/Copernicus/Copernicus_EMSR546/MapServer/65/query",
+      "sha256": "372941be9d5ca0ccac3f377d9b6e7a1ecf4b7dc38e27c243af50bb49e32d06ca"
+    },
+    "lava_layer_66": {
+      "url": "https://mapas.igme.es/gis/rest/services/Copernicus/Copernicus_EMSR546/MapServer/66/query",
+      "sha256": "a9e50cfb315a4519608fb0f66909011ccc6e07bb9b85efa4f4e945f8f1502dc3"
+    },
+    "lava_layer_67": {
+      "url": "https://mapas.igme.es/gis/rest/services/Copernicus/Copernicus_EMSR546/MapServer/67/query",
+      "sha256": "c6516ebff7707cd75bad51cbf80701b8e8a3cd696d90f2a332ce287e94ec7f8c"
+    },
+    "seismic": {
+      "url": "https://www.seismicportal.eu/fdsnws/event/1/query",
+      "params": {
+        "starttime": "2021-08-01",
+        "endtime": "2022-01-01",
+        "format": "text",
+        "minlat": 28.35,
+        "maxlat": 28.9,
+        "minlon": -18.1,
+        "maxlon": -17.6
+      },
+      "sha256": "ef1ebe4258662d22f280717a6bf80fba92c370e585b70e2643b0c7aac9afc014"
+    }
+  },
+  "grid": {
+    "crs": "EPSG:4083 (REGCAN95 / UTM 28N)",
+    "west": 205000.0,
+    "north": 3174000.0,
+    "step": 25.0,
+    "east": 223000.0,
+    "south": 3160000.0,
+    "rows": 560,
+    "cols": 720,
+    "sea_cells": 215904,
+    "method": "bilinear from GLO-30 (PixelIsPoint); ocean from WBM set to NaN"
+  }
+}
