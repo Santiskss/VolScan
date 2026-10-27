@@ -1,23 +1,23 @@
 import { useEffect, useState } from 'react'
 import { api, fmt, STATIC, type Status } from './api'
 import AtlasLaPalma from './views/AtlasLaPalma'
-import Assistant from './views/Assistant'
 import CanariasLive from './views/CanariasLive'
-import Solunar from './views/Solunar'
+import Reports from './views/Reports'
+import Validation from './views/Validation'
 
 const TABS = [
   ['atlas', 'Atlas volcánico · 3D'],
   ['canarias', 'Canarias en directo'],
-  ['mareas', 'Mareas y Luna'],
-  ['asistente', 'Asistente IA'],
+  ['validacion', 'Validación 2021'],
+  ['informes', 'Informes mensuales'],
 ] as const
 type Tab = (typeof TABS)[number][0]
 
 const HEADERS: Record<Tab, [string, string, string]> = {
   atlas: ['La Palma', 'Tajogaite · 19 sep – 13 dic 2021 · EMSR546', 'Histórico real · reconstrucción, no en directo'],
   canarias: ['Canarias', 'Sismicidad por zona volcánica', 'En directo · catálogo IGN'],
-  mareas: ['Canarias', 'Correlación solunar · 2011–hoy', 'Hipótesis medida, no asumida'],
-  asistente: ['Canarias', 'RAG sobre conocimiento y datos', 'Apoyo a la decisión · no alerta'],
+  validacion: ['La Palma', 'Pronóstico de impacto frente a lo observado', 'Acierto medido, no prometido'],
+  informes: ['Canarias', 'Vigilancia sísmica por zona volcánica', 'Fuente: IGN · no es una alerta'],
 }
 
 function Logo() {
@@ -30,7 +30,7 @@ function Logo() {
 }
 
 export default function App() {
-  const [tab, setTab] = useState<Tab>(() => (location.hash.slice(1).split('@')[0] as Tab) || 'atlas')
+  const [tab, setTab] = useState<Tab>(() => ((TABS.map((t) => t[0]) as string[]).includes(location.hash.slice(1).split('@')[0]) ? location.hash.slice(1).split('@')[0] as Tab : 'atlas'))
   const [status, setStatus] = useState<Status | null>(null)
   useEffect(() => { if (location.hash.slice(1).split('@')[0] !== tab) location.hash = tab }, [tab])
   useEffect(() => {
@@ -61,8 +61,8 @@ export default function App() {
       </div>
       {tab === 'atlas' && <AtlasLaPalma />}
       {tab === 'canarias' && <CanariasLive />}
-      {tab === 'mareas' && <Solunar />}
-      {tab === 'asistente' && <Assistant />}
+      {tab === 'validacion' && <Validation />}
+      {tab === 'informes' && <Reports />}
     </>
   )
 }

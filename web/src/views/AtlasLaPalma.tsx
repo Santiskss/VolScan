@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { api, fmt, type Citation, type DayState, type Meta, type Quake, type Terrain } from '../api'
-import Atlas3D, { type Label, type QuakePoint } from '../three/Atlas3D'
+import { api, fmt, type Citation, type DayState, type ImpactDay, type Meta, type Quake, type Terrain } from '../api'
+import ImpactPanel from './ImpactPanel'
+import Atlas3D, { type Label, type QuakePoint, type SurfacePoint } from '../three/Atlas3D'
 
 type Brief = { text: string; ai: boolean; error?: string; model: { provider: string; model: string }; citations: Citation[] }
 
@@ -22,6 +23,10 @@ export default function AtlasLaPalma() {
   const [brief, setBrief] = useState<Brief | null>(null)
   const [briefLoading, setBriefLoading] = useState(false)
   const [focus, setFocus] = useState<{ x: number; y: number; distKm: number } | null>(null)
+  const [imp, setImp] = useState<ImpactDay | null>(null)
+  const [impLoading, setImpLoading] = useState(false)
+  const [showAssets, setShowAssets] = useState(true)
+  const impCache = useRef(new Map<string, ImpactDay>())
   const cache = useRef(new Map<string, DayState>())
 
   useEffect(() => {
@@ -50,6 +55,20 @@ export default function AtlasLaPalma() {
   }, [date])
 
   useEffect(() => { setBrief(null) }, [date])
+
+  useEffect(() => {
+    if (!date) return
+    const c = impCache.current.get(date)
+    if (c) { setImp(c); return }
+    let alive = true
+    setImpLoading(true)
+    api.lpImpact(date).then((d) => { impCache.current.set(date, d); if (alive) setImp(d) }).catch(() => alive && setImp(null)).finally(() => alive && setImpLoading(false))
+    return () => { alive = false }
+  }, [date])
+
+  const assets: SurfacePoint[] = useMemo(() => (!showAssets || !imp?.buildings_at_risk_xy || imp.date !== date) ? [] :
+    imp.buildings_at_risk_xy.map(([x, y, v]) => ({ x, y, v })), [imp, showAssets, date])
+  const scenarioOverlay = imp && imp.date === date && imp.phase === 'pre-eruptive' ? imp.scenario?.overlay ?? null : null
 
   useEffect(() => {
     if (!playing || !meta) return
@@ -91,7 +110,7 @@ export default function AtlasLaPalma() {
     <div className="view">
       <div className="stage">
         <div className="canvas-wrap">
-          <Atlas3D terrain={terrain} overlay={showLava ? day?.overlay ?? null : null} quakes={qpoints} labels={labels}
+          <Atlas3D terrain={terrain} overlay={showLava ? day?.overlay ?? scenarioOverlay : null} quakes={qpoints} labels={labels} surfacePoints={assets}
             depthScale={depthScale} terrainOpacity={opacity} focus={focus} />
           <div className="corner tl">La Palma · Cumbre Vieja · relieve previo a 2021 · profundidad ×{depthScale.toString().replace('.', ',')}</div>
           {date && (
@@ -165,6 +184,8 @@ export default function AtlasLaPalma() {
       </div>
 
       <aside className="side">
+        <ImpactPanel imp={imp && imp.date === date ? imp : null} loading={impLoading} />
+
         <section className="incident">
           <h3>Parte de situación · IA</h3>
           {!brief && <button className="btn olive" disabled={briefLoading || !date} onClick={() => loadBrief()}>{briefLoading ? 'Redactando…' : 'Ver parte de este día'}</button>}
@@ -203,6 +224,7 @@ export default function AtlasLaPalma() {
           <label className="check"><input type="checkbox" checked={showQuakes} onChange={(e) => setShowQuakes(e.target.checked)} /><span>Sismos en profundidad<span className="hint">IGN · catálogo de terremotos</span></span></label>
           <label className="check"><input type="checkbox" checked={cumulative} onChange={(e) => setCumulative(e.target.checked)} /><span>Acumulado desde el 1 sep<span className="hint">si no, últimos 7 días</span></span></label>
           <label className="check"><input type="checkbox" checked={showLava} onChange={(e) => setShowLava(e.target.checked)} /><span>Pronóstico y colada observada<span className="hint">conjunto VolScan · Copernicus EMS EMSR546</span></span></label>
+          <label className="check"><input type="checkbox" checked={showAssets} onChange={(e) => setShowAssets(e.target.checked)} /><span>Edificios en riesgo (72 h)<span className="hint">inventario Copernicus EMS · color = probabilidad</span></span></label>
           <label className="check"><input type="checkbox" checked={showLabels} onChange={(e) => setShowLabels(e.target.checked)} /><span>Topónimos<span className="hint">© OpenStreetMap</span></span></label>
           <div className="slider-row"><span>Transparencia del terreno</span><span>{Math.round((1 - opacity) * 100)} %</span></div>
           <input type="range" min={0.3} max={1} step={0.02} value={opacity} onChange={(e) => setOpacity(+e.target.value)} style={{ width: '100%' }} />
