@@ -16,7 +16,8 @@ if [ ! -d .venv ]; then
   $PY -m venv .venv
 fi
 .venv/bin/pip install -q -e ".[server]"
-if [ ! -f web/dist/index.html ] || [ "${REBUILD:-0}" = "1" ]; then
+# rebuild when there is no build, when asked, or when the sources changed after the last build (e.g. after git pull)
+if [ ! -f web/dist/index.html ] || [ "${REBUILD:-0}" = "1" ] || [ -n "$(find web/src web/index.html web/package.json -newer web/dist/index.html 2>/dev/null | head -1)" ]; then
   echo "▶ Compilando la interfaz web…"
   command -v npm >/dev/null 2>&1 || { echo "✖ Necesitas Node.js 18+ (brew install node)"; exit 1; }
   (cd web && npm ci --no-audit --no-fund && npm run build)
