@@ -46,6 +46,9 @@ def main(out: Path):
     (out / "api/status.json").write_text(json.dumps(status))
     save("api/terrain/lapalma", "/api/terrain/lapalma")
     save("api/terrain/archipelago", "/api/terrain/archipelago")
+    save("api/terrain/tenerife", "/api/terrain/tenerife")
+    for sc in save("api/tenerife/scenarios", "/api/tenerife/scenarios")["scenarios"]:
+        save(f"api/tenerife/scenario/{sc['key']}", f"/api/tenerife/scenario/{sc['key']}")
     save("api/canarias/zones", "/api/canarias/zones")
     save("api/canarias/calibration", "/api/canarias/calibration")
     for z in ("tenerife", "la_palma", "el_hierro", "la_gomera", "enmedio", "gran_canaria", "lanzarote_fuerteventura"):

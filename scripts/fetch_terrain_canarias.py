@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Pre-2021 terrain for the 3D views: whole La Palma island (100 m) and the archipelago (500 m).
+"""Terrain for the 3D views (La Palma 100 m, Tenerife 100 m, archipelago 500 m) and the Tenerife lava grid (25 m).
 
 Source: Copernicus DEM GLO-30 (TanDEM-X, 2011-2015) from the AWS open-data
 bucket, with ocean masked by its WBM water mask. Tiles that don't exist
@@ -29,6 +29,9 @@ LICENCE = ("Copernicus DEM GLO-30 © DLR e.V. 2010-2014 and © Airbus Defence an
 PRODUCTS = {
     "terrain_lapalma_100m": dict(west=208000.0, east=236000.0, south=3146000.0, north=3196000.0, step=100.0),
     "terrain_archipelago_500m": dict(west=170000.0, east=670000.0, south=3055000.0, north=3262000.0, step=500.0),
+    "terrain_tenerife_100m": dict(west=305000.0, east=395000.0, south=3093000.0, north=3168000.0, step=100.0),
+    # lava grid for the Tenerife scenarios: Teide-Pico Viejo, both rifts and the slopes they drain to (not Anaga)
+    "../tenerife/dem_utm25": dict(west=309000.0, east=373000.0, south=3096000.0, north=3153000.0, step=25.0),
 }
 
 
@@ -106,7 +109,9 @@ def main():
     for name, spec in PRODUCTS.items():
         print("building", name)
         z = build(spec, manifest)
-        np.savez_compressed(OUT / f"{name}.npz", elev=z, west=spec["west"], north=spec["north"], step=spec["step"])
+        f = (OUT / f"{name}.npz").resolve()
+        f.parent.mkdir(parents=True, exist_ok=True)
+        np.savez_compressed(f, elev=z, west=spec["west"], north=spec["north"], step=spec["step"])
         print(f"  {z.shape}, land cells {int(np.isfinite(z).sum())}, max {np.nanmax(z):.0f} m")
     (OUT / "terrain_manifest.json").write_text(json.dumps(dict(licence=LICENCE, tiles=manifest, products=PRODUCTS),
                                                           indent=1) + "\n")

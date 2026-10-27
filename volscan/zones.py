@@ -30,11 +30,11 @@ class Zone:
 
 
 ZONES = [
-    Zone("el_hierro", "El Hierro", 27.55, 27.92, -18.25, -17.85, "includes Tagoro (2011-2012 submarine eruption)"),
+    Zone("el_hierro", "El Hierro", 27.55, 27.92, -18.25, -17.85, "incluye Tagoro (erupción submarina 2011-2012)"),
     Zone("la_palma", "La Palma", 28.40, 28.90, -18.05, -17.70, "Cumbre Vieja: San Juan 1949, Teneguía 1971, Tajogaite 2021"),
-    Zone("la_gomera", "La Gomera", 27.95, 28.25, -17.40, -17.05, "no Holocene eruptions"),
-    Zone("tenerife", "Tenerife", 27.95, 28.62, -16.95, -16.10, "Teide–Pico Viejo, ridges; Chinyero 1909"),
-    Zone("enmedio", "Canal Tenerife–Gran Canaria", 27.75, 28.40, -16.10, -15.85, "submarine Volcán de Enmedio area"),
+    Zone("la_gomera", "La Gomera", 27.95, 28.25, -17.40, -17.05, "sin erupciones holocenas"),
+    Zone("tenerife", "Tenerife", 27.95, 28.62, -16.95, -16.10, "Teide–Pico Viejo y dorsales; Chinyero 1909"),
+    Zone("enmedio", "Canal Tenerife–Gran Canaria", 27.75, 28.40, -16.10, -15.85, "zona submarina del volcán de Enmedio"),
     Zone("gran_canaria", "Gran Canaria", 27.70, 28.20, -15.85, -15.33, ""),
     Zone("lanzarote_fuerteventura", "Lanzarote y Fuerteventura", 27.95, 29.45, -14.60, -13.30,
          "Timanfaya 1730-36, Tao 1824"),
