@@ -12,3 +12,4 @@ web/dist/
 web/tsconfig.tsbuildinfo
 out/
 data/canarias/emsc_backup.csv
+config/

@@ -13,7 +13,7 @@ from functools import lru_cache
 from pathlib import Path
 
 import numpy as np
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
@@ -34,6 +34,74 @@ WEB = ROOT / "web" / "dist"
 CACHE = ROOT / "out" / "cache"
 
 app = FastAPI(title="VolScan", version=__version__)
+
+# ------------------------------------------------------------------ users, roles, audit trail
+from .. import security as sec  # noqa: E402
+
+PUBLIC = {"/api/auth/config", "/api/login"}
+NOT_AUDITED = {"/api/status"}
+
+
+@app.middleware("http")
+async def _auth_and_audit(request: Request, call_next):
+    path = request.url.path
+    if not path.startswith("/api/") and not path.startswith("/ogc"):
+        return await call_next(request)
+    token = (request.headers.get("authorization") or "").removeprefix("Bearer ").strip() or None
+    user = sec.user_for(token)
+    if user is None and path not in PUBLIC:
+        sec.audit(dict(user=None, role=None, method=request.method, path=path, query=str(request.url.query), status=401,
+                       ip=request.client.host if request.client else None))
+        return JSONResponse(dict(detail="inicia sesión"), status_code=401)
+    request.state.user = user
+    resp = await call_next(request)
+    if path not in NOT_AUDITED:
+        sec.audit(dict(user=user["name"] if user else None, role=user["role"] if user else None, method=request.method,
+                       path=path, query=str(request.url.query), status=resp.status_code,
+                       ip=request.client.host if request.client else None))
+    return resp
+
+
+def need(request: Request, role: str):
+    u = getattr(request.state, "user", None)
+    if not u or not sec.role_at_least(u["role"], role):
+        raise HTTPException(403, f"necesitas el rol «{role}»")
+    return u
+
+
+class LoginReq(BaseModel):
+    name: str
+    password: str
+
+
+@app.get("/api/auth/config")
+def auth_config(request: Request):
+    token = (request.headers.get("authorization") or "").removeprefix("Bearer ").strip() or None
+    return J(dict(enabled=sec.auth_enabled(), user=sec.user_for(token), roles=list(sec.ROLES)))
+
+
+@app.post("/api/login")
+def auth_login(req: LoginReq, request: Request):
+    token = sec.login(req.name, req.password)
+    sec.audit(dict(user=req.name, role=None, method="POST", path="/api/login", query="", status=200 if token else 401,
+                   event="login_ok" if token else "login_failed", ip=request.client.host if request.client else None))
+    if not token:
+        time.sleep(1.0)
+        raise HTTPException(401, "usuario o contraseña incorrectos")
+    return J(dict(token=token, user=sec.user_for(token)))
+
+
+@app.post("/api/logout")
+def auth_logout(request: Request):
+    token = (request.headers.get("authorization") or "").removeprefix("Bearer ").strip()
+    sec.logout(token)
+    return J(dict(ok=True))
+
+
+@app.get("/api/audit")
+def audit_trail(request: Request, limit: int = 200):
+    need(request, "admin")
+    return J(dict(entries=sec.read_audit(min(limit, 2000)), chain=sec.verify_audit(), auth_enabled=sec.auth_enabled()))
 
 
 def _clean(o):
@@ -230,7 +298,8 @@ def canarias_quakes(days: float = 30, start: str | None = None, end: str | None 
 
 
 @app.post("/api/canarias/refresh")
-def canarias_refresh():
+def canarias_refresh(request: Request):
+    need(request, "tecnico")
     return J(store.refresh_live())
 
 
@@ -450,7 +519,9 @@ class BriefReq(BaseModel):
 
 
 @app.post("/api/lapalma2021/briefing/{date}")
-def lp_briefing(date: str, req: BriefReq = BriefReq()):
+def lp_briefing(date: str, request: Request, req: BriefReq = BriefReq()):
+    if req.regenerate:
+        need(request, "tecnico")
     day = _lp_day(date)
     cfg = llm.LLMConfig.from_env()
     f = CACHE / "briefings" / f"lapalma2021_{date}_{cfg.provider}_{cfg.model.replace(':', '_').replace('/', '_')}.json"
@@ -507,7 +578,8 @@ class RewriteReq(BaseModel):
 
 
 @app.post("/api/reports/rewrite")
-def report_rewrite(req: RewriteReq):
+def report_rewrite(req: RewriteReq, request: Request):
+    need(request, "tecnico")
     """The language model rewrites the summary in an institutional register WITHOUT adding facts (the figures go in as data)."""
     rep = _report(req.zone, req.month, dt.date.today().isoformat())
     cfg = llm.LLMConfig.from_env()
@@ -531,7 +603,8 @@ class ChatReq(BaseModel):
 
 
 @app.post("/api/chat")
-def chat(req: ChatReq):
+def chat(req: ChatReq, request: Request):
+    need(request, "tecnico")
     if not req.question.strip():
         raise HTTPException(400, "pregunta vacía")
     idx = rag.get_index(store.load_events(), replay().obs if _replay["obj"] else None)

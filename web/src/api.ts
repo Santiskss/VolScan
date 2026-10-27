@@ -108,10 +108,33 @@ function staticUrl(url: string): string {
   return `${p}.json`
 }
 
+// ---- session (only when the server has VOLSCAN_AUTH=on)
+const TOKEN_KEY = 'volscan.token'
+export function getToken(): string | null { try { return sessionStorage.getItem(TOKEN_KEY) } catch { return null } }
+export function setToken(t: string | null) { try { if (t) sessionStorage.setItem(TOKEN_KEY, t); else sessionStorage.removeItem(TOKEN_KEY) } catch { /* private mode */ } }
+export const authEvents = new EventTarget()
+function authHeaders(): Record<string, string> { const t = getToken(); return t ? { Authorization: `Bearer ${t}` } : {} }
+function onStatus(r: Response, url: string) {
+  if (r.status === 401) authEvents.dispatchEvent(new Event('unauthorized'))
+  if (!r.ok) throw new Error(r.status === 403 ? 'tu rol no permite esta acción' : `${r.status} ${url}`)
+}
+
 async function get<T>(url: string): Promise<T> {
-  const r = await fetch(STATIC ? staticUrl(url) : url)
-  if (!r.ok) throw new Error(`${r.status} ${url}`)
+  const r = await fetch(STATIC ? staticUrl(url) : url, STATIC ? undefined : { headers: authHeaders() })
+  onStatus(r, url)
   return r.json() as Promise<T>
+}
+
+/** Authenticated download (PDF, CAP, GeoJSON...) saved with the given file name. */
+export async function download(url: string, filename: string) {
+  const r = await fetch(url, { headers: authHeaders() })
+  onStatus(r, url)
+  const blob = await r.blob()
+  const a = document.createElement('a')
+  a.href = URL.createObjectURL(blob)
+  a.download = filename
+  document.body.appendChild(a); a.click(); a.remove()
+  setTimeout(() => URL.revokeObjectURL(a.href), 2000)
 }
 async function post<T>(url: string, body: unknown): Promise<T> {
   if (STATIC) {
@@ -122,12 +145,19 @@ async function post<T>(url: string, body: unknown): Promise<T> {
     if (url === '/api/canarias/refresh') return get<T>('/api/status').then((s: any) => s.catalog)
     if (url === '/api/reports/rewrite') return { text: null, ai: false, error: 'la redacción con IA funciona en la versión local', model: { ok: false, provider: 'local', model: '—' } } as T
   }
-  const r = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })
-  if (!r.ok) throw new Error(`${r.status} ${url}`)
+  const r = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json', ...authHeaders() }, body: JSON.stringify(body) })
+  onStatus(r, url)
   return r.json() as Promise<T>
 }
 
+export type AuthUser = { name: string; role: 'lector' | 'tecnico' | 'admin' }
+export type AuditEntry = { t: string; user: string | null; role: string | null; method: string; path: string; query: string; status: number; ip: string | null; event?: string }
+
 export const api = {
+  authConfig: () => STATIC ? Promise.resolve({ enabled: false, user: null as AuthUser | null, roles: [] as string[] }) : get<{ enabled: boolean; user: AuthUser | null; roles: string[] }>('/api/auth/config'),
+  login: (name: string, password: string) => post<{ token: string; user: AuthUser }>('/api/login', { name, password }),
+  logout: () => post<{ ok: boolean }>('/api/logout', {}),
+  audit: (limit = 200) => get<{ entries: AuditEntry[]; chain: { ok: boolean; lines: number; broken_at?: number }; auth_enabled: boolean }>(`/api/audit?limit=${limit}`),
   status: () => get<Status>('/api/status'),
   terrain: (name: 'lapalma' | 'archipelago' | 'tenerife') => get<Terrain>(`/api/terrain/${name}`),
   lpMeta: () => get<Meta>('/api/lapalma2021/meta'),
