@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
-import { api, fmt, type ValidationRow } from '../api'
+import { api, fmt, type ValidationData, type ValidationRow } from '../api'
 
-type Sum = { days: number; within_p10_p90_72h: number; total_pred_72: number; total_obs_72: number; first_10_days: { days: number; within: number } }
+const pc = (v: number | null | undefined) => (v == null ? '—' : `${Math.round(100 * v)} %`)
 
 const W = 900, H = 320, M = { l: 52, r: 16, t: 16, b: 34 }
 
@@ -20,7 +20,7 @@ function Chart({ rows }: { rows: ValidationRow[] }) {
   return (
     <div className="chart-wrap">
       <div className="legend-row">
-        <span><i className="sw band" />Pronóstico VolScan (bajo–alto)</span>
+        <span><i className="sw band" />Pronóstico VolScan (P10–P90 calibrado)</span>
         <span><i className="sw line" />Pronóstico central</span>
         <span><i className="sw dot" />Observado por Copernicus</span>
       </div>
@@ -47,26 +47,30 @@ function Chart({ rows }: { rows: ValidationRow[] }) {
 }
 
 export default function Validation() {
-  const [d, setD] = useState<{ rows: ValidationRow[]; summary: Sum; truth: string } | null>(null)
+  const [d, setD] = useState<ValidationData | null>(null)
   const [err, setErr] = useState<string | null>(null)
   useEffect(() => { api.lpValidation().then(setD).catch((e) => setErr(String(e))) }, [])
   const s = d?.summary
+  const first = d?.rows.find((r) => r.obs_72 != null)
+  const sens = d?.delay_sensitivity
   return (
     <div className="page">
       <h2>¿Cuánto acierta VolScan? La Palma 2021, día a día</h2>
-      <p className="lead">Cada día de la erupción, VolScan pronosticó cuántos edificios nuevos alcanzaría la lava en las 72 h siguientes, solo con lo que se sabía ese día. Aquí se compara con lo que Copernicus cartografió después. El dónde lo da el conjunto de coladas; el cuánto, el ritmo de crecimiento de la colada observado en los días previos.</p>
+      <p className="lead">Cada día de la erupción, VolScan pronosticó cuántos edificios nuevos alcanzaría la lava en las 72 h siguientes, solo con lo que se sabía ese día. Aquí se compara con lo que Copernicus cartografió después.</p>
+      {d && <p className="note">{d.method}</p>}
       {err && <div className="note">No se pudo cargar la validación: {err}</div>}
-      {!d && !err && <div className="loading">Calculando 80 pronósticos y comparándolos con la realidad (30 s la primera vez)…</div>}
+      {!d && !err && <div className="loading">Calculando 83 pronósticos y comparándolos con la realidad (un par de minutos la primera vez)…</div>}
       {s && <div className="kpis kpis-page">
-        <div className="kpi"><div className="k">Días dentro del rango</div><div className="v">{s.within_p10_p90_72h}<small>/ {s.days}</small></div><div className="s">{Math.round(100 * s.within_p10_p90_72h / s.days)} % de los días, el valor real cayó dentro del rango bajo–alto</div></div>
-        <div className="kpi"><div className="k">Primeros 10 días</div><div className="v">{s.first_10_days.within}<small>/ {s.first_10_days.days}</small></div><div className="s">la semana crítica para evacuar</div></div>
-        <div className="kpi"><div className="k">Edificios · pronóstico total</div><div className="v">{fmt.int(s.total_pred_72)}</div><div className="s">suma de ventanas de 72 h (se solapan)</div></div>
-        <div className="kpi"><div className="k">Edificios · observado total</div><div className="v">{fmt.int(s.total_obs_72)}</div><div className="s">VolScan se queda corto un {Math.round(100 * (1 - s.total_pred_72 / s.total_obs_72))} %</div></div>
+        <div className="kpi"><div className="k">Días dentro del rango</div><div className="v">{s.within_p10_p90_72h}<small>/ {s.days}</small></div><div className="s">{Math.round(100 * s.within_p10_p90_72h / s.days)} % de los días (un P10–P90 bien calibrado daría 80 %)</div></div>
+        <div className="kpi"><div className="k">Sesgo total</div><div className="v">{s.bias_pct != null && s.bias_pct > 0 ? '+' : ''}{fmt.num(s.bias_pct)}<small> %</small></div><div className="s">{fmt.int(s.total_pred_72)} pronosticados frente a {fmt.int(s.total_obs_72)} observados (ventanas de 72 h, se solapan)</div></div>
+        <div className="kpi"><div className="k">Error medio</div><div className="v">{fmt.num(s.mae_72)}</div><div className="s">edificios por pronóstico de 72 h</div></div>
+        {s.watch && <div className="kpi"><div className="k">Lista de vigilancia</div><div className="v">{pc(s.watch.with_pocket.recall)}</div><div className="s">de los edificios perdidos estaban en la lista 72 h antes ({pc(s.watch.high.recall)} sin los cercados)</div></div>}
       </div>}
       {d && <Chart rows={d.rows} />}
-      {d && <div className="cards" style={{ marginTop: 16 }}>
-        <div className="card"><h3>Dónde acierta</h3><p className="note">En la primera semana, cuando más importa: el 20 de septiembre previó 282 edificios para las 72 h siguientes (rango 54–528), y fueron 277. La dirección de la colada y los núcleos alcanzados (Todoque, Los Campitos, Triana) salen bien desde el primer día.</p></div>
-        <div className="card"><h3>Dónde falla</h3><p className="note">Las aperturas de bocas nuevas y los desbordamientos laterales bruscos, como los del 11–12 y el 26 de octubre, quedan por encima del rango. El modelo no anticipa saltos de caudal. Mejora prevista: bocas nuevas como miembros del conjunto y caudal estimado con imagen térmica.</p></div>
+      {d && s && <div className="cards" style={{ marginTop: 16 }}>
+        <div className="card"><h3>Dónde acierta</h3><p className="note">{first ? `El primer pronóstico con mapa entregado (${fmt.date(first.date + 'T12:00:00Z')}) previó ${Math.round(first.pred_72.expected)} edificios en 72 h (rango ${first.pred_72.p10_p90[0]}–${first.pred_72.p10_p90[1]}); fueron ${first.obs_72}. ` : ''}La dirección de la colada y los núcleos alcanzados salen bien desde el primer mapa, y en conjunto el pronóstico se queda un {fmt.num(Math.abs(s.bias_pct ?? 0))} % {(s.bias_pct ?? 0) < 0 ? 'corto' : 'largo'}.</p></div>
+        <div className="card"><h3>Dónde falla, y qué hacemos</h3><p className="note">Los saltos bruscos de crecimiento lateral (9–12 y 25–28 de octubre) se salen del rango: rellenaron el terreno entre brazos de la colada, en zona densa. Probamos tres formas de pronosticar ese «dónde» (desbordamientos por los márgenes, núcleo de márgenes activos y relleno) y ninguna mejoró el recuento, así que no se mezclan. Sí sirven para la <b>lista de vigilancia</b>: los edificios cercados por la colada recogieron {s.watch ? pc((s.watch.with_pocket.recall ?? 0) - (s.watch.high.recall ?? 0)) : '—'} más de lo perdido, con una precisión del {s.watch ? pc(s.watch.with_pocket.precision) : '—'}.</p></div>
+        <div className="card"><h3>Retraso de los mapas</h3><p className="note">Copernicus entrega cada mapa entre 7 h (modo rápido) y 48 h (modo estándar) después de recibir la imagen. Aquí se supone {fmt.num(d.map_delay_h)} h. {sens ? `Con 7 h: ${sens['7'].within_p10_p90_72h}/${sens['7'].days} días en rango y sesgo ${fmt.num(sens['7'].bias_pct)} %. Con 48 h: ${sens['48'].within_p10_p90_72h}/${sens['48'].days} y ${fmt.num(sens['48'].bias_pct)} %.` : ''}</p></div>
         <div className="card"><h3>Verdad de terreno</h3><p className="note">{d.truth}. Una institución puede defender una decisión con una herramienta cuyo acierto está medido; por eso esta página existe.</p></div>
       </div>}
     </div>

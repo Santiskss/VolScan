@@ -67,3 +67,17 @@ def test_narrative_never_divides_by_missing_baseline():
     r = dict(zone=dict(name="X"), partial=False, stats=dict(n=0, max_mag=None, depth_median=None, shallow_lt5=0, n_m3=0),
              prev=dict(depth_median=None), rate_ratio=None, felt=0, unrest_end=dict(index=None), tides=None)
     assert narrative(r).startswith("X registró 0 terremotos localizados")
+
+
+def test_validation_summary_counts_range_bias_and_watch():
+    from volscan.replay import validation_summary
+    rows = [dict(date="2021-09-25", pred_72=dict(expected=100, p10_p90=[50, 150]), obs_72=120,
+                 watch=dict(high=10, high_hit=4, pocket=10, pocket_hit=2, lost=10)),
+            dict(date="2021-10-25", pred_72=dict(expected=20, p10_p90=[5, 60]), obs_72=300,
+                 watch=dict(high=10, high_hit=1, pocket=30, pocket_hit=9, lost=30)),
+            dict(date="2021-10-26", pred_72=dict(expected=20, p10_p90=[5, 60]))]
+    s = validation_summary(rows)
+    assert s["days"] == 2 and s["within_p10_p90_72h"] == 1
+    assert s["bias_pct"] == round(100 * (120 - 420) / 420, 1)
+    assert s["watch"]["high"]["recall"] == round(5 / 40, 3)
+    assert s["watch"]["with_pocket"]["recall"] == round(16 / 40, 3)

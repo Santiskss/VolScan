@@ -30,10 +30,19 @@ export default function ImpactPanel({ imp, loading }: { imp: ImpactDay | null; l
   return (
     <section className="impact">
       <h3>Impacto previsto · próximas 72 h</h3>
-      <div className="impact-grid">
+      {!c && <div className="note" style={{ marginTop: 0 }}>Aún no se ha entregado ningún mapa de Copernicus: el impacto sale solo del conjunto de coladas, sin ajustar al crecimiento observado. Edificios: {r0(imp.buildings?.expected)} (P10–P90 {r0(imp.buildings?.p10_p90[0])}–{r0(imp.buildings?.p10_p90[1])}).</div>}
+      {c && <div className="impact-grid">
         <div><div className="k">Edificios</div><div className="v">{r0(c?.buildings.central)}</div><div className="s">{r0(c?.buildings.low)}–{r0(c?.buildings.high)} · ya perdidos {r0(imp.already_lost?.buildings)}</div></div>
         <div><div className="k">Carreteras</div><div className="v">{fmt.num(c?.road_km.central)}<small> km</small></div><div className="s">{fmt.num(c?.road_km.low)}–{fmt.num(c?.road_km.high)} · ya cortados {fmt.num(imp.already_lost?.road_km)}</div></div>
-      </div>
+      </div>}
+      {c && <div className="note" style={{ marginTop: 4 }}>Último mapa de Copernicus conocido: de hace {fmt.num(c.map_age_h)} h (se cuenta que llega {fmt.num(imp.map_delay_h)} h después de la imagen).{c.interval ? ` Rango calibrado con el error real de ${c.interval.n_past} pronósticos anteriores.` : ' Rango: dispersión del ritmo de crecimiento reciente (aún sin historial para calibrarlo).'}</div>}
+      {imp.watch && <>
+        <div className="subh">Lista de vigilancia · edificios en pie</div>
+        <div className="impact-grid">
+          <div><div className="k">Alcanzables en 72 h</div><div className="v">{r0(imp.watch.high)}</div><div className="s">algún miembro del conjunto llega</div></div>
+          <div><div className="k">Cercados por la colada</div><div className="v" style={{ color: '#3f5fb0' }}>{r0(imp.watch.pocket)}</div><div className="s">donde suele ir el crecimiento lateral</div></div>
+        </div>
+      </>}
       {imp.truth_after && <div className="truth">Lo que pasó (Copernicus, {fmt.dateTime(imp.truth_after.at)}): <b>{r0(imp.truth_after.new_buildings)} edificios</b> y {fmt.num(imp.truth_after.new_road_km)} km nuevos</div>}
       {imp.isolation && imp.isolation.length > 0 && <>
         <div className="subh">Barrios</div>
