@@ -195,7 +195,7 @@ def canarias_zones(at: str | None = None):
         u = unrest(zc, t_at)
         last30 = zc.window(t_at - 30 * DAY, t_at)
         out.append(dict(key=z.key, name=z.name, note=z.note, centroid=z.centroid,
-                        box=[z.lat_min, z.lat_max, z.lon_min, z.lon_max],
+                        bbox=[z.lat_min, z.lat_max, z.lon_min, z.lon_max],
                         index=u.index, components=u.components, rate_ratio=u.rate_ratio, energy_ratio=u.energy_ratio,
                         shallowing_km=u.shallowing_km, n7=u.recent.n, n30=len(last30),
                         max_mag30=float(np.nanmax(last30.mag)) if len(last30) and not np.all(np.isnan(last30.mag)) else None,
@@ -483,9 +483,8 @@ def report_months():
 @lru_cache(maxsize=512)
 def _report(zone: str, month: str, today: str):
     from ..reports import monthly_report
-    from ..zones import zone_of
     cat = store.zone_catalog(_catalog(), zone)
-    ev = [e for e in store.load_events() if zone_of(e.lat, e.lon).key == zone]
+    ev = [e for e, k in zip(store.load_events(), store.event_zone_keys()) if k == zone]
     return _clean(monthly_report(cat, ev, zone, month, indicators=True))
 
 

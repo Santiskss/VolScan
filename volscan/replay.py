@@ -35,7 +35,7 @@ from .geo import lonlat_to_utm28, utm28_to_lonlat
 from .lava import LavaForecast, LavaParams, LogNormal, forecast
 from .raster import rasterize_lonlat
 from .seismic import Catalog, unrest
-from .zones import BY_KEY
+from .zones import in_zone
 
 CASE = DATA / "lapalma2021"
 CACHE = Path(__file__).resolve().parents[1] / "out" / "cache"
@@ -177,10 +177,8 @@ class LaPalma2021:
     def seismic_state(self, now: dt.datetime) -> dict | None:
         if self.catalog is None:
             return None
-        z = BY_KEY["la_palma"]
         cat = self.catalog
-        inz = (cat.lat >= z.lat_min) & (cat.lat <= z.lat_max) & (cat.lon >= z.lon_min) & (cat.lon <= z.lon_max)
-        lp = cat.select(inz)
+        lp = cat.select(in_zone(cat.lat, cat.lon, "la_palma"))
         u = unrest(lp, now.timestamp())
         day0 = now.timestamp() - 86400
         d = lp.window(day0, now.timestamp())
@@ -409,9 +407,7 @@ class ImpactReplay:
             return None
         g = self.r.grid
         t1, t0 = now.timestamp(), now.timestamp() - 72 * 3600
-        z = BY_KEY["la_palma"]
-        m = (cat.t >= t0) & (cat.t < t1) & (cat.lat >= z.lat_min) & (cat.lat <= z.lat_max) & \
-            (cat.lon >= z.lon_min) & (cat.lon <= z.lon_max) & ~np.isnan(cat.depth)
+        m = (cat.t >= t0) & (cat.t < t1) & in_zone(cat.lat, cat.lon, "la_palma") & ~np.isnan(cat.depth)
         if m.sum() < 30:
             self._scen[key] = None
             return None
