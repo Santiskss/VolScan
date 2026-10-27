@@ -59,6 +59,18 @@ def main(out: Path):
                      error="instantánea estática", citations=[])
         (out / f"api/lapalma2021/briefing-static/{day}.json").parent.mkdir(parents=True, exist_ok=True)
         (out / f"api/lapalma2021/briefing-static/{day}.json").write_text(json.dumps(brief, ensure_ascii=False))
+    for day in meta["days"]:
+        save(f"api/lapalma2021/impact/{day}", f"/api/lapalma2021/impact/{day}")
+    save("api/lapalma2021/validation", "/api/lapalma2021/validation")
+    months_all = c.get("/api/reports/months").json()
+    recent = months_all["months"][:6]
+    keep = recent + ["2021-12", "2021-11", "2021-10", "2021-09", "2011-12", "2011-11", "2011-10", "2011-09", "2011-08", "2011-07"]
+    months_all["months"] = keep
+    (out / "api/reports/months.json").parent.mkdir(parents=True, exist_ok=True)
+    (out / "api/reports/months.json").write_text(json.dumps(months_all))
+    for z in months_all["zones"]:
+        for m in keep:
+            save(f"api/reports/monthly/{z['key']}/{m}", f"/api/reports/monthly?zone={z['key']}&month={m}")
     total = sum(f.stat().st_size for f in out.rglob("*") if f.is_file())
     print(f"snapshot in {out}: {sum(1 for _ in out.rglob('*.json'))} JSON, {total / 1e6:.1f} MB")
 
