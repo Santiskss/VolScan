@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { api, fmt, STATIC, type Calibration, type Indicators, type Quake, type Terrain, type Zone } from '../api'
+import { api, fmt, STATIC, type Status, type Calibration, type Indicators, type Quake, type Terrain, type Zone } from '../api'
 import { GnssTable, LevelChip, So2Bars, type So2Status } from './Indicators'
 import Atlas3D, { type Label, type QuakePoint } from '../three/Atlas3D'
 
@@ -26,6 +26,7 @@ export default function CanariasLive() {
   const [focus, setFocus] = useState<{ x: number; y: number; distKm: number } | null>(null)
   const [at, setAt] = useState<string>('')
   const [so2, setSo2] = useState<So2Status | null>(null)
+  const [cat, setCat] = useState<Status['catalog'] | null>(null)
   const [ind, setInd] = useState<Indicators | null>(null)
   const [cal, setCal] = useState<Calibration | null>(null)
   const indZone = active ?? 'tenerife'
@@ -34,6 +35,7 @@ export default function CanariasLive() {
 
   const load = () => {
     api.zones().then((z) => { setZones(z.zones); setAt(z.at); setSo2(z.so2) })
+    api.status().then((st) => setCat(st.catalog)).catch(() => setCat(null))
     api.quakes(days).then((q) => setQuakes(q.quakes))
   }
   useEffect(() => { api.terrain('archipelago').then(setTerrain) }, [])
@@ -52,7 +54,9 @@ export default function CanariasLive() {
         <div className="canvas-wrap">
           <Atlas3D terrain={terrain} quakes={pts} labels={labels} exaggeration={4} depthScale={1.2} terrainOpacity={0.9} maxDepthKm={40} focus={focus} quakeScale={6} />
           <div className="corner tl">Archipiélago · relieve 500 m ×4 · sismos IGN a su profundidad (×1,2)</div>
-          <div className="obs-card"><div className="k">{STATIC ? 'Instantánea' : 'En directo'}</div><div className="v"><span className="dot ok" />catálogo IGN · {at ? fmt.dateTime(at) : '—'}</div></div>
+          <div className="obs-card"><div className="k">{STATIC ? 'Instantánea' : 'En directo'}</div><div className="v"><span className={`dot ${STATIC || cat?.health?.ok !== false ? 'ok' : 'warn'}`} />catálogo IGN · {at ? fmt.dateTime(at) : '—'}</div>
+            {!STATIC && cat?.health && !cat.health.ok && <div className="note" style={{ maxWidth: 280, marginTop: 4 }}>{cat.health.message}</div>}
+            {cat?.last && <div className="note">último sismo: {fmt.dateTime(cat.last)}</div>}</div>
           <div className="legend-strip"><div className="item"><b style={{ color: '#e23d14' }}>●</b> 24 h <b style={{ color: '#f08a35' }}>●</b> 7 días <b style={{ color: '#8f8577' }}>●</b> {days} días · tamaño = magnitud</div></div>
           <div className="controls-row">
             {[7, 30, 90, 365].map((d) => <button key={d} className={`btn ${d === days ? 'primary' : ''}`} onClick={() => setDays(d)}>{d === 365 ? '1 año' : `${d} d`}</button>)}

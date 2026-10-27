@@ -18,6 +18,7 @@ Retrieved: 2026-10-26.
 
 | File | Source | Licence / attribution | Notes |
 |---|---|---|---|
+| `emsc_backup.csv` (not in git, created at runtime) | EMSC-CSEM FDSN event service (seismicportal.eu) | EMSC; locations authored by IGN where stated | Only when the IGN download fails: events after the last IGN event, ids prefixed `emsc:`. |
 | `ign/ign_YYYY_MM.csv` | IGN, Catálogo de terremotos, box 26.5–30 N, 19–12.5 W, Jan 2010 – today | Instituto Geográfico Nacional (IGN). Catálogo de terremotos. doi:10.7419/162.03.2022 | Downloaded month by month from the public form (`volscan.sources.ign_catalog`). The current month is refreshed live. Empty fields are kept empty. |
 | `terrain_lapalma_100m.npz`, `terrain_archipelago_500m.npz` | Copernicus DEM GLO-30 (AWS open data) | © DLR e.V. 2010-2014 and © Airbus Defence and Space GmbH 2014-2018, provided under COPERNICUS by the EU and ESA | Pre-2021 surface, bilinear to UTM 28N, ocean from WBM = NaN. `scripts/fetch_terrain_canarias.py`. |
 | `lapalma2021/places.json` | OpenStreetMap via Nominatim | © OpenStreetMap contributors (ODbL) | Point locations of neighbourhoods. |

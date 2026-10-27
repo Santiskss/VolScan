@@ -59,12 +59,31 @@ def J(o):
 _llm_status = dict(at=0.0, value=None)
 
 
+_auto = dict(running=False)
+AUTO_REFRESH_S = 15 * 60
+
+
+def _auto_refresh():
+    """Keep the live catalogue current without anyone pressing a button (background thread, throttled)."""
+    if _auto["running"] or time.time() - (store.status()["refreshed_at"] or 0) < AUTO_REFRESH_S:
+        return
+
+    def run():
+        try:
+            store.refresh_live(min_interval_s=AUTO_REFRESH_S)
+        finally:
+            _auto["running"] = False
+    _auto["running"] = True
+    threading.Thread(target=run, daemon=True).start()
+
+
 @app.get("/api/status")
 def status():
     if time.time() - _llm_status["at"] > 60:
         _llm_status["value"] = llm.ping()
         _llm_status["at"] = time.time()
     store.load_events()
+    _auto_refresh()
     return J(dict(version=__version__, llm=_llm_status["value"], catalog=store.status(),
                   now=dt.datetime.now(dt.timezone.utc).isoformat()))
 
