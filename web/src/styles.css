@@ -224,3 +224,4 @@ table.places td { font-variant-numeric: tabular-nums; }
 .login input { font: inherit; padding: 8px 10px; border: 1px solid var(--line); background: #fff; border-radius: 2px; }
 .warn-text { color: var(--accent-ink); }
 .chip button.linklike { background: none; border: 0; color: inherit; text-decoration: underline; cursor: pointer; font: inherit; padding: 0 0 0 6px; }
+.exports { margin-top: 10px; }

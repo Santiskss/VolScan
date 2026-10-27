@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { api, fmt, STATIC, type Report } from '../api'
+import { api, download, fmt, STATIC, type Report } from '../api'
 import Solunar from './Solunar'
 import { GnssTable, LevelChip } from './Indicators'
 
@@ -33,6 +33,7 @@ export default function Reports() {
   const [rep, setRep] = useState<Report | null>(null)
   const [ai, setAi] = useState<{ text: string | null; error?: string; model?: string } | null>(null)
   const [busy, setBusy] = useState(false)
+  const [expErr, setExpErr] = useState<string | null>(null)
   useEffect(() => {
     api.reportMonths().then((m) => {
       setMonths(m.months); setZones([...m.zones].sort((a, b) => ZONE_ORDER.indexOf(a.key) - ZONE_ORDER.indexOf(b.key)))
@@ -48,7 +49,10 @@ export default function Reports() {
         <select id="rep-zone" value={zone} onChange={(e) => setZone(e.target.value)}>{zones.map((z) => <option key={z.key} value={z.key}>{z.name}</option>)}</select>
         <select id="rep-month" value={month} onChange={(e) => setMonth(e.target.value)}>{months.map((m) => <option key={m} value={m}>{new Date(m + '-15T12:00:00Z').toLocaleDateString('es-ES', { month: 'long', year: 'numeric', timeZone: 'UTC' })}</option>)}</select>
         <span style={{ flex: 1 }} />
-        {!STATIC && <button className="btn" onClick={() => window.print()}>Imprimir o guardar PDF</button>}
+        {!STATIC && <button className="btn" onClick={() => download(`/api/export/report/${zone}/${month}.pdf`, `volscan_informe_${zone}_${month}.pdf`).catch((e) => setExpErr(String(e.message ?? e)))}>Descargar PDF</button>}
+        {!STATIC && <button className="btn" onClick={() => download(`/api/export/report/${zone}/${month}.csv`, `volscan_informe_${zone}_${month}.csv`).catch((e) => setExpErr(String(e.message ?? e)))}>CSV</button>}
+        <button className="btn" onClick={() => window.print()}>Imprimir</button>
+        {expErr && <span className="note warn-text">{expErr}</span>}
       </div>
       {!rep && <div className="loading">Preparando informe…</div>}
       {rep && s && <>
