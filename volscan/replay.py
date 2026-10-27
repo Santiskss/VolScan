@@ -45,7 +45,8 @@ REPLAY_END = dt.date(2021, 12, 25)
 DELIVERY_DELAY_H = 24.0
 WATCH_P_HIGH = 0.01          # first tier of the watch list: some ensemble member reaches the building
 WATCH_POCKET = 0.2           # second tier: hemmed in by the flow field (infill score)
-CAL_SMOOTH = 5.0             # additive smoothing of the error ratios used to calibrate the range
+CAL_SMOOTH = 5.0
+INFILL_SHARE = 0.3           # share of new area placed by the infill score for the upper bound             # additive smoothing of the error ratios used to calibrate the range
 
 ENSEMBLE = LavaParams(n_paths=600, viscosity_pa_s=LogNormal(3e6, 1.5), max_length_m=LogNormal(6000, 0.5))
 
@@ -378,9 +379,12 @@ class ImpactReplay:
             q = C.pop("_q")
             if horizon_h == 72.0:
                 cal = self.calibrated(now, C["buildings"]["central"])
+                hi_inf = self.infill_high(now, horizon_h, fc, already)
                 if cal:
-                    C["buildings"].update(low=cal["low"], high=cal["high"])
-                    C["interval"] = cal
+                    C["buildings"].update(low=cal["low"], high=max(cal["high"], hi_inf))
+                    C["interval"] = dict(cal, infill_high=hi_inf)
+                else:
+                    C["buildings"]["high"] = max(C["buildings"]["high"], hi_inf)
             bc = self.exp.bld_cell
             qb = np.where(bc >= 0, q[np.clip(bc, 0, None)], 0.0)
             pts = [(float(x), float(y), round(float(v), 3)) for (x, y), v in zip(self.exp.bld_xy, qb) if v >= 0.02]
@@ -445,6 +449,22 @@ class ImpactReplay:
         self._scen[key] = out
         return out
 
+    def infill_high(self, now: dt.datetime, horizon_h: float, fc, already: np.ndarray) -> int:
+        """Upper bound if part of the new area goes to the ground hemmed in by the flow (lateral infill).
+
+        The count itself stays on the main ensemble (mixing made it worse, see
+        volscan.lateral); but the P90 must cover the days when the growth fills
+        a dense pocket, as on 9–13 Oct 2021. It takes the high growth rate with
+        30 % of the new area placed by the infill score.
+        """
+        from .lateral import infill_prior  # noqa: F401  (documentation pointer)
+        r = self.r
+        pm = fc.probability(r.hours(now) + horizon_h).ravel()
+        pk = self.pocket(r.obs_until(now)[-1])
+        a = pm / pm.sum() if pm.sum() > 0 else pm
+        b = pk / pk.sum() if pk.sum() > 0 else pk
+        return int(self.constrained(now, horizon_h, (1 - INFILL_SHARE) * a + INFILL_SHARE * b, already)["buildings"]["high"])
+
     # ---------- validation and calibration
     def raw_row(self, d: dt.date, horizons=(24.0, 72.0)) -> dict | None:
         """Forecast made at the end of day d (central + rate range), the truth, and when that truth became known."""
@@ -471,6 +491,7 @@ class ImpactReplay:
                     row[f"obs_{int(h)}"] = observed_losses(self.exp, newm)["buildings"] - base["buildings"]
                     row[f"_truth_known_{int(h)}"] = (r.obs[kl[-1]].observed_at + r.delay).isoformat()
                     if h == 72.0:
+                        row["_infill_high_72"] = self.infill_high(now, h, fc, r.mask(ks[-1]))
                         W = self.watch_list(now, h, fc)
                         c = np.clip(self.exp.bld_cell, 0, None)
                         lost = (self.exp.bld_cell >= 0) & newm[c] & ~r.mask(ks[-1])[c]
@@ -508,12 +529,15 @@ class ImpactReplay:
         while d <= dt.date(2021, 12, 13):
             row = self.raw_row(d)
             if row:
+                hi_inf = row.get("_infill_high_72")
                 row = {k: v for k, v in row.items() if not k.startswith("_")}
                 now = dt.datetime(d.year, d.month, d.day, 23, 59, tzinfo=dt.timezone.utc)
                 cal = self.calibrated(now, row["pred_72"]["expected"])
-                row["pred_72"] = dict(row["pred_72"], rate_range=row["pred_72"]["p10_p90"],
-                                      p10_p90=[cal["low"], cal["high"]] if cal else row["pred_72"]["p10_p90"],
-                                      calibrated=bool(cal))
+                lo, hi = (cal["low"], cal["high"]) if cal else row["pred_72"]["p10_p90"]
+                if hi_inf is not None:
+                    hi = max(hi, hi_inf)
+                row["pred_72"] = dict(row["pred_72"], rate_range=row["pred_72"]["p10_p90"], p10_p90=[lo, hi],
+                                      calibrated=bool(cal), infill_high=hi_inf)
                 out.append(row)
             d += dt.timedelta(days=1)
         return out

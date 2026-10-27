@@ -56,7 +56,7 @@ part of this submission. Public datasets are listed with their licences in
 | Muse Spark agent with tools | next |
 
 ### Results (honest)
-- **Impact, 2021 validation** (83 daily 72 h forecasts, maps assumed known 24 h after acquisition): the real number of newly reached buildings fell inside the calibrated P10–P90 on **61/83 days**; total bias **−11 %**. Bursts of lateral growth (9–12 and 25–28 Oct) stay out of range. A watch list of buildings reachable *or hemmed in by the flow* held **54 %** of the buildings lost in the following 72 h.
+- **Impact, 2021 validation** (83 daily 72 h forecasts, maps assumed known 24 h after acquisition): the real number of newly reached buildings fell inside the P10–P90 on **67/83 days** (81 %, for a nominal 80 %); total bias **−11 %**. The range is calibrated with past errors and its upper end covers lateral infill of the ground hemmed in by the flow. The worst burst (25–28 Oct, ~10 buildings/ha) stays out of range. A watch list of buildings reachable *or hemmed in by the flow* held **54 %** of the buildings lost in the following 72 h.
 - **Unrest index, 2011–2026**: index ≥ 4 happened in **15 episodes** archipelago-wide; **both eruptions** were preceded (El Hierro 80 days, La Palma 6 days). The rest were real unrest without eruption. It is a base rate, not a probability.
 - **Deformation**: El Hierro 2011, station FRON anomalous from 20 Aug (7 weeks before the eruption). La Palma 2021: public stations see the co-eruptive deflation (MAZO −44 mm), not the near-vent pre-eruptive uplift (those IGN stations are not public).
 - **SO2**: 0 before 19 Sep 2021, tens of kt during the eruption; quiet maximum over 2024–2026: 0.13 kt.
