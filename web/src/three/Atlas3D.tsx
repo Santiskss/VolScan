@@ -6,6 +6,7 @@ import { decodeHeights, type Overlay, type Terrain } from '../api'
 
 export type QuakePoint = { x: number; y: number; depth: number; mag: number; ageH: number }
 export type Label = { x: number; y: number; text: string; kind?: 'place' | 'vent' | 'zonelabel' }
+export type SurfacePoint = { x: number; y: number; v: number }
 
 type Props = {
   terrain: Terrain | null
@@ -18,12 +19,13 @@ type Props = {
   maxDepthKm?: number
   focus?: { x: number; y: number; distKm: number } | null
   quakeScale?: number
+  surfacePoints?: SurfacePoint[]
 }
 
 const km = 1000
 
 export default function Atlas3D({ terrain, overlay, quakes = [], labels = [], exaggeration = 1.6, depthScale = 0.5,
-  terrainOpacity = 0.86, maxDepthKm = 40, focus, quakeScale = 1 }: Props) {
+  terrainOpacity = 0.86, maxDepthKm = 40, focus, quakeScale = 1, surfacePoints = [] }: Props) {
   const host = useRef<HTMLDivElement>(null)
   const S = useRef<any>({})
 
@@ -46,7 +48,7 @@ export default function Atlas3D({ terrain, overlay, quakes = [], labels = [], ex
     controls.dampingFactor = 0.08
     controls.maxPolarAngle = Math.PI * 0.62
     scene.add(new THREE.AmbientLight(0xffffff, 1))
-    const groups = { terrain: new THREE.Group(), quakes: new THREE.Group(), labels: new THREE.Group(), guides: new THREE.Group() }
+    const groups = { terrain: new THREE.Group(), quakes: new THREE.Group(), labels: new THREE.Group(), guides: new THREE.Group(), points: new THREE.Group() }
     Object.values(groups).forEach((g) => scene.add(g))
     const resize = () => {
       const w = el.clientWidth, h = el.clientHeight
@@ -243,6 +245,31 @@ export default function Atlas3D({ terrain, overlay, quakes = [], labels = [], ex
   }, [labels, terrain, exaggeration])
 
   useEffect(() => { S.current.heights = null }, [terrain])
+
+  // ---------- assets on the surface (e.g. buildings at risk), coloured by probability
+  useEffect(() => {
+    const s = S.current
+    if (!s.scene || !s.center || !s.terrainMeta) return
+    const g: THREE.Group = s.groups.points
+    g.clear()
+    if (!surfacePoints.length) return
+    const t: Terrain = s.terrainMeta
+    const h = s.heights ?? (s.heights = decodeHeights(t))
+    const geo = new THREE.BoxGeometry(0.05, 0.05, 0.05)
+    const mat = new THREE.MeshBasicMaterial({ depthTest: true })
+    const inst = new THREE.InstancedMesh(geo, mat, surfacePoints.length)
+    const m = new THREE.Matrix4(), col = new THREE.Color()
+    const lo = new THREE.Color('#f2c14e'), hi = new THREE.Color('#7a0f0a')
+    surfacePoints.forEach((p, i) => {
+      const j = Math.floor((p.x - t.west) / t.step), k = Math.floor((t.north - p.y) / t.step)
+      const z = k >= 0 && k < t.rows && j >= 0 && j < t.cols ? h[k * t.cols + j] : 0
+      m.makeTranslation((p.x - s.center.cx) / km, ((Number.isNaN(z) ? 0 : z) / km) * exaggeration + 0.02, -(p.y - s.center.cy) / km)
+      inst.setMatrixAt(i, m)
+      inst.setColorAt(i, col.copy(lo).lerp(hi, Math.min(1, Math.max(0, p.v))))
+    })
+    inst.renderOrder = 3
+    g.add(inst)
+  }, [surfacePoints, terrain, exaggeration])
 
   // ---------- focus (fly to)
   useEffect(() => {

@@ -32,6 +32,34 @@ export type Status = {
   llm: { ok: boolean; provider: string; model: string; base?: string; error?: string; models?: string[] }
   catalog: { n_events: number; first: string | null; last: string | null; refresh_error: string | null; citation: string }
 }
+export type Range3 = { low: number; central: number; high: number }
+export type Facility = { name: string; kind: string; lon: number; lat: number; p: number; already_lost: boolean; eta_h: (number | null)[] }
+export type Isolation = { name: string; kind: string; lon: number; lat: number; p_isolated: number; p_reached: number }
+export type ImpactBlock = {
+  horizon_h: number
+  already_lost: { buildings: number; road_km: number }
+  buildings: { expected: number; p10_p90: number[] }
+  road_km: { expected: number; p10_p90: number[] }
+  facilities: Facility[]; ponds: { expected: number; already_lost: number }; isolation: Isolation[]
+}
+export type ImpactDay = { date: string; phase: 'eruptive' | 'pre-eruptive' } & Partial<ImpactBlock> & {
+  constrained?: { rates_ha_h: number[]; area_ha: Range3; buildings: Range3; road_km: Range3 }
+  truth_after?: null | { at: string; new_buildings: number; new_road_km: number }
+  buildings_at_risk_xy?: [number, number, number][]
+  method?: string
+  scenario?: null | (ImpactBlock & { n_vent_events: number; shallow_depth_max_km: number; vent_centroid_xy: [number, number]
+    nearest_candidate_to_real_vent_km: number; places: { name: string; p: number }[]; overlay: Overlay; note: string })
+}
+export type ValidationRow = { date: string; lost_buildings: number; pred_24: { expected: number; p10_p90: number[] }; obs_24?: number; pred_72: { expected: number; p10_p90: number[] }; obs_72?: number }
+export type Report = {
+  zone: { key: string; name: string; note: string }; month: string; title: string; partial: boolean; generated_at: string
+  stats: { n: number; max_mag: number | null; n_m2: number; n_m3: number; depth_median: number | null; depth_p10: number | null; shallow_lt5: number; energy_j: number }
+  prev: Report['stats']; baseline: { rate_day: number; n_365: number }; rate_day: number; rate_ratio: number | null
+  daily: number[]; daily_depth: (number | null)[]; b: null | { b: number; sigma: number; mc: number; n: number }
+  unrest_end: { index: number | null; components: Record<string, number | null> }
+  top_events: { t: string; mag: number | null; mag_type: string; depth: number | null; place: string; int_max: string | null; id: string }[]
+  felt: number; tides: null | Record<'semidiurnal' | 'fortnightly', { n: number; c: number; p_shift: number }>; summary: string; sources: string[]
+}
 export type Citation = { n: number; doc: string; section: string; kind: string; excerpt: string }
 
 /** Static snapshot (no server): the API is read from pre-generated JSON next to the page. */
@@ -44,6 +72,7 @@ function staticUrl(url: string): string {
   if (p === 'api/canarias/quakes') p += `-${q.get('days') ?? '30'}`
   if (p === 'api/solunar') p += `/${q.get('zone') ?? 'la_palma'}`
   if (p.startsWith('api/lapalma2021/briefing/')) p = p.replace('briefing', 'briefing-static')
+  if (p === 'api/reports/monthly') p += `/${q.get('zone')}/${q.get('month')}`
   return `${p}.json`
 }
 
@@ -59,6 +88,7 @@ async function post<T>(url: string, body: unknown): Promise<T> {
       return { answer: null, ai: false, error: 'esta es una instantánea estática; el asistente con IA funciona en la versión local (VolScan.command)', model: { ok: false, provider: 'local', model: '—' }, citations: [] } as T
     }
     if (url === '/api/canarias/refresh') return get<T>('/api/status').then((s: any) => s.catalog)
+    if (url === '/api/reports/rewrite') return { text: null, ai: false, error: 'la redacción con IA funciona en la versión local', model: { ok: false, provider: 'local', model: '—' } } as T
   }
   const r = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })
   if (!r.ok) throw new Error(`${r.status} ${url}`)
@@ -77,6 +107,11 @@ export const api = {
   quakes: (days = 30) => get<{ n: number; quakes: Quake[]; citation: string }>(`/api/canarias/quakes?days=${days}`),
   refresh: () => post<Status['catalog']>('/api/canarias/refresh', {}),
   solunar: (zone: string, start = '2011-01-01') => get<any>(`/api/solunar?zone=${zone}&start=${start}`),
+  lpImpact: (d: string) => get<ImpactDay>(`/api/lapalma2021/impact/${d}`),
+  lpValidation: () => get<{ rows: ValidationRow[]; summary: { days: number; within_p10_p90_72h: number; total_pred_72: number; total_obs_72: number; first_10_days: { days: number; within: number } }; truth: string }>('/api/lapalma2021/validation'),
+  reportMonths: () => get<{ months: string[]; zones: { key: string; name: string }[] }>('/api/reports/months'),
+  report: (zone: string, month: string) => get<Report>(`/api/reports/monthly?zone=${zone}&month=${month}`),
+  reportRewrite: (zone: string, month: string) => post<{ text: string | null; ai: boolean; error?: string; model: Status['llm'] }>('/api/reports/rewrite', { zone, month }),
   chat: (question: string, context?: string) =>
     post<{ answer: string | null; ai: boolean; error?: string; model: Status['llm']; citations: Citation[] }>('/api/chat', { question, context }),
 }

@@ -266,6 +266,62 @@ def lp_quakes():
     return JSONResponse(_lp_quakes())
 
 
+_impact = dict(obj=None)
+
+
+def impact_replay():
+    with _replay_lock:
+        r = _replay["obj"]
+    if r is None:
+        r = replay()
+    with _replay_lock:
+        if _impact["obj"] is None:
+            from ..replay import ImpactReplay
+            _impact["obj"] = ImpactReplay(r)
+        return _impact["obj"]
+
+
+@lru_cache(maxsize=256)
+def _lp_impact(date: str):
+    d = dt.date.fromisoformat(date)
+    now = dt.datetime(d.year, d.month, d.day, 23, 59, tzinfo=dt.timezone.utc)
+    ir = impact_replay()
+    if now < LAPALMA_2021_ONSET:
+        sc = ir.scenario(now)
+        return _clean(dict(date=date, phase="pre-eruptive", scenario=sc))
+    return _clean(dict(date=date, **ir.eruptive(now)))
+
+
+@app.get("/api/lapalma2021/impact/{date}")
+def lp_impact(date: str):
+    try:
+        dt.date.fromisoformat(date)
+    except ValueError:
+        raise HTTPException(400, "fecha inválida")
+    return JSONResponse(_lp_impact(date))
+
+
+@app.get("/api/lapalma2021/validation")
+def lp_validation():
+    f = CACHE / "validation_lapalma2021.json"
+    if f.exists():
+        return JSONResponse(json.loads(f.read_text()))
+    rows = impact_replay().validation()
+    within = [r for r in rows if "obs_72" in r]
+    inside = sum(1 for r in within if r["pred_72"]["p10_p90"][0] <= r["obs_72"] <= r["pred_72"]["p10_p90"][1])
+    first10 = [r for r in within if r["date"] <= "2021-09-29"]
+    res = _clean(dict(rows=rows, summary=dict(
+        days=len(within), within_p10_p90_72h=inside,
+        total_pred_72=round(sum(r["pred_72"]["expected"] for r in within), 0),
+        total_obs_72=sum(r["obs_72"] for r in within),
+        first_10_days=dict(days=len(first10),
+                           within=sum(1 for r in first10 if r["pred_72"]["p10_p90"][0] <= r["obs_72"] <= r["pred_72"]["p10_p90"][1]))),
+        truth="Copernicus EMS EMSR546: edificios dentro de la colada observada (inventario CEMS, 2.988 destruidos al final)"))
+    f.parent.mkdir(parents=True, exist_ok=True)
+    f.write_text(json.dumps(res))
+    return JSONResponse(res)
+
+
 def _fallback_brief(day: dict) -> str:
     s, l = day.get("seismic") or {}, day.get("lava") or {}
     lines = [f"Resumen automático sin modelo de lenguaje · {day['date']}"]
@@ -316,6 +372,57 @@ def lp_briefing(date: str, req: BriefReq = BriefReq()):
     except llm.LLMUnavailable as e:
         res = dict(date=date, text=_fallback_brief(day), model=cfg.public(), ai=False, error=str(e), citations=[])
     return JSONResponse(res)
+
+
+# ------------------------------------------------------------------ monthly reports
+@app.get("/api/reports/months")
+def report_months():
+    from ..reports import available_months
+    return J(dict(months=available_months(_catalog()), zones=[dict(key=z.key, name=z.name) for z in ZONES]))
+
+
+@lru_cache(maxsize=512)
+def _report(zone: str, month: str, today: str):
+    from ..reports import monthly_report
+    from ..zones import zone_of
+    cat = store.zone_catalog(_catalog(), zone)
+    ev = [e for e in store.load_events() if zone_of(e.lat, e.lon).key == zone]
+    return _clean(monthly_report(cat, ev, zone, month))
+
+
+@app.get("/api/reports/monthly")
+def report_monthly(zone: str = "tenerife", month: str | None = None):
+    if zone not in BY_KEY or zone == "atlantico":
+        raise HTTPException(404, "zona desconocida")
+    month = month or dt.datetime.now(dt.timezone.utc).strftime("%Y-%m")
+    try:
+        from ..reports import month_bounds
+        month_bounds(month)
+    except Exception:
+        raise HTTPException(400, "mes inválido (AAAA-MM)")
+    return JSONResponse(_report(zone, month, dt.date.today().isoformat()))
+
+
+class RewriteReq(BaseModel):
+    zone: str
+    month: str
+
+
+@app.post("/api/reports/rewrite")
+def report_rewrite(req: RewriteReq):
+    """The language model rewrites the summary in an institutional register WITHOUT adding facts (the figures go in as data)."""
+    rep = _report(req.zone, req.month, dt.date.today().isoformat())
+    cfg = llm.LLMConfig.from_env()
+    facts = {k: rep[k] for k in ("title", "partial", "stats", "prev", "baseline", "rate_ratio", "b", "unrest_end", "top_events", "felt", "tides")}
+    msgs = [dict(role="system", content=(
+        "Redactas el resumen del informe mensual de vigilancia sísmica de VolScan para un Cabildo. Español institucional, "
+        "claro, 120-170 palabras, en un párrafo. Usa EXCLUSIVAMENTE las cifras del JSON; no añadas hechos, causas ni "
+        "previsiones. Termina indicando que la valoración oficial corresponde al PEVOLCA.")),
+        dict(role="user", content=json.dumps(facts, ensure_ascii=False, default=str)[:6000])]
+    try:
+        return JSONResponse(dict(text=llm.chat(msgs, cfg, max_tokens=500), ai=True, model=cfg.public()))
+    except llm.LLMUnavailable as e:
+        return JSONResponse(dict(text=None, ai=False, error=str(e), model=cfg.public()))
 
 
 # ------------------------------------------------------------------ chat (RAG)
