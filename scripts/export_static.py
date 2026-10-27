@@ -47,6 +47,9 @@ def main(out: Path):
     save("api/terrain/lapalma", "/api/terrain/lapalma")
     save("api/terrain/archipelago", "/api/terrain/archipelago")
     save("api/canarias/zones", "/api/canarias/zones")
+    save("api/canarias/calibration", "/api/canarias/calibration")
+    for z in ("tenerife", "la_palma", "el_hierro", "la_gomera", "enmedio", "gran_canaria", "lanzarote_fuerteventura"):
+        save(f"api/canarias/indicators/{z}", f"/api/canarias/indicators?zone={z}")
     for d in (7, 30, 90, 365):
         save(f"api/canarias/quakes-{d}", f"/api/canarias/quakes?days={d}")
     for z in ("la_palma", "el_hierro", "tenerife", "gran_canaria", "lanzarote_fuerteventura"):

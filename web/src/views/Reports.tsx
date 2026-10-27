@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { api, fmt, STATIC, type Report } from '../api'
 import Solunar from './Solunar'
+import { GnssTable, LevelChip } from './Indicators'
 
 const ZONE_ORDER = ['tenerife', 'la_palma', 'el_hierro', 'gran_canaria', 'lanzarote_fuerteventura', 'la_gomera', 'enmedio']
 
@@ -52,7 +53,7 @@ export default function Reports() {
       {!rep && <div className="loading">Preparando informe…</div>}
       {rep && s && <>
         <div className="report-head">
-          <div className="kicker">Informe mensual de vigilancia sísmica · VolScan</div>
+          <div className="kicker">Informe mensual de vigilancia volcánica · VolScan</div>
           <h2>{rep.title}{rep.partial ? ' (mes en curso)' : ''}</h2>
           <div className="note">Datos: catálogo del IGN · generado el {fmt.dateTime(rep.generated_at)} · zona: {rep.zone.note || rep.zone.name}</div>
         </div>
@@ -101,6 +102,22 @@ export default function Reports() {
               <span className="k">Mareas vivas (exceso en sizigia)</span><span className={`sig ${rep.tides.fortnightly.p_shift < 0.05 ? 'yes' : 'no'}`}>p = {rep.tides.fortnightly.p_shift.toFixed(2).replace('.', ',')}</span>
             </div> : <div className="note">Menos de 30 terremotos: no se calcula.</div>}
             <p className="note">Prueba robusta con el catálogo desagrupado y 100 desplazamientos temporales. El historial completo está más abajo.</p>
+          </div>
+        </div>
+        <div className="cards" style={{ marginTop: 12 }}>
+          <div className="card">
+            <h3>Deformación (GNSS) {rep.deformation && <LevelChip level={rep.deformation.level} />}</h3>
+            {rep.deformation ? <GnssTable stations={rep.deformation.stations} /> : <div className="note">Sin estaciones GNSS públicas con datos para este mes.</div>}
+            <p className="note">Desviación de los últimos 30 días respecto a la tendencia de los 3 años anteriores. Estaciones procesadas por el Nevada Geodetic Laboratory.</p>
+          </div>
+          <div className="card">
+            <h3>Gases (SO2 por satélite) {rep.so2 && <LevelChip level={rep.so2.days_detected ? 'SO2 detectado' : 'sin SO2 visible'} />}</h3>
+            {rep.so2 ? <div className="kv">
+              <span className="k">Días con dato</span><span>{rep.so2.days}</span>
+              <span className="k">Días con SO2 ≥ {fmt.num(rep.so2.threshold_kt, 0)} kt</span><span>{rep.so2.days_detected}</span>
+              <span className="k">Máximo diario</span><span>{fmt.num(rep.so2.max_kt, 2)} kt</span>
+            </div> : <div className="note">Sin datos de SO2 para este mes (la serie diaria cubre 2021 y los dos últimos años).</div>}
+            <p className="note">NASA OMPS, troposfera baja, sobre el archipiélago. Detecta erupciones y desgasificación fuerte, no la difusa.</p>
           </div>
         </div>
         <p className="note" style={{ marginTop: 10 }}>Fuentes: {rep.sources.join(' · ')}. VolScan no emite niveles de alerta; la valoración oficial corresponde al PEVOLCA.</p>

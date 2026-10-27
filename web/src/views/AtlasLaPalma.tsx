@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { api, fmt, type Citation, type DayState, type ImpactDay, type Meta, type Quake, type Terrain } from '../api'
 import ImpactPanel from './ImpactPanel'
+import { LevelChip, So2Bars } from './Indicators'
 import Atlas3D, { type Label, type QuakePoint, type SurfacePoint } from '../three/Atlas3D'
 
 type Brief = { text: string; ai: boolean; error?: string; model: { provider: string; model: string }; citations: Citation[] }
@@ -231,6 +232,18 @@ export default function AtlasLaPalma() {
           <div className="slider-row"><span>Escala de profundidad</span><span>×{depthScale}</span></div>
           <input type="range" min={0.2} max={1} step={0.1} value={depthScale} onChange={(e) => setDepthScale(+e.target.value)} style={{ width: '100%' }} />
         </section>
+
+        {day?.indicators && <section>
+          <h3>Deformación y gases</h3>
+          <table className="places">
+            <thead><tr><th>GNSS</th><th>Este / Norte / Vertical</th><th>Nivel</th></tr></thead>
+            <tbody>{day.indicators.gnss.map((g) => <tr key={g.code}><td>{g.code}<div className="note">{g.place}</div></td>
+              <td>{g.disp_mm ? `${fmt.num(g.disp_mm.e)} / ${fmt.num(g.disp_mm.n)} / ${fmt.num(g.disp_mm.u)} mm` : '—'}</td><td><LevelChip level={g.level} /></td></tr>)}</tbody>
+          </table>
+          <p className="note">Desplazamiento desde el 10 sep 2021 (antes del enjambre). Estaciones públicas a 10–17 km de la boca: ven el hundimiento durante la erupción, pero no la hinchazón previa que midió el IGN junto a la boca (sus estaciones cercanas no son públicas).</p>
+          <div className="subh">SO2 por satélite (kt sobre Canarias) · <LevelChip level={day.indicators.so2.level} /></div>
+          <So2Bars series={day.indicators.so2_series} threshold={day.indicators.so2.threshold_kt ?? 1} />
+        </section>}
 
         <section>
           <h3>Sismicidad · detalle</h3>

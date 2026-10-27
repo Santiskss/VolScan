@@ -147,6 +147,9 @@ class Unrest:
     shallowing_km: float | None          # baseline median depth − recent median depth (positive = shallower)
     index: float | None                  # 0..10, see `unrest`
     components: dict
+    mc: float | None = None              # common completeness magnitude used for the counts
+    rate_surprise: float | None = None   # −log10 Poisson P(N >= n_recent | baseline rate)
+    energy_vs_worst_week: float | None = None
 
 
 def _score(x, lo, hi):
@@ -156,38 +159,79 @@ def _score(x, lo, hi):
     return float(min(1.0, max(0.0, (math.log10(x) - math.log10(lo)) / (math.log10(hi) - math.log10(lo)))))
 
 
+def poisson_surprise(n: int, mu: float) -> float:
+    """−log10 P(N >= n) for N ~ Poisson(mu). 0 when n <= mu."""
+    if n <= mu or mu <= 0:
+        return 0.0 if n <= mu else 30.0
+    from scipy.stats import poisson
+    p = float(poisson.sf(n - 1, mu))
+    return 30.0 if p <= 0 else min(30.0, -math.log10(p))
+
+
+MIN_RECENT_ABOVE_MC = 5        # fewer events than this above Mc in a week: rate and energy can't score
+MIN_DEPTHS = 20                # recent and baseline located events needed for the shallowing component
+
+
 def unrest(cat: Catalog, at: float, recent_days: float = 7, baseline_days: float = 365,
            gap_days: float = 30) -> Unrest:
     """Compare the last `recent_days` against a baseline that ends `gap_days` earlier.
 
     The gap keeps the start of an ongoing swarm out of the baseline.
-    Components (each from 0 to 1):
-      rate:    rate ratio, 0 at ×1, 1 at ×100
-      energy:  daily energy ratio, 0 at ×1, 1 at ×1000
-      shallow: shallowing of the median depth, 0 at 0 km, 1 at ≥10 km
-    index = 10 × the mean of the available components. If there is no
-    baseline, index = None (we don't make one up).
+
+    Calibrated against 2011–2026 (see knowledge/metodologia_volscan.md, "índice"):
+    raw ratios produced dozens of alarms in quiet zones, where three small
+    events against a near-empty baseline look like "×10". So:
+      - Counts only use events at or above a COMMON completeness magnitude
+        (Mc by maximum curvature over baseline + recent). A denser network
+        detects more small events; above Mc that doesn't change the count.
+      - rate: how improbable the recent count is under the baseline rate
+        (Poisson), 0 at p = 1, 1 at p = 1e-10. Not the ratio itself: ×10 on a
+        rate of 0.1/day is noise, ×10 on 5/day is not.
+      - energy: recent weekly energy against the most energetic week of the
+        baseline year, 0 at ×1, 1 at ×100.
+      - shallow: shallowing of the median depth, 0 at 0 km, 1 at ≥10 km, only
+        with ≥ 20 located events in each window.
+    Rate and energy need ≥ 5 recent events above Mc.
+    index = 10 × mean of the available components. No baseline → None.
     """
     rs, re_ = at - recent_days * DAY, at
     be = rs - gap_days * DAY
     bs = be - baseline_days * DAY
     recent = window_stats(cat, rs, re_)
     base = window_stats(cat, bs, be)
-    rate_ratio = recent.rate_per_day / base.rate_per_day if base.n > 0 else None
-    e_rec = recent.energy_j / recent_days
-    e_base = base.energy_j / baseline_days if base.energy_j > 0 else None
-    energy_ratio = e_rec / e_base if e_base else None
+    wr, wb = cat.window(rs, re_), cat.window(bs, be)
+    both = np.r_[wr.mag, wb.mag]
+    mc = mc_maxc(both[~np.isnan(both)])
+    if mc is None:
+        mr, mb = np.ones(len(wr), bool), np.ones(len(wb), bool)
+    else:
+        mr, mb = wr.mag >= mc - 1e-9, wb.mag >= mc - 1e-9
+    n_r, n_b = int(mr.sum()), int(mb.sum())
+    rate_ratio = (n_r / recent_days) / (n_b / baseline_days) if n_b > 0 else None
+    surprise = poisson_surprise(n_r, n_b / baseline_days * recent_days) if n_b > 0 else None
+
+    e_r = float(energy_joules(wr.mag[mr]).sum()) if n_r else 0.0
+    e_base_day = float(energy_joules(wb.mag[mb]).sum()) / baseline_days if n_b else 0.0
+    energy_ratio = (e_r / recent_days) / e_base_day if e_base_day > 0 else None
+    worst = None
+    if n_b:
+        wk = np.floor((wb.t[mb] - bs) / (recent_days * DAY)).astype(int)
+        worst = float(np.bincount(wk, weights=energy_joules(wb.mag[mb])).max())
+    e_vs_worst = e_r / worst if worst else None
+
     shallow = None
-    if recent.depth_median_km is not None and base.depth_median_km is not None and recent.n >= 10:
+    if recent.depth_median_km is not None and base.depth_median_km is not None and \
+            (~np.isnan(wr.depth)).sum() >= MIN_DEPTHS and (~np.isnan(wb.depth)).sum() >= MIN_DEPTHS:
         shallow = base.depth_median_km - recent.depth_median_km
+    enough = n_r >= MIN_RECENT_ABOVE_MC
     comps = {
-        "rate": _score(rate_ratio, 1, 100) if rate_ratio is not None else None,
-        "energy": _score(energy_ratio, 1, 1000) if energy_ratio is not None else None,
+        "rate": (min(1.0, surprise / 10) if enough else 0.0) if surprise is not None else None,
+        "energy": (_score(e_vs_worst, 1, 100) if enough else 0.0) if e_vs_worst is not None else None,
         "shallow": float(min(1.0, max(0.0, shallow / 10))) if shallow is not None else None,
     }
     avail = [v for v in comps.values() if v is not None]
     index = 10 * float(np.mean(avail)) if base.n > 0 and avail else None
-    return Unrest(at, recent, base, rate_ratio, energy_ratio, shallow, index, comps)
+    return Unrest(at, recent, base, rate_ratio, energy_ratio, shallow, index, comps, mc, surprise, e_vs_worst)
 
 
 def unrest_series(cat: Catalog, start: float, end: float, step_days: float = 1.0, **kw):

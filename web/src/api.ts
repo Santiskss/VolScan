@@ -1,3 +1,4 @@
+import type { GnssStation, So2Status } from './views/Indicators'
 export type Terrain = {
   name: string; west: number; north: number; step: number; rows: number; cols: number;
   heights_i16_b64: string; nodata: number; texture: string; max_elev: number; attribution: string
@@ -17,6 +18,8 @@ export type DayState = {
     places: PlaceState[]
   }
   overlay?: Overlay
+  indicators?: { gnss: { code: string; place: string; since: string; disp_mm: null | { e: number; n: number; u: number }; level: string }[]
+    so2: So2Status; so2_series: { date: string; kt: number }[] }
 }
 export type Meta = {
   onset: string; days: string[]; vent: { lonlat: [number, number]; xy: [number, number] }
@@ -26,7 +29,14 @@ export type Zone = {
   key: string; name: string; note: string; centroid: [number, number]; box: number[]; index: number | null
   components: Record<string, number | null>; rate_ratio: number | null; n7: number; n30: number; max_mag30: number | null
   depth_median30: number | null; daily30: number[]; b: null | { b: number; sigma: number; mc: number; n: number }
+  mc: number | null; rate_surprise: number | null; history: string | null
+  deformation: { level: string; n_stations: number; evaluated_at: string | null; worst: GnssStation | null }
 }
+export type CalibrationRow = { threshold: number; episodes: number; preceded_eruption: number; eruptions: number; lead_days: Record<string, number>
+  share_of_time_pct: number; list: { zone: string; start: string; end: string; peak: number; outcome: string }[] }
+export type Calibration = { start: string; end: string; table: CalibrationRow[]; eruptions: Record<string, { date: string; name: string }>; series?: [string, number | null][] }
+export type Indicators = { zone: string; deformation: { level: string; stations: GnssStation[]; citation: string }; so2: So2Status
+  so2_series: { date: string; so2_kt: number }[]; notes: { deformation: string; so2: string } }
 export type Status = {
   version: string; now: string
   llm: { ok: boolean; provider: string; model: string; base?: string; error?: string; models?: string[] }
@@ -69,6 +79,8 @@ export type Report = {
   unrest_end: { index: number | null; components: Record<string, number | null> }
   top_events: { t: string; mag: number | null; mag_type: string; depth: number | null; place: string; int_max: string | null; id: string }[]
   felt: number; tides: null | Record<'semidiurnal' | 'fortnightly', { n: number; c: number; p_shift: number }>; summary: string; sources: string[]
+  deformation: null | { level: string; stations: GnssStation[] }
+  so2: null | { days: number; days_detected: number; max_kt: number; threshold_kt: number }
 }
 export type Citation = { n: number; doc: string; section: string; kind: string; excerpt: string }
 
@@ -83,6 +95,7 @@ function staticUrl(url: string): string {
   if (p === 'api/solunar') p += `/${q.get('zone') ?? 'la_palma'}`
   if (p.startsWith('api/lapalma2021/briefing/')) p = p.replace('briefing', 'briefing-static')
   if (p === 'api/reports/monthly') p += `/${q.get('zone')}/${q.get('month')}`
+  if (p === 'api/canarias/indicators') p += `/${q.get('zone')}`
   return `${p}.json`
 }
 
@@ -113,7 +126,9 @@ export const api = {
   lpQuakes: () => get<{ n: number; quakes: Quake[] }>('/api/lapalma2021/quakes'),
   lpBriefing: (d: string, regenerate = false) =>
     post<{ text: string; ai: boolean; error?: string; model: Status['llm']; citations: Citation[] }>(`/api/lapalma2021/briefing/${d}`, { regenerate }),
-  zones: () => get<{ at: string; zones: Zone[]; note: string }>('/api/canarias/zones'),
+  zones: () => get<{ at: string; zones: Zone[]; note: string; so2: So2Status }>('/api/canarias/zones'),
+  calibration: () => get<Calibration>('/api/canarias/calibration'),
+  indicators: (zone: string) => get<Indicators>(`/api/canarias/indicators?zone=${zone}`),
   quakes: (days = 30) => get<{ n: number; quakes: Quake[]; citation: string }>(`/api/canarias/quakes?days=${days}`),
   refresh: () => post<Status['catalog']>('/api/canarias/refresh', {}),
   solunar: (zone: string, start = '2011-01-01') => get<any>(`/api/solunar?zone=${zone}&start=${start}`),

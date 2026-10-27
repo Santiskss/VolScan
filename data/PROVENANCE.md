@@ -30,3 +30,12 @@ Retrieved: 2026-10-26.
 | `cems_transport_grading.geojson` | idem | idem | 6,747 road segments; damage grade per segment. |
 | `osm_facilities_places_20210901.json` | OpenStreetMap, Overpass attic query as of 2021-09-01 | © OpenStreetMap contributors (ODbL) | Services, places, irrigation reservoirs, substations. |
 | `osm_roads_20210901.json` | idem | idem | Road network before the eruption, for the isolation analysis. |
+
+## Deformation and gas — `data/canarias/gnss/`, `data/canarias/so2_omps_daily.csv` (`scripts/fetch_gnss_so2.py`)
+
+| File | Source | Licence / attribution | Notes |
+|---|---|---|---|
+| `gnss/{STATION}.csv.gz` | Nevada Geodetic Laboratory, IGS20 daily solutions, Nubia-fixed ("AF") tenv3 series, 28 Canary Islands stations | Blewitt, G., W. C. Hammond, and C. Kreemer (2018), Harnessing the GPS data explosion for interdisciplinary science, Eos, 99, doi:10.1029/2018EO104623. Openly available. | Daily east/north/up in mm relative to the first epoch. Equipment-change steps (NGL `steps.txt`, type 1) removed by the difference of 20-day medians. Final series lag ~4 weeks. |
+| `so2_omps_daily.csv` | NASA OMPS SO2, lower troposphere (Suomi-NPP; NOAA-20 for days NPP lacks), served as imagery by NASA GIBS | NASA EOSDIS GIBS / Worldview. NASA data are open (no restrictions). | Colours decoded to DU with the published GIBS colour map; mass above 1 DU in the box 25.5–31.5 N, 20.5–11 W, in kt. Saturates at 32 DU, so it is a lower bound. Days: Aug 2021 – Jan 2022 and the last two years. |
+
+Retrieved: 2026-10-27.
