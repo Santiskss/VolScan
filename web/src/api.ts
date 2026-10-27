@@ -48,7 +48,8 @@ export type Indicators = { zone: string; deformation: { level: string; stations:
 export type Status = {
   version: string; now: string
   llm: { ok: boolean; provider: string; model: string; base?: string; error?: string; models?: string[] }
-  catalog: { n_events: number; first: string | null; last: string | null; refresh_error: string | null; citation: string }
+  catalog: { n_events: number; first: string | null; last: string | null; refresh_error: string | null; citation: string
+    health?: { level: string; ok: boolean; message: string; last_download_age_h: number | null; last_event_age_h: number | null; backup_events: number } }
 }
 export type Range3 = { low: number; central: number; high: number }
 export type Facility = { name: string; kind: string; lon: number; lat: number; p: number; already_lost: boolean; eta_h: (number | null)[] }

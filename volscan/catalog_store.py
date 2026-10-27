@@ -13,14 +13,29 @@ from .sources import ign_catalog as ign
 from .zones import zone_of
 
 STORE = DATA / "canarias" / "ign"
+BACKUP = DATA / "canarias" / "emsc_backup.csv"
+STALE_H = 6.0          # no good IGN download for this long → "retrasado"
+QUIET_H = 48.0         # no event at all in the archipelago for this long is unusual → say so
 _lock = threading.Lock()
-_state = dict(events=None, loaded_at=0.0, refreshed_at=0.0, refresh_error=None)
+_state = dict(events=None, loaded_at=0.0, refreshed_at=0.0, refresh_error=None, backup_used=False, backup_error=None)
+
+
+def _last_ign_download() -> float | None:
+    """When the IGN cache was last written successfully (mtime of the newest monthly file)."""
+    files = sorted(STORE.glob("ign_*.csv"))
+    return files[-1].stat().st_mtime if files else None
 
 
 def load_events(force: bool = False):
+    """IGN cache, plus EMSC backup events only AFTER the last IGN event (to fill a gap, never to duplicate)."""
     with _lock:
         if _state["events"] is None or force:
-            _state["events"] = ign.load_cache(STORE)
+            ev = ign.load_cache(STORE)
+            if BACKUP.exists():
+                last = ev[-1].time_utc if ev else None
+                extra = [e for e in ign.read_csv(BACKUP) if last is None or e.time_utc > last]
+                ev = ev + extra
+            _state["events"] = ev
             _state["loaded_at"] = time.time()
         return _state["events"]
 
@@ -30,7 +45,11 @@ def load_catalog() -> Catalog:
 
 
 def refresh_live(min_interval_s: float = 600.0) -> dict:
-    """Download the current (and previous, during the first days of a month) month again. Throttled."""
+    """Download the current (and previous, during the first days of a month) month again. Throttled.
+
+    If IGN fails (network, or its page changed format), fill the gap since the
+    last IGN event with EMSC, and say so in the status.
+    """
     now = time.time()
     if now - _state["refreshed_at"] < min_interval_s:
         return status()
@@ -39,11 +58,54 @@ def refresh_live(min_interval_s: float = 600.0) -> dict:
     try:
         ign.sync_monthly(STORE, start, today, refresh_after=start, log=lambda m: None)
         _state["refresh_error"] = None
-    except Exception as e:  # network down: keep serving the cache and say so
+        _state["backup_used"] = False
+    except Exception as e:  # network down or format change: keep serving the cache, fill with EMSC, and say so
         _state["refresh_error"] = f"{type(e).__name__}: {e}"
+        _fill_from_backup()
     _state["refreshed_at"] = now
     load_events(force=True)
     return status()
+
+
+def _fill_from_backup():
+    from .sources import emsc_fdsn
+    cached = ign.load_cache(STORE)
+    since = cached[-1].time_utc if cached else dt.datetime.now(dt.timezone.utc) - dt.timedelta(days=30)
+    try:
+        ev = emsc_fdsn.fetch(since, dt.datetime.now(dt.timezone.utc))
+        ign.write_csv(sorted(ev, key=lambda e: e.time_utc), BACKUP)
+        _state["backup_used"], _state["backup_error"] = True, None
+    except Exception as e:
+        _state["backup_used"], _state["backup_error"] = False, f"{type(e).__name__}: {e}"
+
+
+def health(now: float | None = None) -> dict:
+    """Is the live catalogue current? Plain-language level and message for the interface."""
+    now = now or time.time()
+    ev = _state["events"] or []
+    ign_ev = [e for e in ev if not e.evid.startswith("emsc:")]
+    last_dl = _last_ign_download()
+    dl_age = (now - last_dl) / 3600 if last_dl else None
+    last_ev = ev[-1].time_utc.timestamp() if ev else None
+    ev_age = (now - last_ev) / 3600 if last_ev else None
+    n_backup = len(ev) - len(ign_ev)
+    err = _state["refresh_error"]
+    if err and "IgnFormatChanged" in err:
+        level, msg = "fuente cambiada", "La página del IGN ha cambiado de formato: VolScan no puede leerla."
+    elif err:
+        level, msg = "sin conexión con el IGN", "No se pudo descargar el catálogo del IGN."
+    elif dl_age is not None and dl_age > STALE_H:
+        level, msg = "retrasado", f"La última descarga del IGN es de hace {dl_age:.0f} h."
+    else:
+        level, msg = "al día", "Catálogo del IGN descargado recientemente."
+    if n_backup:
+        msg += f" Se muestran {n_backup} sismos de respaldo de EMSC desde el último dato del IGN."
+    elif err and _state.get("backup_error"):
+        msg += " El respaldo de EMSC tampoco respondió."
+    if ev_age is not None and ev_age > QUIET_H:
+        msg += f" El último sismo registrado es de hace {ev_age:.0f} h, algo poco habitual en Canarias."
+    return dict(level=level, ok=level == "al día", message=msg, last_download_age_h=None if dl_age is None else round(dl_age, 1),
+                last_event_age_h=None if ev_age is None else round(ev_age, 1), backup_events=n_backup)
 
 
 def status() -> dict:
@@ -51,7 +113,7 @@ def status() -> dict:
     return dict(n_events=len(ev), first=ev[0].time_utc.isoformat() if ev else None,
                 last=ev[-1].time_utc.isoformat() if ev else None,
                 refreshed_at=_state["refreshed_at"] or None, refresh_error=_state["refresh_error"],
-                citation=ign.CITATION)
+                health=health(), citation=ign.CITATION)
 
 
 def events_between(start: dt.datetime, end: dt.datetime, zone: str | None = None, min_mag: float | None = None,
