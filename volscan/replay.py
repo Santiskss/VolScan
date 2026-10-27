@@ -235,3 +235,165 @@ def replay_days():
     while d <= REPLAY_END:
         yield d
         d += dt.timedelta(days=1)
+
+
+# ---------------------------------------------------------------- impact, pre-eruptive scenario, validation
+class ImpactReplay:
+    """Impact layer over the La Palma 2021 replay (see volscan.impact)."""
+
+    def __init__(self, base: "LaPalma2021"):
+        from .impact import load_exposure
+        self.r = base
+        self.exp = load_exposure(base.grid, CASE / "exposure")
+        self._scen = {}
+
+    @staticmethod
+    def _public(I: dict) -> dict:
+        I = dict(I)
+        I.pop("building_probability", None)
+        crit = [f for f in I["facilities"] if f["kind"] != "Estanque de riego"]
+        ponds = [f for f in I["facilities"] if f["kind"] == "Estanque de riego"]
+        I["facilities"] = crit[:25]
+        I["ponds"] = dict(expected=round(sum(f["p"] for f in ponds if not f["already_lost"]), 1),
+                          already_lost=sum(1 for f in ponds if f["already_lost"]))
+        return I
+
+    def growth_rates(self, now: dt.datetime, window_days: float = 6.0) -> list[float]:
+        """Observed area growth rates (ha/h) between consecutive CEMS maps of the last few days."""
+        r = self.r
+        ks = r.obs_until(now)
+        cell_ha = r.grid.step ** 2 / 1e4
+        rec = [k for k in ks if (now - r.obs[k].observed_at).total_seconds() <= window_days * 86400]
+        rates = []
+        for a, b in zip(rec[:-1], rec[1:]):
+            dh = (r.obs[b].observed_at - r.obs[a].observed_at).total_seconds() / 3600
+            if dh >= 6:
+                rates.append(max(0.0, float(r.mask(b).sum() - r.mask(a).sum()) * cell_ha / dh))
+        if not rates and ks:
+            rates = [float(r.mask(ks[-1]).sum()) * cell_ha / max(r.hours(r.obs[ks[-1]].observed_at), 1.0)]
+        return rates
+
+    def constrained(self, now: dt.datetime, horizon_h: float, p_flat: np.ndarray, already: np.ndarray) -> dict:
+        """Area-constrained expectation (low / central / high from the spread of recent growth rates)."""
+        from .impact import expected_from_cells, scale_to_area
+        cell_ha = self.r.grid.step ** 2 / 1e4
+        rates = self.growth_rates(now)
+        lo, mid, hi = (min(rates) * 0.7, float(np.median(rates)), max(rates) * 1.3) if rates else (0, 0, 0)
+        out = {}
+        for k, rate in (("low", lo), ("central", mid), ("high", hi)):
+            q = scale_to_area(p_flat, rate * horizon_h, cell_ha, already)
+            out[k] = expected_from_cells(q, self.exp)
+            if k == "central":
+                q_mid = q
+        return dict(rates_ha_h=[round(x, 2) for x in rates], area_ha=dict(low=round(lo * horizon_h, 1), central=round(mid * horizon_h, 1),
+                    high=round(hi * horizon_h, 1)), buildings=dict(low=round(out["low"]["buildings"]), central=round(out["central"]["buildings"]),
+                    high=round(out["high"]["buildings"])), road_km=dict(low=round(out["low"]["road_km"], 1),
+                    central=round(out["central"]["road_km"], 1), high=round(out["high"]["road_km"], 1)), _q=q_mid)
+
+    def eruptive(self, now: dt.datetime, horizon_h: float = 72.0) -> dict:
+        from .impact import impact, isolation, observed_losses
+        r = self.r
+        L = r.lava_state(now)
+        fc = L["_fc"]
+        t_now = r.hours(now)
+        ks = r.obs_until(now)
+        already = r.mask(ks[-1]) if ks else None
+        I = impact(fc, self.exp, t_now + horizon_h, already)
+        bp = I["building_probability"]
+        iso = isolation(fc, self.exp, t_now + horizon_h, already)
+        later = now + dt.timedelta(hours=horizon_h)
+        kl = r.obs_until(later)
+        truth = None
+        if kl and kl[-1] != (ks[-1] if ks else None) and later <= r.obs[-1].observed_at + dt.timedelta(days=1):
+            t_obs = observed_losses(self.exp, r.mask(kl[-1]))
+            base = I["already_lost"]
+            truth = dict(at=r.obs[kl[-1]].observed_at.isoformat(),
+                         new_buildings=t_obs["buildings"] - base["buildings"],
+                         new_road_km=round(t_obs["road_km"] - base["road_km"], 2))
+        C = self.constrained(now, horizon_h, fc.probability(t_now + horizon_h).ravel(), already)
+        q = C.pop("_q")
+        bc = self.exp.bld_cell
+        qb = np.where(bc >= 0, q[np.clip(bc, 0, None)], 0.0)
+        pts = [(float(x), float(y), round(float(v), 3)) for (x, y), v in zip(self.exp.bld_xy, qb) if v >= 0.02]
+        return dict(phase="eruptive", **self._public(I), constrained=C, isolation=iso[:15], truth_after=truth,
+                    buildings_at_risk_xy=pts,
+                    method="Dónde: conjunto de coladas reponderado con lo observado. Cuánto: crecimiento de área observado por "
+                           "Copernicus en los últimos días (bajo/central/alto). Aislamiento: miembros del conjunto sobre la red de OSM.")
+
+    def scenario(self, now: dt.datetime, n_paths: int = 500) -> dict | None:
+        """Pre-eruptive: vents drawn from the shallow seismicity of the last 72 h. Hours count from the (unknown) opening."""
+        from .impact import impact, isolation
+        from .lava import LavaParams, LogNormal, forecast
+        key = now.date().isoformat()
+        if key in self._scen:
+            return self._scen[key]
+        cat = self.r.catalog
+        if cat is None:
+            return None
+        g = self.r.grid
+        t1, t0 = now.timestamp(), now.timestamp() - 72 * 3600
+        z = BY_KEY["la_palma"]
+        m = (cat.t >= t0) & (cat.t < t1) & (cat.lat >= z.lat_min) & (cat.lat <= z.lat_max) & \
+            (cat.lon >= z.lon_min) & (cat.lon <= z.lon_max) & ~np.isnan(cat.depth)
+        if m.sum() < 30:
+            self._scen[key] = None
+            return None
+        depth = cat.depth[m]
+        shallow = depth <= np.percentile(depth, 30)
+        x, y = lonlat_to_utm28(cat.lon[m][shallow], cat.lat[m][shallow])
+        i, j = g.xy_to_ij(x, y)
+        ok = (i >= 0) & (i < g.shape[0]) & (j >= 0) & (j < g.shape[1])
+        ok[ok] &= ~np.isnan(g.elev[i[ok], j[ok]])
+        if ok.sum() < 10:
+            self._scen[key] = None
+            return None
+        vents = [(float(a), float(b), 1.0) for a, b in zip(x[ok], y[ok])]
+        params = LavaParams(n_paths=n_paths, viscosity_pa_s=LogNormal(3e6, 1.5), max_length_m=LogNormal(6000, 0.5),
+                            vent_sigma_m=1000.0)
+        fc = forecast(g, vents, params, seed=11)
+        I = impact(fc, self.exp, 24 * 30)
+        iso = isolation(fc, self.exp, 24 * 30)
+        p = fc.probability()
+        from .textures import lava_overlay_rgba, png_data_url
+        rv = self.r.vent_xy
+        d_real = float(np.min(np.hypot(x[ok] - rv[0], y[ok] - rv[1])))
+        out = dict(phase="pre-eruptive", n_vent_events=int(ok.sum()), shallow_depth_max_km=round(float(np.percentile(depth, 30)), 1),
+                   vent_centroid_xy=[float(np.median(x[ok])), float(np.median(y[ok]))],
+                   nearest_candidate_to_real_vent_km=round(d_real / 1000, 2),
+                   **self._public(I), isolation=iso[:15],
+                   places=[dict(name=pl["name"], p=round(float(fc.probability()[np.unravel_index(pl["cell"], g.shape)]), 3))
+                           for pl in self.exp.places if pl["cell"] >= 0],
+                   overlay=dict(png=png_data_url(lava_overlay_rgba(p, None), "RGBA"), west=g.west, north=g.north, step=g.step,
+                                rows=g.shape[0], cols=g.shape[1], horizon_h=None,
+                                legend="Escenario: colada desde las bocas probables (sismicidad somera de las últimas 72 h)"),
+                   note="Escenario anticipado: no se sabe dónde abrirá la boca. Se lanzan coladas desde donde se concentra "
+                        "la sismicidad más somera (con 1 km de incertidumbre). Las horas cuentan desde una apertura hipotética.")
+        out["places"] = sorted([q for q in out["places"] if q["p"] >= 0.01], key=lambda q: -q["p"])[:15]
+        self._scen[key] = out
+        return out
+
+    def validation(self, horizons=(24.0, 72.0)) -> list[dict]:
+        """Every day of the eruption: forecast at end of day for +h vs what CEMS observed later."""
+        from .impact import observed_losses
+        r = self.r
+        out = []
+        d = LAPALMA_2021_ONSET.date()
+        while d <= dt.date(2021, 12, 13):
+            now = dt.datetime(d.year, d.month, d.day, 23, 59, tzinfo=dt.timezone.utc)
+            ks = r.obs_until(now)
+            if ks:
+                L = r.lava_state(now)
+                fc = L["_fc"]
+                base = observed_losses(self.exp, r.mask(ks[-1]))
+                row = dict(date=d.isoformat(), lost_buildings=base["buildings"], lost_road_km=base["road_km"])
+                for h in horizons:
+                    later = now + dt.timedelta(hours=h)
+                    kl = r.obs_until(later)
+                    C = self.constrained(now, h, fc.probability(r.hours(now) + h).ravel(), r.mask(ks[-1]))
+                    b = C["buildings"]
+                    row[f"pred_{int(h)}"] = dict(expected=b["central"], p10_p90=[b["low"], b["high"]])
+                    if kl[-1] != ks[-1]:
+                        row[f"obs_{int(h)}"] = observed_losses(self.exp, r.mask(kl[-1]))["buildings"] - base["buildings"]
+                out.append(row)
+            d += dt.timedelta(days=1)
+        return out
