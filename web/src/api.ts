@@ -32,6 +32,14 @@ export type Zone = {
   mc: number | null; rate_surprise: number | null; history: string | null
   deformation: { level: string; n_stations: number; evaluated_at: string | null; worst: GnssStation | null }
 }
+export type TfScenario = {
+  key: string; name: string; history: string; horizon_h: number; unavailable?: boolean; note?: string
+  vents?: { lonlat: [number, number]; xy: [number, number] }[]; vent_names?: string[]; n_paths?: number; reach_sea?: number
+  buildings?: { expected: number; p10_p90: number[] }; road_km?: { expected: number; p10_p90: number[] }
+  facilities?: Facility[]; ponds?: number; places?: { name: string; kind: string; p: number; x: number; y: number }[]; isolation?: Isolation[]
+  buildings_at_risk_xy?: [number, number, number][]; n_buildings_exposed?: number; overlay?: Overlay; exposure_note?: string
+  seismic?: { n_events: number; depth_cut_km: number; n_vents: number; days: number }
+}
 export type CalibrationRow = { threshold: number; episodes: number; preceded_eruption: number; eruptions: number; lead_days: Record<string, number>
   share_of_time_pct: number; list: { zone: string; start: string; end: string; peak: number; outcome: string }[] }
 export type Calibration = { start: string; end: string; table: CalibrationRow[]; eruptions: Record<string, { date: string; name: string }>; series?: [string, number | null][] }
@@ -120,13 +128,15 @@ async function post<T>(url: string, body: unknown): Promise<T> {
 
 export const api = {
   status: () => get<Status>('/api/status'),
-  terrain: (name: 'lapalma' | 'archipelago') => get<Terrain>(`/api/terrain/${name}`),
+  terrain: (name: 'lapalma' | 'archipelago' | 'tenerife') => get<Terrain>(`/api/terrain/${name}`),
   lpMeta: () => get<Meta>('/api/lapalma2021/meta'),
   lpDay: (d: string) => get<DayState>(`/api/lapalma2021/day/${d}`),
   lpQuakes: () => get<{ n: number; quakes: Quake[] }>('/api/lapalma2021/quakes'),
   lpBriefing: (d: string, regenerate = false) =>
     post<{ text: string; ai: boolean; error?: string; model: Status['llm']; citations: Citation[] }>(`/api/lapalma2021/briefing/${d}`, { regenerate }),
   zones: () => get<{ at: string; zones: Zone[]; note: string; so2: So2Status }>('/api/canarias/zones'),
+  tfScenarios: () => get<{ scenarios: { key: string; name: string; history: string }[]; note: string }>('/api/tenerife/scenarios'),
+  tfScenario: (key: string) => get<TfScenario>(`/api/tenerife/scenario/${key}`),
   calibration: () => get<Calibration>('/api/canarias/calibration'),
   indicators: (zone: string) => get<Indicators>(`/api/canarias/indicators?zone=${zone}`),
   quakes: (days = 30) => get<{ n: number; quakes: Quake[]; citation: string }>(`/api/canarias/quakes?days=${days}`),

@@ -61,10 +61,9 @@ export default function CanariasLive() {
         </div>
         <div className="kpis">
           <div className="kpi"><div className="k">Sismos 7 días · Canarias</div><div className="v">{fmt.int(total7)}</div><div className="s">en las zonas volcánicas analizadas</div></div>
-          <div className="kpi"><div className="k">Sismos en pantalla</div><div className="v">{fmt.int(pts.length)}</div><div className="s">últimos {days} días{active ? ` · ${zones.find((z) => z.key === active)?.name}` : ''}</div></div>
           <div className="kpi"><div className="k">Magnitud máxima</div><div className="v">{maxMag > -9 ? fmt.num(maxMag) : '—'}</div><div className="s">en el periodo mostrado</div></div>
           <div className="kpi"><div className="k">SO2 por satélite · 7 días</div><div className="v" style={{ fontSize: 20 }}>{so2 ? <LevelChip level={so2.level} /> : '—'}</div><div className="s">máximo {so2?.max_kt == null ? '—' : `${fmt.num(so2.max_kt, 2)} kt`} · NASA OMPS</div></div>
-          <div className="kpi"><div className="k">Zona más activa</div><div className="v" style={{ fontSize: 20 }}>{zones[0]?.name ?? '—'}</div><div className="s">índice {zones[0]?.index == null ? '—' : fmt.num(zones[0].index)} / 10</div></div>
+          <div className="kpi"><div className="k">Zona más activa</div><div className="v" style={{ fontSize: 20 }}>{zones[0]?.index ? zones[0].name : 'Ninguna anómala'}</div><div className="s">{zones[0]?.index ? `índice ${fmt.num(zones[0].index)} / 10` : `índice 0 en todas las zonas · ${fmt.int(pts.length)} sismos en pantalla`}</div></div>
         </div>
       </div>
       <aside className="side">

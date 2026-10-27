@@ -149,9 +149,72 @@ def load_exposure(grid: Grid, folder: Path) -> Exposure:
     return exp
 
 
-def build_road_graph(grid: Grid, roads_file: Path, places: list, hubs=("Los Llanos de Aridane", "El Paso")):
-    """Graph whose nodes are lava-grid cells crossed by OSM roads (as of 1 Sep 2021)."""
-    ways = json.loads(roads_file.read_text())["elements"]
+def _read_json(path: Path):
+    import gzip
+    path = Path(path)
+    if path.suffix == ".gz":
+        with gzip.open(path, "rt", encoding="utf-8") as fh:
+            return json.load(fh)
+    return json.loads(path.read_text())
+
+
+def _osm_facilities_places(grid: Grid, elements: list):
+    facilities, places = [], []
+    for e in elements:
+        tg = e.get("tags", {})
+        lat = e.get("lat", e.get("center", {}).get("lat"))
+        lon = e.get("lon", e.get("center", {}).get("lon"))
+        if lat is None:
+            continue
+        x, y = lonlat_to_utm28(lon, lat)
+        cell = int(_cell(grid, float(x), float(y)))
+        if tg.get("place") in PLACE_TYPES and tg.get("name"):
+            places.append(dict(name=tg["name"], kind=tg["place"], x=float(x), y=float(y), lon=lon, lat=lat, cell=cell))
+            continue
+        label = CRITICAL_AMENITY.get(tg.get("amenity", ""))
+        if not label:
+            for (k, v), lab in CRITICAL_OTHER.items():
+                if tg.get(k) == v:
+                    label = lab
+        if label == "Potabilizadora" and (tg.get("name") or "").lower().startswith("galer"):
+            label = "Galería de agua"
+        if label:
+            facilities.append(dict(name=tg.get("name") or label, kind=label, x=float(x), y=float(y), lon=lon, lat=lat,
+                                   cell=cell, osm=f"{e['type']}/{e['id']}"))
+    return facilities, places
+
+
+def load_exposure_osm(grid: Grid, folder: Path, tag: str, hubs=()) -> Exposure:
+    """Exposure from OpenStreetMap only (building centroids, roads, services, places): for islands without a CEMS inventory.
+
+    OSM building coverage varies by municipality; it is a lower bound of what is exposed.
+    """
+    b = _read_json(folder / f"osm_buildings_{tag}.json.gz")
+    bll = np.asarray(b["lonlat"], float).reshape(-1, 2)
+    bx, by = lonlat_to_utm28(bll[:, 0], bll[:, 1])
+    bld_cell = _cell(grid, bx, by)
+    roads = _read_json(folder / f"osm_roads_{tag}.json.gz")["elements"]
+    seg_cells, seg_len, seg_ll = [], [], []
+    for w in roads:
+        g = w.get("geometry")
+        if not g or len(g) < 2:
+            continue
+        a = np.array([[p["lon"], p["lat"]] for p in g], float)
+        cells, length = _sample_line(grid, a, grid.step / 2)
+        if cells.size:
+            seg_cells.append(cells)
+            seg_len.append(length)
+            seg_ll.append(np.round(a, 5).tolist())
+    fac, places = _osm_facilities_places(grid, _read_json(folder / f"osm_facilities_places_{tag}.json.gz")["elements"])
+    exp = Exposure(grid, bld_cell, np.zeros(len(bld_cell), bool), np.column_stack([bx, by]), seg_cells, np.array(seg_len),
+                   np.zeros(len(seg_len), bool), seg_ll, fac, places)
+    exp.graph = build_road_graph(grid, roads, places, hubs=hubs)
+    return exp
+
+
+def build_road_graph(grid: Grid, roads_file, places: list, hubs=("Los Llanos de Aridane", "El Paso")):
+    """Graph whose nodes are lava-grid cells crossed by OSM roads. `roads_file`: path, or the list of ways."""
+    ways = roads_file if isinstance(roads_file, list) else _read_json(roads_file)["elements"]
     edges = set()
     for w in ways:
         geom = w.get("geometry")
@@ -322,6 +385,13 @@ def isolation(fc: LavaForecast, exp: Exposure, t_until: float, already_mask: np.
     if already_mask is not None:
         base_cut = already_mask[nodes]
     places = [pl for pl in exp.places if pl.get("node", -1) >= 0]
+    # places with no road link to a safe hub even before the lava (gaps in the road data, or grid edge) can't be
+    # "isolated by the lava": leave them out instead of reporting them at 100 %
+    keep0 = ~base_cut[edges[:, 0]] & ~base_cut[edges[:, 1]]
+    e0 = edges[keep0]
+    _, lab0 = connected_components(coo_matrix((np.ones(len(e0)), (e0[:, 0], e0[:, 1])), shape=(n, n)), directed=False)
+    safe0 = set(lab0[safe & ~base_cut].tolist())
+    places = [pl for pl in places if base_cut[pl["node"]] or lab0[pl["node"]] in safe0]
     iso = np.zeros((len(places), fc.n_paths), bool)
     reached = np.zeros((len(places), fc.n_paths), bool)
     cache: dict = {}

@@ -73,6 +73,7 @@ def status():
 @lru_cache(maxsize=4)
 def _terrain(name: str, texture_k: int):
     files = {"lapalma": DATA / "canarias" / "terrain_lapalma_100m.npz",
+             "tenerife": DATA / "canarias" / "terrain_tenerife_100m.npz",
              "archipelago": DATA / "canarias" / "terrain_archipelago_500m.npz"}
     if name not in files:
         raise HTTPException(404, "terreno desconocido")
@@ -88,7 +89,29 @@ def _terrain(name: str, texture_k: int):
 
 @app.get("/api/terrain/{name}")
 def terrain(name: str):
-    return J(_terrain(name, 4 if name == "lapalma" else 2))
+    return J(_terrain(name, 4 if name == "lapalma" else 3 if name == "tenerife" else 2))
+
+
+# ------------------------------------------------------------------ Tenerife scenarios
+@app.get("/api/tenerife/scenarios")
+def tf_scenarios():
+    from ..tenerife import catalogue
+    return J(dict(scenarios=catalogue(),
+                  note="Escenarios de planificación con el mismo motor validado en La Palma 2021. No indican que una erupción sea "
+                       "probable ni dónde ocurriría. La valoración oficial corresponde al PEVOLCA."))
+
+
+_tf_lock = threading.Lock()
+
+
+@app.get("/api/tenerife/scenario/{key}")
+def tf_scenario(key: str):
+    from ..tenerife import scenario
+    with _tf_lock:
+        out = scenario(key, _catalog())
+    if out is None:
+        raise HTTPException(404, "escenario desconocido")
+    return J(out)
 
 
 # ------------------------------------------------------------------ Canarias live

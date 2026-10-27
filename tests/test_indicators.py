@@ -83,3 +83,15 @@ def test_calibration_episodes_and_outcomes():
     assert len(eps) == 2
     assert C.classify("la_palma", eps[0]) == "sin erupción"
     assert C.classify("la_palma", eps[1]) == "precedió a la erupción"
+
+
+def test_tenerife_scenarios_catalogue_has_history_and_vents_on_the_grid():
+    from volscan import tenerife as T
+    from volscan.geo import lonlat_to_utm28
+    keys = [s["key"] for s in T.catalogue()]
+    assert "dorsal_noroeste" in keys and T.SEISMIC_KEY in keys
+    g = T.grid()
+    for s in T.SCENARIOS:
+        for lon, lat, _ in s["vents"]:
+            i, j = g.xy_to_ij(*lonlat_to_utm28(lon, lat))
+            assert 0 <= int(i) < g.shape[0] and 0 <= int(j) < g.shape[1] and not np.isnan(g.elev[int(i), int(j)])

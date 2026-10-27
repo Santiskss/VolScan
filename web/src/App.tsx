@@ -3,11 +3,13 @@ import { api, fmt, STATIC, type Status } from './api'
 import AtlasLaPalma from './views/AtlasLaPalma'
 import CanariasLive from './views/CanariasLive'
 import Reports from './views/Reports'
+import TenerifeScenarios from './views/TenerifeScenarios'
 import Validation from './views/Validation'
 
 const TABS = [
   ['atlas', 'Atlas volcánico · 3D'],
   ['canarias', 'Canarias en directo'],
+  ['tenerife', 'Tenerife · escenarios'],
   ['validacion', 'Validación 2021'],
   ['informes', 'Informes mensuales'],
 ] as const
@@ -15,7 +17,8 @@ type Tab = (typeof TABS)[number][0]
 
 const HEADERS: Record<Tab, [string, string, string]> = {
   atlas: ['La Palma', 'Tajogaite · 19 sep – 13 dic 2021 · EMSR546', 'Histórico real · reconstrucción, no en directo'],
-  canarias: ['Canarias', 'Sismicidad por zona volcánica', 'En directo · catálogo IGN'],
+  canarias: ['Canarias', 'Sismicidad, deformación y gases por zona volcánica', 'En directo · catálogo IGN'],
+  tenerife: ['Tenerife', 'Escenarios de impacto por sistema volcánico', 'Planificación · no es un pronóstico'],
   validacion: ['La Palma', 'Pronóstico de impacto frente a lo observado', 'Acierto medido, no prometido'],
   informes: ['Canarias', 'Vigilancia volcánica por zona: sismos, deformación y gases', 'IGN · NGL · NASA · no es una alerta'],
 }
@@ -61,6 +64,7 @@ export default function App() {
       </div>
       {tab === 'atlas' && <AtlasLaPalma />}
       {tab === 'canarias' && <CanariasLive />}
+      {tab === 'tenerife' && <TenerifeScenarios />}
       {tab === 'validacion' && <Validation />}
       {tab === 'informes' && <Reports />}
     </>
