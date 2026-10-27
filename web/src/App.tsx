@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react'
-import { api, fmt, STATIC, type Status } from './api'
+import { api, authEvents, fmt, setToken, STATIC, type AuthUser, type Status } from './api'
+import AuditLog from './views/AuditLog'
+import Login from './views/Login'
 import AtlasLaPalma from './views/AtlasLaPalma'
 import CanariasLive from './views/CanariasLive'
 import Reports from './views/Reports'
@@ -12,6 +14,7 @@ const TABS = [
   ['tenerife', 'Tenerife · escenarios'],
   ['validacion', 'Validación 2021'],
   ['informes', 'Informes mensuales'],
+  ['registro', 'Registro'],
 ] as const
 type Tab = (typeof TABS)[number][0]
 
@@ -20,6 +23,7 @@ const HEADERS: Record<Tab, [string, string, string]> = {
   canarias: ['Canarias', 'Sismicidad, deformación y gases por zona volcánica', 'En directo · catálogo IGN'],
   tenerife: ['Tenerife', 'Escenarios de impacto por sistema volcánico', 'Planificación · no es un pronóstico'],
   validacion: ['La Palma', 'Pronóstico de impacto frente a lo observado', 'Acierto medido, no prometido'],
+  registro: ['VolScan', 'Quién ha hecho qué y cuándo', 'Trazabilidad · ENS'],
   informes: ['Canarias', 'Vigilancia volcánica por zona: sismos, deformación y gases', 'IGN · NGL · NASA · no es una alerta'],
 }
 
@@ -35,6 +39,13 @@ function Logo() {
 export default function App() {
   const [tab, setTab] = useState<Tab>(() => ((TABS.map((t) => t[0]) as string[]).includes(location.hash.slice(1).split('@')[0]) ? location.hash.slice(1).split('@')[0] as Tab : 'atlas'))
   const [status, setStatus] = useState<Status | null>(null)
+  const [auth, setAuth] = useState<{ enabled: boolean; user: AuthUser | null } | null>(null)
+  useEffect(() => {
+    api.authConfig().then((a) => setAuth({ enabled: a.enabled, user: a.user })).catch(() => setAuth({ enabled: true, user: null }))
+    const h = () => { setToken(null); setAuth((a) => ({ enabled: a?.enabled ?? true, user: null })) }
+    authEvents.addEventListener('unauthorized', h)
+    return () => authEvents.removeEventListener('unauthorized', h)
+  }, [])
   useEffect(() => { if (location.hash.slice(1).split('@')[0] !== tab) location.hash = tab }, [tab])
   useEffect(() => {
     const load = () => api.status().then(setStatus).catch(() => setStatus(null))
@@ -43,15 +54,19 @@ export default function App() {
     return () => clearInterval(t)
   }, [])
   const [place, sub, badge] = HEADERS[tab]
+  const isAdmin = !auth?.enabled || auth?.user?.role === 'admin'
+  const tabs = TABS.filter(([k]) => k !== 'registro' || (!STATIC && isAdmin))
+  if (auth?.enabled && !auth.user) return <><div className="topbar"><span className="spacer" /></div><Login onDone={(u) => setAuth({ enabled: true, user: u })} /></>
   const llm = status?.llm
   return (
     <>
       <div className="topbar">
-        {TABS.map(([k, label]) => <button key={k} className={`tab ${tab === k ? 'active' : ''}`} onClick={() => setTab(k)}>{label}</button>)}
+        {tabs.map(([k, label]) => <button key={k} className={`tab ${tab === k ? 'active' : ''}`} onClick={() => setTab(k)}>{label}</button>)}
         <span className="spacer" />
         <span className="chip"><span className={`dot ${llm?.ok ? 'ok' : 'warn'}`} />{STATIC ? 'IA: solo en versión local' : <>IA: {llm ? (llm.provider === 'meta' ? 'Meta · ' : 'Local · ') + llm.model : '—'}{llm && !llm.ok ? ' (sin conexión)' : ''}</>}</span>
         <span className="chip" title={status?.catalog.health?.message ?? ''}><span className={`dot ${!STATIC && status?.catalog.health && !status.catalog.health.ok ? 'warn' : 'ok'}`} />IGN: {status ? `${fmt.int(status.catalog.n_events)} sismos` : '—'}{!STATIC && status?.catalog.health && !status.catalog.health.ok ? ` · ${status.catalog.health.level}` : ''}</span>
         {STATIC && status && <span className="chip"><span className="dot warn" />Instantánea · {fmt.dateTime(status.now)}</span>}
+        {auth?.enabled && auth.user && <span className="chip"><span className="dot ok" />{auth.user.name} · {auth.user.role}<button className="linklike" onClick={() => { api.logout().finally(() => { setToken(null); setAuth({ enabled: true, user: null }) }) }}>Salir</button></span>}
       </div>
       <div className="header">
         <Logo />
@@ -67,6 +82,7 @@ export default function App() {
       {tab === 'tenerife' && <TenerifeScenarios />}
       {tab === 'validacion' && <Validation />}
       {tab === 'informes' && <Reports />}
+      {tab === 'registro' && <AuditLog />}
     </>
   )
 }
