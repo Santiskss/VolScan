@@ -21,3 +21,12 @@ Retrieved: 2026-10-26.
 | `ign/ign_YYYY_MM.csv` | IGN, Catálogo de terremotos, box 26.5–30 N, 19–12.5 W, Jan 2010 – today | Instituto Geográfico Nacional (IGN). Catálogo de terremotos. doi:10.7419/162.03.2022 | Downloaded month by month from the public form (`volscan.sources.ign_catalog`). The current month is refreshed live. Empty fields are kept empty. |
 | `terrain_lapalma_100m.npz`, `terrain_archipelago_500m.npz` | Copernicus DEM GLO-30 (AWS open data) | © DLR e.V. 2010-2014 and © Airbus Defence and Space GmbH 2014-2018, provided under COPERNICUS by the EU and ESA | Pre-2021 surface, bilinear to UTM 28N, ocean from WBM = NaN. `scripts/fetch_terrain_canarias.py`. |
 | `lapalma2021/places.json` | OpenStreetMap via Nominatim | © OpenStreetMap contributors (ODbL) | Point locations of neighbourhoods. |
+
+## La Palma 2021 exposure — `data/lapalma2021/exposure/` (`scripts/fetch_exposure_lapalma.py`)
+
+| File | Source | Licence / attribution | Notes |
+|---|---|---|---|
+| `cems_builtup_grading.geojson` | Copernicus EMS EMSR546, Grading Monitoring 63 (17 Dec 2021), via IGME | © 2021 European Union, CEMS | 8,879 building points in the activation area; 2,988 graded "Destroyed". Used as exposure and as ground truth. |
+| `cems_transport_grading.geojson` | idem | idem | 6,747 road segments; damage grade per segment. |
+| `osm_facilities_places_20210901.json` | OpenStreetMap, Overpass attic query as of 2021-09-01 | © OpenStreetMap contributors (ODbL) | Services, places, irrigation reservoirs, substations. |
+| `osm_roads_20210901.json` | idem | idem | Road network before the eruption, for the isolation analysis. |
