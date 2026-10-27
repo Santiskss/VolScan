@@ -259,13 +259,13 @@ export default function Atlas3D({ terrain, overlay, quakes = [], labels = [], ex
     const mat = new THREE.MeshBasicMaterial({ depthTest: true })
     const inst = new THREE.InstancedMesh(geo, mat, surfacePoints.length)
     const m = new THREE.Matrix4(), col = new THREE.Color()
-    const lo = new THREE.Color('#f2c14e'), hi = new THREE.Color('#7a0f0a')
+    const lo = new THREE.Color('#f2c14e'), hi = new THREE.Color('#7a0f0a'), pocket = new THREE.Color('#3f5fb0')
     surfacePoints.forEach((p, i) => {
       const j = Math.floor((p.x - t.west) / t.step), k = Math.floor((t.north - p.y) / t.step)
       const z = k >= 0 && k < t.rows && j >= 0 && j < t.cols ? h[k * t.cols + j] : 0
       m.makeTranslation((p.x - s.center.cx) / km, ((Number.isNaN(z) ? 0 : z) / km) * exaggeration + 0.02, -(p.y - s.center.cy) / km)
       inst.setMatrixAt(i, m)
-      inst.setColorAt(i, col.copy(lo).lerp(hi, Math.min(1, Math.max(0, p.v))))
+      inst.setColorAt(i, p.v < 0 ? col.copy(pocket) : col.copy(lo).lerp(hi, Math.min(1, Math.max(0, p.v))))
     })
     inst.renderOrder = 3
     g.add(inst)

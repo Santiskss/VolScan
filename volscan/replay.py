@@ -1,9 +1,13 @@
 """La Palma 2021 replay: what VolScan would have known, day by day.
 
 For each day we use ONLY information available by the end of that day:
-seismicity up to that moment, and CEMS observations acquired up to that
-moment. (There's a caveat: CEMS published some maps hours after acquiring
-them. We use the acquisition time and say so in the interface.)
+seismicity up to that moment, and CEMS observations DELIVERED by that moment.
+CEMS rapid-mapping delineations are delivered 7 h (fast mode) to 48 h
+(standard mode) after the image is received. The layers don't record the
+delivery time, so each map is assumed available `DELIVERY_DELAY_H` hours after
+acquisition (24 h by default; the validation reports 7 h and 48 h too).
+Ground truth for validation still uses the acquisition time: that is when the
+lava was really there.
 
 The lava ensemble is computed once over the pre-eruption terrain, starting
 from the vent (the highest point of the first observed flow, 20 Sep). Each
@@ -38,12 +42,18 @@ CACHE = Path(__file__).resolve().parents[1] / "out" / "cache"
 SEA_ENTRY_REAL = dt.datetime(2021, 9, 28, 22, 2, tzinfo=dt.timezone.utc)
 SWARM_START = dt.date(2021, 9, 11)
 REPLAY_END = dt.date(2021, 12, 25)
+DELIVERY_DELAY_H = 24.0
+WATCH_P_HIGH = 0.01          # first tier of the watch list: some ensemble member reaches the building
+WATCH_POCKET = 0.2           # second tier: hemmed in by the flow field (infill score)
+CAL_SMOOTH = 5.0             # additive smoothing of the error ratios used to calibrate the range
 
 ENSEMBLE = LavaParams(n_paths=600, viscosity_pa_s=LogNormal(3e6, 1.5), max_length_m=LogNormal(6000, 0.5))
 
 
 class LaPalma2021:
-    def __init__(self, catalog: Catalog | None = None, params: LavaParams = ENSEMBLE, seed: int = 0):
+    def __init__(self, catalog: Catalog | None = None, params: LavaParams = ENSEMBLE, seed: int = 0,
+                 delivery_delay_h: float = DELIVERY_DELAY_H):
+        self.delay = dt.timedelta(hours=delivery_delay_h)
         self.grid = load_grid_npz(CASE / "dem_utm25.npz")
         self.obs = load_lava_extents(CASE / "lava_extents.geojson")
         self.places = json.loads((CASE / "places.json").read_text())
@@ -102,6 +112,11 @@ class LaPalma2021:
 
     # ---------- per-day state
     def obs_until(self, now: dt.datetime) -> list[int]:
+        """Observations KNOWN at `now` (acquired and delivered)."""
+        return [k for k, o in enumerate(self.obs) if o.observed_at + self.delay <= now]
+
+    def obs_acquired_until(self, now: dt.datetime) -> list[int]:
+        """Observations ACQUIRED by `now` (the ground truth of where the lava was)."""
         return [k for k, o in enumerate(self.obs) if o.observed_at <= now]
 
     def weights_at(self, now: dt.datetime, p: A.AssimParams = A.AssimParams()) -> np.ndarray:
@@ -246,6 +261,8 @@ class ImpactReplay:
         self.r = base
         self.exp = load_exposure(base.grid, CASE / "exposure")
         self._scen = {}
+        self._pocket: dict = {}
+        self._raw: dict = {}
 
     @staticmethod
     def _public(I: dict) -> dict:
@@ -259,7 +276,7 @@ class ImpactReplay:
         return I
 
     def growth_rates(self, now: dt.datetime, window_days: float = 6.0) -> list[float]:
-        """Observed area growth rates (ha/h) between consecutive CEMS maps of the last few days."""
+        """Observed area growth rates (ha/h) between consecutive CEMS maps known at `now`, over the last few days."""
         r = self.r
         ks = r.obs_until(now)
         cell_ha = r.grid.step ** 2 / 1e4
@@ -273,22 +290,70 @@ class ImpactReplay:
             rates = [float(r.mask(ks[-1]).sum()) * cell_ha / max(r.hours(r.obs[ks[-1]].observed_at), 1.0)]
         return rates
 
+    # ---------- buildings hemmed in by the flow ("pockets")
+    def pocket(self, k: int) -> np.ndarray:
+        """Infill score per cell for map k (see volscan.lateral.infill_prior)."""
+        from .lateral import infill_prior
+        if k not in self._pocket:
+            r = self.r
+            self._pocket[k] = infill_prior(r.mask(k).reshape(r.grid.shape), r.valid, r.grid.step).ravel()
+        return self._pocket[k]
+
+    def watch_list(self, now: dt.datetime, horizon_h: float, fc) -> dict:
+        """Two tiers of buildings still standing, for evacuation planning.
+
+        - "alta": some ensemble member reaches it within the horizon (p >= 1 %).
+        - "cercada": not in the first tier, but hemmed in by the flow field
+          (infill score >= 0.2). That is where lateral growth and new lobes go.
+        Their measured recall/precision over 2021 is in the validation.
+        """
+        r = self.r
+        ks = r.obs_until(now)
+        bc = self.exp.bld_cell
+        okb = bc >= 0
+        c = np.clip(bc, 0, None)
+        alive = okb & ~(r.mask(ks[-1])[c] if ks else np.zeros(len(bc), bool))
+        pm = fc.probability(r.hours(now) + horizon_h).ravel()
+        high = alive & (pm[c] >= WATCH_P_HIGH)
+        pocket = alive & ~high & ((self.pocket(ks[-1])[c] >= WATCH_POCKET) if ks else False)
+        return dict(high=high, pocket=pocket)
+
     def constrained(self, now: dt.datetime, horizon_h: float, p_flat: np.ndarray, already: np.ndarray) -> dict:
-        """Area-constrained expectation (low / central / high from the spread of recent growth rates)."""
+        """Area-constrained expectation (low / central / high from the spread of recent growth rates).
+
+        The area to place covers the time since the last KNOWN map, not only the
+        horizon: a map known now may be a day old.
+        """
         from .impact import expected_from_cells, scale_to_area
-        cell_ha = self.r.grid.step ** 2 / 1e4
+        r = self.r
+        cell_ha = r.grid.step ** 2 / 1e4
         rates = self.growth_rates(now)
+        ks = r.obs_until(now)
+        lag_h = (now - r.obs[ks[-1]].observed_at).total_seconds() / 3600 if ks else 0.0
+        span = horizon_h + lag_h
         lo, mid, hi = (min(rates) * 0.7, float(np.median(rates)), max(rates) * 1.3) if rates else (0, 0, 0)
         out = {}
         for k, rate in (("low", lo), ("central", mid), ("high", hi)):
-            q = scale_to_area(p_flat, rate * horizon_h, cell_ha, already)
+            q = scale_to_area(p_flat, rate * span, cell_ha, already)
             out[k] = expected_from_cells(q, self.exp)
             if k == "central":
                 q_mid = q
-        return dict(rates_ha_h=[round(x, 2) for x in rates], area_ha=dict(low=round(lo * horizon_h, 1), central=round(mid * horizon_h, 1),
-                    high=round(hi * horizon_h, 1)), buildings=dict(low=round(out["low"]["buildings"]), central=round(out["central"]["buildings"]),
-                    high=round(out["high"]["buildings"])), road_km=dict(low=round(out["low"]["road_km"], 1),
-                    central=round(out["central"]["road_km"], 1), high=round(out["high"]["road_km"], 1)), _q=q_mid)
+        return dict(rates_ha_h=[round(x, 2) for x in rates], map_age_h=round(lag_h, 1),
+                    area_ha=dict(low=round(lo * span, 1), central=round(mid * span, 1), high=round(hi * span, 1)),
+                    buildings=dict(low=round(out["low"]["buildings"]), central=round(out["central"]["buildings"]),
+                                   high=round(out["high"]["buildings"])),
+                    road_km=dict(low=round(out["low"]["road_km"], 1), central=round(out["central"]["road_km"], 1),
+                                 high=round(out["high"]["road_km"], 1)), _q=q_mid)
+
+    def coverage_map(self, now: dt.datetime, horizon_h: float = 72.0) -> np.ndarray | None:
+        """Per-cell probability of new lava within the horizon (area-constrained, central), shape = grid."""
+        r = self.r
+        ks = r.obs_until(now)
+        if not ks:
+            return None
+        fc = r.lava_state(now)["_fc"]
+        return self.constrained(now, horizon_h, fc.probability(r.hours(now) + horizon_h).ravel(),
+                                r.mask(ks[-1]))["_q"].reshape(r.grid.shape)
 
     def eruptive(self, now: dt.datetime, horizon_h: float = 72.0) -> dict:
         from .impact import impact, isolation, observed_losses
@@ -299,26 +364,38 @@ class ImpactReplay:
         ks = r.obs_until(now)
         already = r.mask(ks[-1]) if ks else None
         I = impact(fc, self.exp, t_now + horizon_h, already)
-        bp = I["building_probability"]
         iso = isolation(fc, self.exp, t_now + horizon_h, already)
         later = now + dt.timedelta(hours=horizon_h)
-        kl = r.obs_until(later)
+        kl = r.obs_acquired_until(later)
         truth = None
-        if kl and kl[-1] != (ks[-1] if ks else None) and later <= r.obs[-1].observed_at + dt.timedelta(days=1):
+        if kl and ks and kl[-1] != ks[-1] and later <= r.obs[-1].observed_at + dt.timedelta(days=1):
             t_obs = observed_losses(self.exp, r.mask(kl[-1]))
             base = I["already_lost"]
             truth = dict(at=r.obs[kl[-1]].observed_at.isoformat(),
                          new_buildings=t_obs["buildings"] - base["buildings"],
                          new_road_km=round(t_obs["road_km"] - base["road_km"], 2))
-        C = self.constrained(now, horizon_h, fc.probability(t_now + horizon_h).ravel(), already)
-        q = C.pop("_q")
-        bc = self.exp.bld_cell
-        qb = np.where(bc >= 0, q[np.clip(bc, 0, None)], 0.0)
-        pts = [(float(x), float(y), round(float(v), 3)) for (x, y), v in zip(self.exp.bld_xy, qb) if v >= 0.02]
+        C, pts, watch = None, [], None
+        if ks:
+            C = self.constrained(now, horizon_h, fc.probability(t_now + horizon_h).ravel(), already)
+            q = C.pop("_q")
+            if horizon_h == 72.0:
+                cal = self.calibrated(now, C["buildings"]["central"])
+                if cal:
+                    C["buildings"].update(low=cal["low"], high=cal["high"])
+                    C["interval"] = cal
+            bc = self.exp.bld_cell
+            qb = np.where(bc >= 0, q[np.clip(bc, 0, None)], 0.0)
+            pts = [(float(x), float(y), round(float(v), 3)) for (x, y), v in zip(self.exp.bld_xy, qb) if v >= 0.02]
+            W = self.watch_list(now, horizon_h, fc)
+            watch = dict(high=int(W["high"].sum()), pocket=int(W["pocket"].sum()),
+                         pocket_xy=[(float(x), float(y)) for (x, y), f in zip(self.exp.bld_xy, W["pocket"]) if f])
         return dict(phase="eruptive", **self._public(I), constrained=C, isolation=iso[:15], truth_after=truth,
-                    buildings_at_risk_xy=pts,
-                    method="Dónde: conjunto de coladas reponderado con lo observado. Cuánto: crecimiento de área observado por "
-                           "Copernicus en los últimos días (bajo/central/alto). Aislamiento: miembros del conjunto sobre la red de OSM.")
+                    buildings_at_risk_xy=pts, watch=watch, map_delay_h=r.delay.total_seconds() / 3600,
+                    method="Dónde: conjunto de coladas desde la boca, reponderado con lo observado. Cuánto: crecimiento de "
+                           "área de los mapas de Copernicus ya entregados, contando desde la fecha del último mapa. Rango: "
+                           "calibrado con el error real de los pronósticos anteriores cuya verdad ya se conoce. Aislamiento: "
+                           "miembros del conjunto sobre la red de OSM. Edificios cercados: rodeados por la colada, donde va el "
+                           "crecimiento lateral.")
 
     def scenario(self, now: dt.datetime, n_paths: int = 500) -> dict | None:
         """Pre-eruptive: vents drawn from the shallow seismicity of the last 72 h. Hours count from the (unknown) opening."""
@@ -372,28 +449,114 @@ class ImpactReplay:
         self._scen[key] = out
         return out
 
-    def validation(self, horizons=(24.0, 72.0)) -> list[dict]:
-        """Every day of the eruption: forecast at end of day for +h vs what CEMS observed later."""
+    # ---------- validation and calibration
+    def raw_row(self, d: dt.date, horizons=(24.0, 72.0)) -> dict | None:
+        """Forecast made at the end of day d (central + rate range), the truth, and when that truth became known."""
         from .impact import observed_losses
+        if d in self._raw:
+            return self._raw[d]
         r = self.r
+        now = dt.datetime(d.year, d.month, d.day, 23, 59, tzinfo=dt.timezone.utc)
+        ks = r.obs_until(now)
+        row = None
+        if ks and now >= LAPALMA_2021_ONSET:
+            fc = r.lava_state(now)["_fc"]
+            base = observed_losses(self.exp, r.mask(ks[-1]))
+            row = dict(date=d.isoformat(), lost_buildings=base["buildings"], lost_road_km=base["road_km"],
+                       map_age_h=round((now - r.obs[ks[-1]].observed_at).total_seconds() / 3600, 1))
+            for h in horizons:
+                later = now + dt.timedelta(hours=h)
+                kl = r.obs_acquired_until(later)
+                C = self.constrained(now, h, fc.probability(r.hours(now) + h).ravel(), r.mask(ks[-1]))
+                b = C["buildings"]
+                row[f"pred_{int(h)}"] = dict(expected=b["central"], p10_p90=[b["low"], b["high"]])
+                if kl[-1] != ks[-1]:
+                    newm = r.mask(kl[-1])
+                    row[f"obs_{int(h)}"] = observed_losses(self.exp, newm)["buildings"] - base["buildings"]
+                    row[f"_truth_known_{int(h)}"] = (r.obs[kl[-1]].observed_at + r.delay).isoformat()
+                    if h == 72.0:
+                        W = self.watch_list(now, h, fc)
+                        c = np.clip(self.exp.bld_cell, 0, None)
+                        lost = (self.exp.bld_cell >= 0) & newm[c] & ~r.mask(ks[-1])[c]
+                        row["watch"] = dict(high=int(W["high"].sum()), high_hit=int((W["high"] & lost).sum()),
+                                            pocket=int(W["pocket"].sum()), pocket_hit=int((W["pocket"] & lost).sum()),
+                                            lost=int(lost.sum()))
+        self._raw[d] = row
+        return row
+
+    def calibrated(self, now: dt.datetime, central: float) -> dict | None:
+        """P10–P90 from the real errors of earlier 72 h forecasts whose truth is already known at `now`.
+
+        Ratios (obs + 5) / (pred + 5) of every completed forecast; their 10th and
+        90th percentiles stretch the current central value. It needs at least 5
+        completed forecasts; before that, the range comes from the spread of
+        recent growth rates only.
+        """
+        ratios = []
+        d = LAPALMA_2021_ONSET.date()
+        while d < now.date():
+            row = self.raw_row(d)
+            if row and "obs_72" in row and dt.datetime.fromisoformat(row["_truth_known_72"]) <= now:
+                ratios.append((row["obs_72"] + CAL_SMOOTH) / (row["pred_72"]["expected"] + CAL_SMOOTH))
+            d += dt.timedelta(days=1)
+        if len(ratios) < 5:
+            return None
+        lo, hi = np.quantile(ratios, [0.1, 0.9])
+        return dict(low=max(0, round((central + CAL_SMOOTH) * lo - CAL_SMOOTH)), high=round((central + CAL_SMOOTH) * hi - CAL_SMOOTH),
+                    n_past=len(ratios), ratio_p10_p90=[round(float(lo), 2), round(float(hi), 2)])
+
+    def validation(self) -> list[dict]:
+        """Every day of the eruption: the 72 h forecast VolScan would have issued, against what CEMS later mapped."""
         out = []
         d = LAPALMA_2021_ONSET.date()
         while d <= dt.date(2021, 12, 13):
-            now = dt.datetime(d.year, d.month, d.day, 23, 59, tzinfo=dt.timezone.utc)
-            ks = r.obs_until(now)
-            if ks:
-                L = r.lava_state(now)
-                fc = L["_fc"]
-                base = observed_losses(self.exp, r.mask(ks[-1]))
-                row = dict(date=d.isoformat(), lost_buildings=base["buildings"], lost_road_km=base["road_km"])
-                for h in horizons:
-                    later = now + dt.timedelta(hours=h)
-                    kl = r.obs_until(later)
-                    C = self.constrained(now, h, fc.probability(r.hours(now) + h).ravel(), r.mask(ks[-1]))
-                    b = C["buildings"]
-                    row[f"pred_{int(h)}"] = dict(expected=b["central"], p10_p90=[b["low"], b["high"]])
-                    if kl[-1] != ks[-1]:
-                        row[f"obs_{int(h)}"] = observed_losses(self.exp, r.mask(kl[-1]))["buildings"] - base["buildings"]
+            row = self.raw_row(d)
+            if row:
+                row = {k: v for k, v in row.items() if not k.startswith("_")}
+                now = dt.datetime(d.year, d.month, d.day, 23, 59, tzinfo=dt.timezone.utc)
+                cal = self.calibrated(now, row["pred_72"]["expected"])
+                row["pred_72"] = dict(row["pred_72"], rate_range=row["pred_72"]["p10_p90"],
+                                      p10_p90=[cal["low"], cal["high"]] if cal else row["pred_72"]["p10_p90"],
+                                      calibrated=bool(cal))
                 out.append(row)
             d += dt.timedelta(days=1)
         return out
+
+
+def validation_summary(rows: list[dict]) -> dict:
+    within = [r for r in rows if "obs_72" in r]
+    inside = lambda r: r["pred_72"]["p10_p90"][0] <= r["obs_72"] <= r["pred_72"]["p10_p90"][1]
+    first10 = [r for r in within if r["date"] <= "2021-09-29"]
+    pred = sum(r["pred_72"]["expected"] for r in within)
+    obs = sum(r["obs_72"] for r in within)
+    err = [abs(r["pred_72"]["expected"] - r["obs_72"]) for r in within]
+    return dict(days=len(within), within_p10_p90_72h=sum(1 for r in within if inside(r)),
+                total_pred_72=round(pred), total_obs_72=obs, bias_pct=round(100 * (pred - obs) / obs, 1) if obs else None,
+                mae_72=round(float(np.mean(err)), 1) if err else None,
+                first_10_days=dict(days=len(first10), within=sum(1 for r in first10 if inside(r))),
+                watch=_watch_summary(within))
+
+
+def _watch_summary(rows: list[dict]) -> dict | None:
+    w = [r["watch"] for r in rows if r.get("watch")]
+    if not w:
+        return None
+    lost = sum(x["lost"] for x in w)
+    hh, hp = sum(x["high_hit"] for x in w), sum(x["pocket_hit"] for x in w)
+    nh, npk = sum(x["high"] for x in w), sum(x["pocket"] for x in w)
+    return dict(lost=lost, high=dict(recall=round(hh / lost, 3) if lost else None, precision=round(hh / nh, 3) if nh else None,
+                                     median_flagged=float(np.median([x["high"] for x in w]))),
+                with_pocket=dict(recall=round((hh + hp) / lost, 3) if lost else None,
+                                 precision=round((hh + hp) / (nh + npk), 3) if nh + npk else None,
+                                 median_flagged=float(np.median([x["high"] + x["pocket"] for x in w]))))
+
+
+def validation_payload(ir: ImpactReplay, sensitivity: dict | None = None) -> dict:
+    rows = ir.validation()
+    return dict(rows=rows, summary=validation_summary(rows), map_delay_h=ir.r.delay.total_seconds() / 3600,
+                delay_sensitivity=sensitivity,
+                truth="Copernicus EMS EMSR546: edificios dentro de la colada observada (inventario CEMS, 2.988 destruidos al final)",
+                method="Cada día a las 23:59 UTC, con los mapas de Copernicus ya entregados (se supone que llegan 24 h después "
+                       "de la imagen), VolScan pronostica los edificios nuevos alcanzados en 72 h. Se compara con el mapa "
+                       "adquirido 72 h después. El rango P10–P90 se calibra solo con los errores de pronósticos anteriores "
+                       "cuya verdad ya se conocía ese día.")

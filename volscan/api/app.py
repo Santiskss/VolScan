@@ -236,7 +236,7 @@ def _lp_day(date: str):
         out["overlay"] = dict(png=png_data_url(lava_overlay_rgba(fc.probability(horizon), obs), "RGBA"),
                               horizon_h=72, west=r.grid.west, north=r.grid.north, step=r.grid.step,
                               rows=r.grid.shape[0], cols=r.grid.shape[1],
-                              legend="Probabilidad de cubrimiento en las próximas 72 h · mancha oscura con borde naranja = colada observada (CEMS)")
+                              legend="Probabilidad de cubrimiento en las próximas 72 h · mancha oscura con borde naranja = último mapa de Copernicus ya entregado")
         out["observed"] = r.observed_geojson(now)
     return _clean(out)
 
@@ -306,17 +306,8 @@ def lp_validation():
     f = CACHE / "validation_lapalma2021.json"
     if f.exists():
         return JSONResponse(json.loads(f.read_text()))
-    rows = impact_replay().validation()
-    within = [r for r in rows if "obs_72" in r]
-    inside = sum(1 for r in within if r["pred_72"]["p10_p90"][0] <= r["obs_72"] <= r["pred_72"]["p10_p90"][1])
-    first10 = [r for r in within if r["date"] <= "2021-09-29"]
-    res = _clean(dict(rows=rows, summary=dict(
-        days=len(within), within_p10_p90_72h=inside,
-        total_pred_72=round(sum(r["pred_72"]["expected"] for r in within), 0),
-        total_obs_72=sum(r["obs_72"] for r in within),
-        first_10_days=dict(days=len(first10),
-                           within=sum(1 for r in first10 if r["pred_72"]["p10_p90"][0] <= r["obs_72"] <= r["pred_72"]["p10_p90"][1]))),
-        truth="Copernicus EMS EMSR546: edificios dentro de la colada observada (inventario CEMS, 2.988 destruidos al final)"))
+    from ..replay import validation_payload
+    res = _clean(validation_payload(impact_replay()))
     f.parent.mkdir(parents=True, exist_ok=True)
     f.write_text(json.dumps(res))
     return JSONResponse(res)

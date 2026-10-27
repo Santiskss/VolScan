@@ -67,7 +67,7 @@ export default function AtlasLaPalma() {
   }, [date])
 
   const assets: SurfacePoint[] = useMemo(() => (!showAssets || !imp?.buildings_at_risk_xy || imp.date !== date) ? [] :
-    imp.buildings_at_risk_xy.map(([x, y, v]) => ({ x, y, v })), [imp, showAssets, date])
+    [...(imp.watch?.pocket_xy ?? []).map(([x, y]) => ({ x, y, v: -1 })), ...imp.buildings_at_risk_xy.map(([x, y, v]) => ({ x, y, v }))], [imp, showAssets, date])
   const scenarioOverlay = imp && imp.date === date && imp.phase === 'pre-eruptive' ? imp.scenario?.overlay ?? null : null
 
   useEffect(() => {
@@ -224,7 +224,7 @@ export default function AtlasLaPalma() {
           <label className="check"><input type="checkbox" checked={showQuakes} onChange={(e) => setShowQuakes(e.target.checked)} /><span>Sismos en profundidad<span className="hint">IGN · catálogo de terremotos</span></span></label>
           <label className="check"><input type="checkbox" checked={cumulative} onChange={(e) => setCumulative(e.target.checked)} /><span>Acumulado desde el 1 sep<span className="hint">si no, últimos 7 días</span></span></label>
           <label className="check"><input type="checkbox" checked={showLava} onChange={(e) => setShowLava(e.target.checked)} /><span>Pronóstico y colada observada<span className="hint">conjunto VolScan · Copernicus EMS EMSR546</span></span></label>
-          <label className="check"><input type="checkbox" checked={showAssets} onChange={(e) => setShowAssets(e.target.checked)} /><span>Edificios en riesgo (72 h)<span className="hint">inventario Copernicus EMS · color = probabilidad</span></span></label>
+          <label className="check"><input type="checkbox" checked={showAssets} onChange={(e) => setShowAssets(e.target.checked)} /><span>Edificios en riesgo (72 h)<span className="hint">inventario Copernicus EMS · amarillo→granate = probabilidad · azul = cercado por la colada</span></span></label>
           <label className="check"><input type="checkbox" checked={showLabels} onChange={(e) => setShowLabels(e.target.checked)} /><span>Topónimos<span className="hint">© OpenStreetMap</span></span></label>
           <div className="slider-row"><span>Transparencia del terreno</span><span>{Math.round((1 - opacity) * 100)} %</span></div>
           <input type="range" min={0.3} max={1} step={0.02} value={opacity} onChange={(e) => setOpacity(+e.target.value)} style={{ width: '100%' }} />

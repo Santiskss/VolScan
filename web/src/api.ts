@@ -43,14 +43,24 @@ export type ImpactBlock = {
   facilities: Facility[]; ponds: { expected: number; already_lost: number }; isolation: Isolation[]
 }
 export type ImpactDay = { date: string; phase: 'eruptive' | 'pre-eruptive' } & Partial<ImpactBlock> & {
-  constrained?: { rates_ha_h: number[]; area_ha: Range3; buildings: Range3; road_km: Range3 }
+  constrained?: null | { rates_ha_h: number[]; map_age_h: number; area_ha: Range3; buildings: Range3; road_km: Range3
+    interval?: { n_past: number; ratio_p10_p90: number[] } }
+  watch?: null | { high: number; pocket: number; pocket_xy: [number, number][] }
+  map_delay_h?: number
   truth_after?: null | { at: string; new_buildings: number; new_road_km: number }
   buildings_at_risk_xy?: [number, number, number][]
   method?: string
   scenario?: null | (ImpactBlock & { n_vent_events: number; shallow_depth_max_km: number; vent_centroid_xy: [number, number]
     nearest_candidate_to_real_vent_km: number; places: { name: string; p: number }[]; overlay: Overlay; note: string })
 }
-export type ValidationRow = { date: string; lost_buildings: number; pred_24: { expected: number; p10_p90: number[] }; obs_24?: number; pred_72: { expected: number; p10_p90: number[] }; obs_72?: number }
+export type ValidationRow = { date: string; lost_buildings: number; map_age_h: number; pred_24: { expected: number; p10_p90: number[] }; obs_24?: number
+  pred_72: { expected: number; p10_p90: number[]; rate_range: number[]; calibrated: boolean }; obs_72?: number
+  watch?: { high: number; high_hit: number; pocket: number; pocket_hit: number; lost: number } }
+export type WatchTier = { recall: number | null; precision: number | null; median_flagged: number }
+export type ValidationSummary = { days: number; within_p10_p90_72h: number; total_pred_72: number; total_obs_72: number; bias_pct: number | null
+  mae_72: number | null; first_10_days: { days: number; within: number }; watch: null | { lost: number; high: WatchTier; with_pocket: WatchTier } }
+export type ValidationData = { rows: ValidationRow[]; summary: ValidationSummary; truth: string; method: string; map_delay_h: number
+  delay_sensitivity: null | Record<string, { days: number; within_p10_p90_72h: number; bias_pct: number | null; mae_72: number | null }> }
 export type Report = {
   zone: { key: string; name: string; note: string }; month: string; title: string; partial: boolean; generated_at: string
   stats: { n: number; max_mag: number | null; n_m2: number; n_m3: number; depth_median: number | null; depth_p10: number | null; shallow_lt5: number; energy_j: number }
@@ -108,7 +118,7 @@ export const api = {
   refresh: () => post<Status['catalog']>('/api/canarias/refresh', {}),
   solunar: (zone: string, start = '2011-01-01') => get<any>(`/api/solunar?zone=${zone}&start=${start}`),
   lpImpact: (d: string) => get<ImpactDay>(`/api/lapalma2021/impact/${d}`),
-  lpValidation: () => get<{ rows: ValidationRow[]; summary: { days: number; within_p10_p90_72h: number; total_pred_72: number; total_obs_72: number; first_10_days: { days: number; within: number } }; truth: string }>('/api/lapalma2021/validation'),
+  lpValidation: () => get<ValidationData>('/api/lapalma2021/validation'),
   reportMonths: () => get<{ months: string[]; zones: { key: string; name: string }[] }>('/api/reports/months'),
   report: (zone: string, month: string) => get<Report>(`/api/reports/monthly?zone=${zone}&month=${month}`),
   reportRewrite: (zone: string, month: string) => post<{ text: string | null; ai: boolean; error?: string; model: Status['llm'] }>('/api/reports/rewrite', { zone, month }),
