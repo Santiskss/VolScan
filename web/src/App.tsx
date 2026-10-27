@@ -17,7 +17,7 @@ const HEADERS: Record<Tab, [string, string, string]> = {
   atlas: ['La Palma', 'Tajogaite · 19 sep – 13 dic 2021 · EMSR546', 'Histórico real · reconstrucción, no en directo'],
   canarias: ['Canarias', 'Sismicidad por zona volcánica', 'En directo · catálogo IGN'],
   validacion: ['La Palma', 'Pronóstico de impacto frente a lo observado', 'Acierto medido, no prometido'],
-  informes: ['Canarias', 'Vigilancia sísmica por zona volcánica', 'Fuente: IGN · no es una alerta'],
+  informes: ['Canarias', 'Vigilancia volcánica por zona: sismos, deformación y gases', 'IGN · NGL · NASA · no es una alerta'],
 }
 
 function Logo() {

@@ -36,8 +36,13 @@ def _stats(c: Catalog) -> dict:
                 shallow_lt5=int((d < 5).sum()), energy_j=float(energy_joules(m).sum()) if m.size else 0.0)
 
 
-def monthly_report(cat: Catalog, events, zone_key: str, month: str, now: dt.datetime | None = None) -> dict:
-    """`cat` = catalogue already filtered to the zone; `events` = list of IgnEvent of the zone (for details)."""
+def monthly_report(cat: Catalog, events, zone_key: str, month: str, now: dt.datetime | None = None,
+                   indicators: bool = False) -> dict:
+    """`cat` = catalogue already filtered to the zone; `events` = list of IgnEvent of the zone (for details).
+
+    With `indicators`, it adds deformation (GNSS, at the last day with data
+    within the month) and satellite SO2 (days above the detection threshold).
+    """
     z = BY_KEY[zone_key]
     a, b = month_bounds(month)
     now = now or dt.datetime.now(dt.timezone.utc)
@@ -88,7 +93,20 @@ def monthly_report(cat: Catalog, events, zone_key: str, month: str, now: dt.date
                          int_max=e.int_max or None, id=e.evid) for e in top],
         felt=len(felt), tides=tides,
         sources=["Instituto Geográfico Nacional (IGN). Catálogo de terremotos. doi:10.7419/162.03.2022"],
+        deformation=None, so2=None,
     )
+    if indicators:
+        from . import deformation as D
+        last_day = (end - dt.timedelta(seconds=1)).date()
+        zd = D.zone_deformation(zone_key, last_day)
+        st_ok = [x for x in zd["stations"] if x["level"] in ("normal", "a vigilar", "anómala")]
+        rep["deformation"] = dict(level=zd["level"], stations=st_ok) if st_ok else None
+        rows = D.so2_series(a.date(), last_day)
+        if rows:
+            det = [r for r in rows if r["so2_kt"] >= D.SO2_DETECT_KT]
+            rep["so2"] = dict(days=len(rows), days_detected=len(det), max_kt=max(r["so2_kt"] for r in rows),
+                              threshold_kt=D.SO2_DETECT_KT)
+        rep["sources"] += [D.ngl_gnss.CITATION, D.gibs_so2.CITATION]
     rep["summary"] = narrative(rep)
     return rep
 
@@ -122,6 +140,17 @@ def narrative(r: dict) -> str:
                      + (f"; {_pl(st['shallow_lt5'], 'evento', 'eventos')} a menos de 5 km." if st["shallow_lt5"] else "."))
     if st["n_m3"]:
         parts.append(f"Hubo {_pl(st['n_m3'], 'terremoto', 'terremotos')} de magnitud 3 o superior.")
+    dfm = r.get("deformation")
+    if dfm:
+        worst = max(dfm["stations"], key=lambda x: max(x.get("z_h") or 0, abs(x.get("z_u") or 0)))
+        lvl = {"normal": "dentro de lo normal", "a vigilar": "con desviaciones a vigilar", "anómala": "anómala"}[dfm["level"]]
+        parts.append(f"Deformación (GNSS, {_pl(len(dfm['stations']), 'estación', 'estaciones')}): {lvl}; la mayor desviación, "
+                     f"en {worst['code']}, fue de {_n(worst['anom_u_mm'])} mm en vertical respecto a su tendencia "
+                     f"(datos hasta el {worst['evaluated_at']}).")
+    so2 = r.get("so2")
+    if so2:
+        parts.append(f"SO2 por satélite: {'sin SO2 visible' if not so2['days_detected'] else _pl(so2['days_detected'], 'día', 'días') + ' con SO2 detectado'}"
+                     f" ({so2['days']} días con dato; máximo {_n(so2['max_kt'], 2)} kt).")
     u = r["unrest_end"]["index"]
     if u is not None:
         parts.append(f"El índice de actividad anómala de VolScan cerró el periodo en {_n(u)}/10"

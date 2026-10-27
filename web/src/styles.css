@@ -206,3 +206,14 @@ table.places td { font-variant-numeric: tabular-nums; }
   .page { height: auto; overflow: visible; }
   body { background: #fff; }
 }
+
+/* indicators: deformation / gas levels */
+.lvl { font-family: var(--mono); font-size: 10px; letter-spacing: .06em; text-transform: uppercase; padding: 2px 6px; border-radius: 2px; white-space: nowrap; }
+.lvl.ok { background: rgba(108,122,88,.16); color: #4d5a3c; }
+.lvl.warn { background: rgba(214,154,52,.2); color: #8a5a10; }
+.lvl.bad { background: rgba(180,83,47,.18); color: var(--accent-ink); }
+.lvl.na { background: rgba(111,103,91,.12); color: var(--muted); }
+.ind-row { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; margin-top: 6px; }
+.ind-row .lab { font-size: 11px; color: var(--muted); }
+.cal-table td, .cal-table th { text-align: right; }
+.cal-table td:first-child, .cal-table th:first-child { text-align: left; }

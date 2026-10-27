@@ -102,10 +102,51 @@ def _daily_counts(cat: Catalog, end: float, days: int):
     return c.tolist()
 
 
+_cal_lock = threading.Lock()
+
+
+def _calibration() -> dict:
+    """Track record of the unrest index, 2011 → today (cached on disk, rebuilt weekly)."""
+    from ..calibration import load_or_build
+    with _cal_lock:
+        cat = _catalog()
+        return load_or_build(CACHE / "unrest_calibration.json", lambda: {z.key: store.zone_catalog(cat, z.key) for z in ZONES},
+                             float(cat.t.max()) if len(cat) else time.time())
+
+
+@app.get("/api/canarias/calibration")
+def canarias_calibration(zone: str | None = None):
+    c = _calibration()
+    out = {k: v for k, v in c.items() if k != "series"}
+    if zone:
+        out["series"] = c["series"].get(zone, [])
+    return J(out)
+
+
+@app.get("/api/canarias/indicators")
+def canarias_indicators(zone: str = "tenerife", days: int = 120):
+    """Deformation (GNSS) for one zone and the archipelago SO2 series, next to the seismic index."""
+    from .. import deformation as D
+    today = dt.datetime.now(dt.timezone.utc).date()
+    return J(dict(zone=zone, deformation=D.zone_deformation(zone, today), so2=D.so2_status(today),
+                  so2_series=D.so2_series(today - dt.timedelta(days=days), today),
+                  notes=dict(deformation="Estaciones GNSS públicas procesadas por NGL (placa africana fija). La serie final "
+                                         "llega con unas 4 semanas de retraso: se evalúa el último día disponible.",
+                             so2="SO2 visible por satélite (OMPS) sobre el archipiélago, por encima de 1 DU. Detecta "
+                                 "erupciones y desgasificación fuerte, no la difusa previa (CO2, He).")))
+
+
 @app.get("/api/canarias/zones")
 def canarias_zones(at: str | None = None):
+    from .. import deformation as D
+    from ..calibration import context_line
     cat = _catalog()
     t_at = dt.datetime.fromisoformat(at).timestamp() if at else time.time()
+    day = dt.datetime.fromtimestamp(t_at, dt.timezone.utc).date()
+    try:
+        cal = _calibration()
+    except Exception:
+        cal = None
     out = []
     for z in ZONES:
         zc = store.zone_catalog(cat, z.key)
@@ -118,10 +159,19 @@ def canarias_zones(at: str | None = None):
                         max_mag30=float(np.nanmax(last30.mag)) if len(last30) and not np.all(np.isnan(last30.mag)) else None,
                         depth_median30=float(np.nanmedian(last30.depth)) if len(last30) and not np.all(np.isnan(last30.depth)) else None,
                         daily30=_daily_counts(zc, t_at, 30),
-                        b=None if u.recent.b is None else dict(b=u.recent.b.b, sigma=u.recent.b.sigma, mc=u.recent.b.mc, n=u.recent.b.n)))
+                        b=None if u.recent.b is None else dict(b=u.recent.b.b, sigma=u.recent.b.sigma, mc=u.recent.b.mc, n=u.recent.b.n),
+                        mc=u.mc, rate_surprise=u.rate_surprise, history=context_line(cal, z.key, u.index),
+                        deformation=_deform_summary(D.zone_deformation(z.key, day))))
     out.sort(key=lambda d: -(d["index"] or -1))
-    return J(dict(at=dt.datetime.fromtimestamp(t_at, dt.timezone.utc).isoformat(), zones=out,
+    return J(dict(at=dt.datetime.fromtimestamp(t_at, dt.timezone.utc).isoformat(), zones=out, so2=D.so2_status(day),
                   note="Índice de actividad anómala 0-10 frente a la línea base propia de cada zona. NO es probabilidad de erupción; las alertas oficiales son del PEVOLCA."))
+
+
+def _deform_summary(zd: dict) -> dict:
+    st = [s for s in zd["stations"] if s["level"] in ("normal", "a vigilar", "anómala")]
+    return dict(level=zd["level"], n_stations=len(st),
+                evaluated_at=max((s["evaluated_at"] for s in st), default=None),
+                worst=max(st, key=lambda s: max(s.get("z_h") or 0, abs(s.get("z_u") or 0)), default=None))
 
 
 @app.get("/api/canarias/quakes")
@@ -227,7 +277,8 @@ def _lp_day(date: str):
     now = dt.datetime(d.year, d.month, d.day, 23, 59, tzinfo=dt.timezone.utc)
     seis = r.seismic_state(now)
     lava = r.lava_state(now)
-    out = dict(date=date, now=now.isoformat(), seismic=seis, lava={k: v for k, v in lava.items() if k != "_fc"})
+    out = dict(date=date, now=now.isoformat(), seismic=seis, lava={k: v for k, v in lava.items() if k != "_fc"},
+               indicators=_lp_indicators(d))
     if lava.get("phase") == "eruptive":
         fc = lava["_fc"]
         ks = r.obs_until(now)
@@ -239,6 +290,21 @@ def _lp_day(date: str):
                               legend="Probabilidad de cubrimiento en las próximas 72 h · mancha oscura con borde naranja = último mapa de Copernicus ya entregado")
         out["observed"] = r.observed_geojson(now)
     return _clean(out)
+
+
+def _lp_indicators(d: dt.date) -> dict:
+    """GNSS displacement since 10 Sep 2021 (before the swarm) and satellite SO2, as known on day d."""
+    from .. import deformation as D
+    G = D.load_gnss()
+    gnss = []
+    for code in ("MAZO", "LPAL"):
+        if code in G:
+            disp = D.displacement_since(G[code], dt.date(2021, 9, 10), d)
+            a = D.station_anomaly(G[code], d)
+            gnss.append(dict(code=code, place=G[code]["place"], since="2021-09-10", disp_mm=disp,
+                             level=a["level"] if a else "sin datos"))
+    rows = D.so2_series(dt.date(2021, 9, 1), d)
+    return dict(gnss=gnss, so2=D.so2_status(d), so2_series=[dict(date=r["date"], kt=r["so2_kt"]) for r in rows])
 
 
 @app.get("/api/lapalma2021/day/{date}")
@@ -378,7 +444,7 @@ def _report(zone: str, month: str, today: str):
     from ..zones import zone_of
     cat = store.zone_catalog(_catalog(), zone)
     ev = [e for e in store.load_events() if zone_of(e.lat, e.lon).key == zone]
-    return _clean(monthly_report(cat, ev, zone, month))
+    return _clean(monthly_report(cat, ev, zone, month, indicators=True))
 
 
 @app.get("/api/reports/monthly")
@@ -404,7 +470,8 @@ def report_rewrite(req: RewriteReq):
     """The language model rewrites the summary in an institutional register WITHOUT adding facts (the figures go in as data)."""
     rep = _report(req.zone, req.month, dt.date.today().isoformat())
     cfg = llm.LLMConfig.from_env()
-    facts = {k: rep[k] for k in ("title", "partial", "stats", "prev", "baseline", "rate_ratio", "b", "unrest_end", "top_events", "felt", "tides")}
+    facts = {k: rep.get(k) for k in ("title", "partial", "stats", "prev", "baseline", "rate_ratio", "b", "unrest_end", "top_events", "felt",
+                                     "tides", "deformation", "so2")}
     msgs = [dict(role="system", content=(
         "Redactas el resumen del informe mensual de vigilancia sísmica de VolScan para un Cabildo. Español institucional, "
         "claro, 120-170 palabras, en un párrafo. Usa EXCLUSIVAMENTE las cifras del JSON; no añadas hechos, causas ni "
