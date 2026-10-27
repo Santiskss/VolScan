@@ -102,8 +102,11 @@ def run(spec: dict, vents_xy: list, seed: int = 21) -> dict:
     key = hashlib.sha256(json.dumps([spec["key"], vents_xy, spec.get("sigma_m"), repr(PARAMS), seed, EXPOSURE_TAG],
                                     default=str).encode()).hexdigest()[:16]
     f = CACHE / f"tenerife_{spec['key']}_{key}.json"
-    if f.exists():
-        return json.loads(f.read_text())
+    fp = f.with_suffix(".npz")
+    if f.exists() and fp.exists():
+        out = json.loads(f.read_text())
+        out["_raster"] = str(fp)
+        return out
     g, exp = grid(), exposure()
     params = LavaParams(**{**PARAMS.__dict__, "vent_sigma_m": spec.get("sigma_m", 1000.0)})
     fc = forecast(g, vents_xy, params, seed=seed)
@@ -140,6 +143,8 @@ def run(spec: dict, vents_xy: list, seed: int = 21) -> dict:
     )
     CACHE.mkdir(parents=True, exist_ok=True)
     f.write_text(json.dumps(out))
+    np.savez_compressed(fp, p=p.astype(np.float16))
+    out["_raster"] = str(fp)
     return out
 
 
@@ -178,3 +183,9 @@ def scenario(key: str, cat=None, at_ts: float | None = None) -> dict | None:
 def catalogue() -> list[dict]:
     return [dict(key=s["key"], name=s["name"], history=s["history"]) for s in SCENARIOS] + \
         [dict(key=SEISMIC_KEY, name="Sismicidad de los últimos 90 días", history="Hipótesis a partir del catálogo IGN")]
+
+
+def probability_raster(sc: dict) -> np.ndarray | None:
+    """Per-cell probability (30 days) of a scenario returned by `scenario` (shape = grid)."""
+    f = sc.get("_raster")
+    return np.load(f)["p"].astype(float) if f and Path(f).exists() else None

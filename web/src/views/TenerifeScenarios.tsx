@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { api, fmt, type Terrain, type TfScenario } from '../api'
 import Atlas3D, { type Label, type SurfacePoint } from '../three/Atlas3D'
+import Exports from './Exports'
 
 const r0 = (v: number | null | undefined) => (v == null ? '—' : Math.round(v).toLocaleString('es-ES'))
 const TOWNS: [string, number, number][] = [
@@ -92,6 +93,12 @@ export default function TenerifeScenarios() {
             </table>
           </>}
           {sc?.exposure_note && <p className="note">{sc.exposure_note}</p>}
+          {sc && !sc.unavailable && <Exports items={[
+            { label: 'Parte PDF', url: `/api/export/impact/tenerife/${key}.pdf`, file: `volscan_tenerife_${key}.pdf` },
+            { label: 'CSV', url: `/api/export/impact/tenerife/${key}.csv`, file: `volscan_tenerife_${key}.csv` },
+            { label: 'Aviso CAP (112)', url: `/api/cap/tenerife/${key}.xml`, file: `volscan_cap_tenerife_${key}.xml`, hint: 'CAP 1.2, estado «Exercise»: escenario, no alerta' },
+            { label: 'GeoJSON', url: `/ogc/collections/tenerife-escenario/items?escenario=${key}`, file: `volscan_tenerife_${key}.geojson` },
+          ]} />}
         </section>
         <section>
           <h3>Capas</h3>

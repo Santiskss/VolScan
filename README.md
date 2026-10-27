@@ -45,6 +45,10 @@ part of this submission. Public datasets are listed with their licences in
 | Day-by-day validation against Copernicus, with map delivery delay and calibrated ranges | ✅ |
 | Tenerife: prepared impact scenarios per volcanic system + one from current seismicity (`volscan.tenerife`) | ✅ |
 | Monthly reports per zone: seismicity, deformation, gas | ✅ |
+| Exports: PDF and CSV (reports, impact sheets), CAP 1.2 messages for 112 systems, GeoJSON via OGC API Features (`/ogc`) | ✅ |
+| Users and roles (lector / tecnico / admin), tamper-evident audit trail (`volscan.security`) | ✅ |
+| Volcanic zones as island shapes, not overlapping boxes (`scripts/build_zones.py`) | ✅ |
+| Live catalogue health + EMSC fallback when the IGN page fails | ✅ |
 | Solunar: tidal / lunar phase per quake, Schuster + robust shift-null test | ✅ |
 | RAG over curated sources + data-derived summaries, local LLM (Ollama) → Meta Muse | ✅ |
 | Volcano Atlas web app (3D terrain, quakes at depth, lava probability, impact, validation, reports) | ✅ |
@@ -90,6 +94,15 @@ everything else still works, and the AI panels say so explicitly.
 Reproduce the data: `pip install -e ".[data]"`, then `python scripts/fetch_lapalma_2021.py`,
 `python scripts/fetch_terrain_canarias.py`, `python scripts/fetch_exposure_lapalma.py`,
 `python scripts/fetch_exposure_tenerife.py`, `python scripts/fetch_gnss_so2.py`, `python scripts/validate_lapalma.py`, and `python -c "import datetime as d; from volscan.sources.ign_catalog import sync_monthly as s; s('data/canarias/ign', d.date(2010,1,1), d.date.today())"`.
+
+## Interoperability and access
+
+- **OGC API Features** at `http://localhost:8200/ogc` (add it in QGIS as a WFS / OGC API - Features connection): zones,
+  GNSS stations, last-30-day quakes, La Palma 2021 lava probability and buildings at risk (`?fecha=`), Tenerife scenarios (`?escenario=`).
+- **CAP 1.2** at `/api/cap/lapalma2021/{fecha}.xml` and `/api/cap/tenerife/{escenario}.xml`: status `Exercise`,
+  scope `Restricted`, one area per probability band. VolScan never issues real alerts.
+- **Access control**: `VOLSCAN_AUTH=on` in `.env` and `python -m volscan.security add-user NAME lector|tecnico|admin`.
+  Every call is logged in `out/audit/audit.jsonl` with a hash chain (`python -m volscan.security verify-audit`).
 
 ## License
 

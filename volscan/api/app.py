@@ -14,7 +14,7 @@ from pathlib import Path
 
 import numpy as np
 from fastapi import FastAPI, HTTPException, Request
-from fastapi.responses import FileResponse, JSONResponse
+from fastapi.responses import FileResponse, JSONResponse, Response
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
@@ -488,6 +488,248 @@ def lp_validation():
     f.parent.mkdir(parents=True, exist_ok=True)
     f.write_text(json.dumps(res))
     return JSONResponse(res)
+
+
+# ------------------------------------------------------------------ interoperability: CAP 1.2 and OGC API Features
+def _lp_bands(date: str):
+    """Probability bands of new lava within 72 h (area-constrained, as the impact panel) for a replay day."""
+    from ..geoexport import probability_bands
+    d = dt.date.fromisoformat(date)
+    now = dt.datetime(d.year, d.month, d.day, 23, 59, tzinfo=dt.timezone.utc)
+    ir = impact_replay()
+    q = ir.coverage_map(now) if now >= LAPALMA_2021_ONSET else None
+    if q is None:
+        return None, None
+    return probability_bands(ir.r.grid, q), now
+
+
+def _tf(key: str):
+    from ..tenerife import grid as tf_grid, probability_raster, scenario
+    with _tf_lock:
+        sc = scenario(key, _catalog())
+    if sc is None or sc.get("unavailable"):
+        raise HTTPException(404, "escenario desconocido o sin datos")
+    return sc, probability_raster(sc), tf_grid()
+
+
+@app.get("/api/cap/lapalma2021/{date}.xml")
+def cap_lapalma(date: str, request: Request):
+    need(request, "tecnico")
+    from .. import cap
+    try:
+        bands, now = _lp_bands(date)
+    except ValueError:
+        raise HTTPException(400, "fecha inválida")
+    if not bands:
+        raise HTTPException(404, "ese día aún no hay pronóstico de colada (no hay mapa de Copernicus entregado)")
+    imp = _lp_impact(date)
+    c = imp.get("constrained") or {}
+    b, r = c.get("buildings", {}), c.get("road_km", {})
+    iso = [i for i in imp.get("isolation", []) if i["p_isolated"] >= 0.1]
+    desc = (f"Reconstrucción de La Palma 2021 con los datos disponibles el {date}. En las próximas 72 h se esperan "
+            f"{b.get('central')} edificios nuevos alcanzados (rango {b.get('low')}–{b.get('high')}) y {r.get('central')} km de vías. "
+            f"{len(iso)} núcleos podrían quedar aislados. Polígonos: probabilidad de que la colada cubra cada zona en 72 h.")
+    xml = cap.build(kind="lapalma2021", ref=date, sent=now, headline=f"La Palma 2021 · impacto previsto a 72 h ({date}) · simulación",
+                    description=desc, bands=bands, isolated=iso, expires=now + dt.timedelta(hours=72),
+                    parameters={"horizonte_h": 72, "edificios_central": b.get("central"), "edificios_p10": b.get("low"),
+                                "edificios_p90": b.get("high"), "vias_km_central": r.get("central"), "fuente": "VolScan"})
+    return Response(xml, media_type="application/xml",
+                    headers={"Content-Disposition": f'attachment; filename="volscan_cap_lapalma2021_{date}.xml"'})
+
+
+@app.get("/api/cap/tenerife/{key}.xml")
+def cap_tenerife(key: str, request: Request):
+    need(request, "tecnico")
+    from .. import cap
+    from ..geoexport import probability_bands
+    sc, p, g = _tf(key)
+    bands = probability_bands(g, p) if p is not None else []
+    iso = [i for i in sc.get("isolation", []) if i["p_isolated"] >= 0.05]
+    b = sc["buildings"]
+    desc = (f"Escenario de planificación «{sc['name']}» ({sc.get('history') or ''}). Si se abriera una boca ahí, en 30 días la "
+            f"colada alcanzaría {round(b['expected'])} edificios de media (P10–P90 {round(b['p10_p90'][0])}–{round(b['p10_p90'][1])}) "
+            f"y {round(sc['road_km']['expected'], 1)} km de vías. No indica que una erupción sea probable.")
+    xml = cap.build(kind="tenerife", ref=key, sent=dt.datetime.now(dt.timezone.utc),
+                    headline=f"Tenerife · escenario {sc['name']} · planificación", description=desc, bands=bands, isolated=iso,
+                    parameters={"horizonte_h": sc["horizon_h"], "edificios_media": round(b["expected"]),
+                                "vias_km_media": round(sc["road_km"]["expected"], 1), "fuente": "VolScan"})
+    return Response(xml, media_type="application/xml",
+                    headers={"Content-Disposition": f'attachment; filename="volscan_cap_tenerife_{key}.xml"'})
+
+
+OGC_COLLECTIONS = {
+    "zonas": "Zonas volcánicas de Canarias (cada isla con su mar hasta 25 km, y el canal de Enmedio)",
+    "estaciones-gnss": "Estaciones GNSS públicas con su desviación respecto a la tendencia (NGL)",
+    "sismos-30d": "Sismos de los últimos 30 días (catálogo IGN)",
+    "lapalma2021-colada-72h": "La Palma 2021: probabilidad de colada nueva en 72 h (parámetro fecha=AAAA-MM-DD)",
+    "lapalma2021-colada-observada": "La Palma 2021: último mapa de Copernicus entregado (parámetro fecha)",
+    "lapalma2021-edificios-riesgo": "La Palma 2021: edificios con probabilidad de ser alcanzados en 72 h (parámetro fecha)",
+    "tenerife-escenario": "Tenerife: probabilidad de colada en 30 días (parámetro escenario=" +
+                          "dorsal_noroeste|pico_viejo|teide_norte|dorsal_noreste|sismicidad_actual)",
+    "tenerife-servicios": "Tenerife: servicios e infraestructuras alcanzables por escenario (parámetro escenario)",
+}
+
+
+def _ogc_base(request: Request) -> str:
+    return str(request.base_url).rstrip("/") + "/ogc"
+
+
+@app.get("/ogc")
+def ogc_landing(request: Request):
+    b = _ogc_base(request)
+    return J(dict(title="VolScan · OGC API Features", description="Capas de VolScan para QGIS, ArcGIS y visores OGC.",
+                  links=[dict(href=b, rel="self", type="application/json"),
+                         dict(href=f"{b}/conformance", rel="conformance", type="application/json"),
+                         dict(href=f"{b}/collections", rel="data", type="application/json")]))
+
+
+@app.get("/ogc/conformance")
+def ogc_conformance():
+    return J(dict(conformsTo=["http://www.opengis.net/spec/ogcapi-features-1/1.0/conf/core",
+                              "http://www.opengis.net/spec/ogcapi-features-1/1.0/conf/geojson"]))
+
+
+def _coll(request: Request, cid: str) -> dict:
+    b = _ogc_base(request)
+    return dict(id=cid, title=OGC_COLLECTIONS[cid], itemType="feature", crs=["http://www.opengis.net/def/crs/OGC/1.3/CRS84"],
+                links=[dict(href=f"{b}/collections/{cid}/items", rel="items", type="application/geo+json")])
+
+
+@app.get("/ogc/collections")
+def ogc_collections(request: Request):
+    return J(dict(collections=[_coll(request, c) for c in OGC_COLLECTIONS],
+                  links=[dict(href=f"{_ogc_base(request)}/collections", rel="self", type="application/json")]))
+
+
+@app.get("/ogc/collections/{cid}")
+def ogc_collection(cid: str, request: Request):
+    if cid not in OGC_COLLECTIONS:
+        raise HTTPException(404, "colección desconocida")
+    return J(_coll(request, cid))
+
+
+@lru_cache(maxsize=1)
+def _zone_features():
+    from ..geoexport import mask_polygons
+    from ..zones import BY_KEY, _raster
+    label, lat1, lon0, res, keys = _raster()
+    feats = []
+    for k, key in enumerate(keys):
+        if key == "atlantico":
+            continue
+        polys = mask_polygons((lon0, lat1, res), label == k, tol_cells=1.0)
+        feats.append(dict(type="Feature", id=key, properties=dict(key=key, name=BY_KEY[key].name, note=BY_KEY[key].note),
+                          geometry=dict(type="MultiPolygon", coordinates=[q["coordinates"] for q in polys])))
+    return feats
+
+
+@app.get("/ogc/collections/{cid}/items")
+def ogc_items(cid: str, request: Request, fecha: str = "2021-09-25", escenario: str = "dorsal_noroeste", limit: int = 10000):
+    from ..geoexport import feature_collection
+    if cid not in OGC_COLLECTIONS:
+        raise HTTPException(404, "colección desconocida")
+    pt = lambda lon, lat, props, fid=None: dict(type="Feature", id=fid, properties=props,
+                                                geometry=dict(type="Point", coordinates=[round(lon, 6), round(lat, 6)]))
+    feats: list = []
+    if cid == "zonas":
+        feats = _zone_features()
+    elif cid == "estaciones-gnss":
+        from .. import deformation as D
+        today = dt.datetime.now(dt.timezone.utc).date()
+        for z in ZONES:
+            for s_ in D.zone_deformation(z.key, today)["stations"]:
+                feats.append(pt(s_["lon"], s_["lat"], {k: v for k, v in s_.items() if k not in ("lon", "lat")} | dict(zone=z.key), s_["code"]))
+    elif cid == "sismos-30d":
+        e = dt.datetime.now(dt.timezone.utc)
+        for q in store.events_between(e - dt.timedelta(days=30), e, limit=limit):
+            feats.append(pt(q["lon"], q["lat"], dict(t=q["t"], mag=q["mag"], depth_km=q["depth"], zone=q["zone"], place=q["place"]), q["id"]))
+    elif cid.startswith("lapalma2021-"):
+        try:
+            d = dt.date.fromisoformat(fecha)
+        except ValueError:
+            raise HTTPException(400, "fecha inválida (AAAA-MM-DD)")
+        now = dt.datetime(d.year, d.month, d.day, 23, 59, tzinfo=dt.timezone.utc)
+        if cid == "lapalma2021-colada-72h":
+            feats = _lp_bands(fecha)[0] or []
+        elif cid == "lapalma2021-colada-observada":
+            o = replay().observed_geojson(now)
+            feats = [dict(o, id="observada")] if o else []
+        else:
+            from ..geo import utm28_to_lonlat
+            for k, (x, y, v) in enumerate(_lp_impact(fecha).get("buildings_at_risk_xy") or []):
+                lon, lat = utm28_to_lonlat(x, y)
+                feats.append(pt(float(lon), float(lat), dict(p_72h=v), k))
+    elif cid.startswith("tenerife-"):
+        sc, p, g = _tf(escenario)
+        if cid == "tenerife-escenario":
+            from ..geoexport import probability_bands
+            feats = probability_bands(g, p) if p is not None else []
+        else:
+            feats = [pt(f["lon"], f["lat"], dict(kind=f["kind"], name=f["name"], p_30d=f["p"], eta_p50_h=f["eta_h"][1]), k)
+                     for k, f in enumerate(sc.get("facilities", []))]
+    feats = feats[:limit]
+    fc = feature_collection(_clean(feats), numberReturned=len(feats), timeStamp=dt.datetime.now(dt.timezone.utc).isoformat())
+    return JSONResponse(fc, media_type="application/geo+json")
+
+
+# ------------------------------------------------------------------ exports: PDF and CSV
+def _file(content: bytes, media: str, name: str) -> Response:
+    return Response(content, media_type=media, headers={"Content-Disposition": f'attachment; filename="{name}"'})
+
+
+@app.get("/api/export/report/{zone}/{month}.{fmt}")
+def export_report(zone: str, month: str, fmt: str, request: Request):
+    need(request, "tecnico")
+    from .. import pdfexport as X
+    if zone not in BY_KEY or zone == "atlantico" or fmt not in ("pdf", "csv"):
+        raise HTTPException(404, "no existe")
+    r = _report(zone, month, dt.date.today().isoformat())
+    if fmt == "pdf":
+        return _file(X.report_pdf(r), "application/pdf", f"volscan_informe_{zone}_{month}.pdf")
+    return _file(X.report_csv(r), "text/csv; charset=utf-8", f"volscan_informe_{zone}_{month}.csv")
+
+
+@app.get("/api/export/impact/lapalma2021/{date}.{fmt}")
+def export_lp_impact(date: str, fmt: str, request: Request):
+    need(request, "tecnico")
+    from .. import pdfexport as X
+    imp = _lp_impact(date)
+    if imp.get("phase") != "eruptive":
+        raise HTTPException(404, "antes de la erupción no hay parte de impacto (ver escenario anticipado)")
+    fac, iso = imp.get("facilities", []), imp.get("isolation", [])
+    if fmt == "csv":
+        return _file(X.impact_csv(fac, iso), "text/csv; charset=utf-8", f"volscan_impacto_lapalma2021_{date}.csv")
+    c = imp.get("constrained") or {}
+    b, r_, w = c.get("buildings") or {}, c.get("road_km") or {}, imp.get("watch") or {}
+    kpis = [("Edificios nuevos en 72 h", str(b.get("central", "—")), f"{b.get('low', '—')}–{b.get('high', '—')}"),
+            ("Vías nuevas en 72 h (km)", str(r_.get("central", "—")), f"{r_.get('low', '—')}–{r_.get('high', '—')}"),
+            ("Edificios ya perdidos", str(imp["already_lost"]["buildings"]), f"{imp['already_lost']['road_km']} km de vías"),
+            ("Lista de vigilancia", f"{w.get('high', '—')} alcanzables", f"{w.get('pocket', '—')} cercados por la colada"),
+            ("Último mapa de Copernicus", f"hace {c.get('map_age_h', '—')} h", f"se supone entregado {imp.get('map_delay_h')} h tras la imagen")]
+    pdf = X.impact_pdf(f"La Palma 2021 · impacto previsto a 72 h · {date}", "Reconstrucción con los datos disponibles ese día (simulación, no alerta).",
+                       kpis, fac, iso, [], imp.get("method", ""), "Copernicus EMS EMSR546, IGN, Copernicus DEM, OpenStreetMap (ODbL)")
+    return _file(pdf, "application/pdf", f"volscan_impacto_lapalma2021_{date}.pdf")
+
+
+@app.get("/api/export/impact/tenerife/{key}.{fmt}")
+def export_tf_impact(key: str, fmt: str, request: Request):
+    need(request, "tecnico")
+    from .. import pdfexport as X
+    sc, _, _ = _tf(key)
+    fac, iso = sc.get("facilities", []), sc.get("isolation", [])
+    if fmt == "csv":
+        return _file(X.impact_csv(fac, iso), "text/csv; charset=utf-8", f"volscan_escenario_tenerife_{key}.csv")
+    b, r_ = sc["buildings"], sc["road_km"]
+    kpis = [("Edificios alcanzables (30 días)", str(round(b["expected"])), f"P10–P90 {round(b['p10_p90'][0])}–{round(b['p10_p90'][1])}"),
+            ("Vías (km)", f"{r_['expected']:.1f}".replace(".", ","), f"P10–P90 {r_['p10_p90'][0]:.1f}–{r_['p10_p90'][1]:.1f}"),
+            ("Edificios con P >= 5 %", str(sc.get("n_buildings_exposed", "—")), sc.get("exposure_note", "")),
+            ("Recorridos que llegan al mar", f"{round(100 * sc.get('reach_sea', 0))} %", f"{sc.get('n_paths')} recorridos de colada")]
+    pdf = X.impact_pdf(f"Tenerife · escenario {sc['name']}", f"{sc.get('history') or ''} · escenario de planificación, no pronóstico.",
+                       kpis, fac, iso, sc.get("places", []),
+                       "Conjunto de coladas (mismo motor validado en La Palma 2021) desde los centros eruptivos históricos, con "
+                       "700–800 m de incertidumbre; impacto sobre OpenStreetMap. Parámetros basálticos.",
+                       "Copernicus DEM GLO-30, OpenStreetMap (ODbL), IGN")
+    return _file(pdf, "application/pdf", f"volscan_escenario_tenerife_{key}.pdf")
 
 
 def _fallback_brief(day: dict) -> str:

@@ -1,4 +1,5 @@
 import { fmt, type ImpactDay } from '../api'
+import Exports from './Exports'
 
 const r0 = (v: number | null | undefined) => (v == null ? '—' : Math.round(v).toLocaleString('es-ES'))
 
@@ -60,6 +61,12 @@ export default function ImpactPanel({ imp, loading }: { imp: ImpactDay | null; l
         {imp.ponds && <div className="note">Estanques de riego: {imp.ponds.already_lost} perdidos, {fmt.num(imp.ponds.expected)} más esperados.</div>}
       </>}
       <p className="note">{imp.method}</p>
+      <Exports items={[
+        { label: 'Parte PDF', url: `/api/export/impact/lapalma2021/${imp.date}.pdf`, file: `volscan_impacto_${imp.date}.pdf` },
+        { label: 'CSV', url: `/api/export/impact/lapalma2021/${imp.date}.csv`, file: `volscan_impacto_${imp.date}.csv` },
+        { label: 'Aviso CAP (112)', url: `/api/cap/lapalma2021/${imp.date}.xml`, file: `volscan_cap_${imp.date}.xml`, hint: 'CAP 1.2, estado «Exercise»: simulación, no alerta' },
+        { label: 'GeoJSON', url: `/ogc/collections/lapalma2021-colada-72h/items?fecha=${imp.date}`, file: `volscan_colada72h_${imp.date}.geojson`, hint: 'También como OGC API Features en /ogc' },
+      ]} />
     </section>
   )
 }
