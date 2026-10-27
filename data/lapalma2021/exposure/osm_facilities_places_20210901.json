@@ -1,0 +1,10002 @@
+{
+  "version": 0.6,
+  "generator": "Overpass API 0.7.62.11 87bfad18",
+  "osm3s": {
+    "timestamp_osm_base": "2026-10-27T00:27:51Z",
+    "copyright": "The data included in this document is from www.openstreetmap.org. The data is made available under ODbL."
+  },
+  "elements": [
+
+{
+  "type": "node",
+  "id": 29017252,
+  "lat": 28.6592569,
+  "lon": -17.9152016,
+  "tags": {
+    "population": "20043",
+    "population:date": "2016-01-01",
+    "source:file": "http://centrodedescargas.cnig.es/CentroDescargas/equipamiento/BD_Municipios-Entidades.zip",
+    "ref:ine": "38024000500",
+    "ele": "340",
+    "admin_level": "8",
+    "name:ru": "Лос-Янос-де-Аридане",
+    "source": "landsat;Instituto Geográfico Nacional",
+    "source:date": "2011-06",
+    "place": "town",
+    "source:ele": "MDT5",
+    "source:name": "Nomenclátor Geográfico de Municipios y Entidades de Población",
+    "name": "Los Llanos de Aridane",
+    "capital": "8",
+    "wikidata": "Q366948"
+  }
+},
+{
+  "type": "node",
+  "id": 32969685,
+  "lat": 28.5840787,
+  "lon": -17.8809751,
+  "tags": {
+    "man_made": "survey_point",
+    "source": "IDEE",
+    "source:filename": "Geodesia - Red Regente_-18.75587_27.36158_4.36897_43.81842.gml",
+    "source:name": "Infraestructura de Datos Espaciales de España",
+    "source:ref": "http://www.idee.es",
+    "ele": "698",
+    "name": "Jedey",
+    "ref:RRG": "RRG_1082",
+    "place": "village",
+    "note": "This is a point from an official geodetic network. Use it as a reference, but do NOT move it.",
+    "gml_featuretype": "VerticeRedRegente",
+    "ideewfs:alturaElipsoidal": "698.416015625",
+    "ideewfs:convergencia": "0",
+    "ideewfs:factorEscala": "0",
+    "ideewfs:fechaCompensacion": "2001-01-01 00:00:00.0",
+    "ideewfs:husoUTM": "28",
+    "ideewfs:latitud": "28.5829475833333",
+    "ideewfs:longitud": "-17.8817075861111",
+    "ideewfs:nombre": "Jedey",
+    "ideewfs:numeroROI": "108839",
+    "ideewfs:xUTM": "218137.759",
+    "ideewfs:yUTM": "3165174.248"
+  }
+},
+{
+  "type": "node",
+  "id": 33341496,
+  "lat": 28.6525783,
+  "lon": -17.9499084,
+  "tags": {
+    "name": "Punta de Juan Graje",
+    "place": "locality"
+  }
+},
+{
+  "type": "node",
+  "id": 285625980,
+  "lat": 28.6629795,
+  "lon": -17.8414294,
+  "tags": {
+    "amenity": "place_of_worship",
+    "name": "Ermita de la Virgen del Pino",
+    "religion": "christian"
+  }
+},
+{
+  "type": "node",
+  "id": 285637626,
+  "lat": 28.6516505,
+  "lon": -17.9459682,
+  "tags": {
+    "source:file": "http://centrodedescargas.cnig.es/CentroDescargas/equipamiento/BD_Municipios-Entidades.zip",
+    "population": "1434",
+    "population:date": "2009",
+    "ref:ine": "38045000400",
+    "source": "Instituto Geográfico Nacional",
+    "source:date": "2011-06",
+    "source:ele": "MDT5",
+    "source:name": "Nomenclátor Geográfico de Municipios y Entidades de Población",
+    "name": "Puerto de Tazacorte",
+    "ele": "9",
+    "place": "suburb"
+  }
+},
+{
+  "type": "node",
+  "id": 287813560,
+  "lat": 28.6519106,
+  "lon": -17.9465997,
+  "tags": {
+    "healthcare": "pharmacy",
+    "name": "Farmacia",
+    "amenity": "pharmacy"
+  }
+},
+{
+  "type": "node",
+  "id": 295063544,
+  "lat": 28.5529423,
+  "lon": -17.8885664,
+  "tags": {
+    "place": "hamlet",
+    "name": "Casas del Remo"
+  }
+},
+{
+  "type": "node",
+  "id": 295063758,
+  "lat": 28.5858953,
+  "lon": -17.9102010,
+  "tags": {
+    "source:file": "http://centrodedescargas.cnig.es/CentroDescargas/equipamiento/BD_Municipios-Entidades.zip",
+    "ref:ine": "38024000800",
+    "ele": "17",
+    "population:date": "2009",
+    "population": "941",
+    "name": "Puerto Naos",
+    "source:name": "Nomenclátor Geográfico de Municipios y Entidades de Población",
+    "source:ele": "MDT5",
+    "place": "suburb",
+    "source": "Instituto Geográfico Nacional",
+    "source:date": "2011-06"
+  }
+},
+{
+  "type": "node",
+  "id": 295063883,
+  "lat": 28.6428580,
+  "lon": -17.9326028,
+  "tags": {
+    "source:file": "http://centrodedescargas.cnig.es/CentroDescargas/equipamiento/BD_Municipios-Entidades.zip",
+    "ref:ine": "38045000700",
+    "ele": "99",
+    "population:date": "2019",
+    "population": "4575",
+    "admin_level": "8",
+    "place": "town",
+    "capital": "8",
+    "name": "Tazacorte",
+    "source": "Instituto Geográfico Nacional",
+    "source:date": "2011-06",
+    "source:ele": "MDT5",
+    "source:name": "Nomenclátor Geográfico de Municipios y Entidades de Población",
+    "website": "http://tazacorte.es/site/",
+    "wikipedia": "es:Tazacorte"
+  }
+},
+{
+  "type": "node",
+  "id": 303081150,
+  "lat": 28.6514036,
+  "lon": -17.8799155,
+  "tags": {
+    "source:file": "http://centrodedescargas.cnig.es/CentroDescargas/equipamiento/BD_Municipios-Entidades.zip",
+    "ref:ine": "38027000500",
+    "ele": "670",
+    "population:date": "2015-01-01",
+    "population": "7563",
+    "admin_level": "8",
+    "place": "town",
+    "name": "El Paso",
+    "source": "Instituto Geográfico Nacional",
+    "source:date": "2011-06",
+    "source:ele": "MDT5",
+    "source:name": "Nomenclátor Geográfico de Municipios y Entidades de Población",
+    "capital": "8"
+  }
+},
+{
+  "type": "node",
+  "id": 304674790,
+  "lat": 28.6510612,
+  "lon": -17.8673614,
+  "tags": {
+    "brand:wikipedia": "en:Royal Dutch Shell",
+    "phone": "+34 922 497 064",
+    "operator": "Shell",
+    "amenity": "fuel",
+    "brand:wikidata": "Q154950",
+    "brand": "Shell"
+  }
+},
+{
+  "type": "node",
+  "id": 304879035,
+  "lat": 28.6342754,
+  "lon": -17.8879311,
+  "tags": {
+    "source:file": "http://centrodedescargas.cnig.es/CentroDescargas/equipamiento/BD_Municipios-Entidades.zip",
+    "ref:ine": "38027000900;38024001000",
+    "ele": "506",
+    "population:date": "2009",
+    "population": "2117",
+    "name": "Tajuya",
+    "source": "Instituto Geográfico Nacional",
+    "source:date": "2011-06",
+    "source:ele": "MDT5",
+    "source:name": "Nomenclátor Geográfico de Municipios y Entidades de Población",
+    "place": "suburb"
+  }
+},
+{
+  "type": "node",
+  "id": 347754882,
+  "lat": 28.6186143,
+  "lon": -17.9046955,
+  "tags": {
+    "name": "Todoque",
+    "place": "suburb",
+    "population": "1393",
+    "population:date": "2009",
+    "source:date": "2011-06",
+    "source:file": "http://centrodedescargas.cnig.es/CentroDescargas/equipamiento/BD_Municipios-Entidades.zip",
+    "ref:ine": "38024001100",
+    "ele": "337",
+    "source:name": "Nomenclátor Geográfico de Municipios y Entidades de Población",
+    "source:ele": "MDT5",
+    "source": "Instituto Geográfico Nacional"
+  }
+},
+{
+  "type": "node",
+  "id": 392702838,
+  "lat": 28.6516112,
+  "lon": -17.9452524,
+  "tags": {
+    "name": "Centro de Salud Puerto de Tazacorte",
+    "healthcare": "clinic",
+    "amenity": "clinic"
+  }
+},
+{
+  "type": "node",
+  "id": 392722759,
+  "lat": 28.6588141,
+  "lon": -17.9160382,
+  "tags": {
+    "name": "Guardia Civil",
+    "amenity": "police"
+  }
+},
+{
+  "type": "node",
+  "id": 392728480,
+  "lat": 28.6564122,
+  "lon": -17.9077460,
+  "tags": {
+    "wheelchair": "yes",
+    "amenity": "fuel",
+    "brand": "Shell"
+  }
+},
+{
+  "type": "node",
+  "id": 414229031,
+  "lat": 28.5543689,
+  "lon": -17.8903645,
+  "tags": {
+    "religion": "christian",
+    "amenity": "place_of_worship",
+    "denomination": "catholic"
+  }
+},
+{
+  "type": "node",
+  "id": 415910697,
+  "lat": 28.6416743,
+  "lon": -17.9347159,
+  "tags": {
+    "fuel:octane_98": "yes",
+    "brand:wikipedia": "en:Royal Dutch Shell",
+    "operator": "Shell",
+    "fuel:octane_95": "yes",
+    "fuel:diesel": "yes",
+    "amenity": "fuel",
+    "addr:street": "Avenida Constitucion",
+    "brand": "Shell",
+    "addr:postcode": "38770",
+    "brand:wikidata": "Q154950",
+    "addr:housenumber": "4",
+    "website": "https://www.disagrupo.es/estaciones/canarias/80060/shell-tazacorte",
+    "addr:city": "Tazacorte"
+  }
+},
+{
+  "type": "node",
+  "id": 570529932,
+  "lat": 28.6491873,
+  "lon": -17.9002117,
+  "tags": {
+    "name": "Dos Pinos",
+    "place": "hamlet"
+  }
+},
+{
+  "type": "node",
+  "id": 583270185,
+  "lat": 28.5510274,
+  "lon": -17.8019105,
+  "tags": {
+    "amenity": "place_of_worship",
+    "denomination": "catholic",
+    "name": "Iglesea Santo Domingo Guzman",
+    "religion": "christian"
+  }
+},
+{
+  "type": "node",
+  "id": 583270186,
+  "lat": 28.5548205,
+  "lon": -17.8001762,
+  "tags": {
+    "place": "suburb",
+    "population": "328",
+    "population:date": "2009",
+    "source:file": "http://centrodedescargas.cnig.es/CentroDescargas/equipamiento/BD_Municipios-Entidades.zip",
+    "ref:ine": "38053001400",
+    "ele": "697",
+    "source": "Instituto Geográfico Nacional",
+    "source:date": "2011-06",
+    "source:ele": "MDT5",
+    "source:name": "Nomenclátor Geográfico de Municipios y Entidades de Población",
+    "name": "Tigalate"
+  }
+},
+{
+  "type": "node",
+  "id": 583542108,
+  "lat": 28.6382343,
+  "lon": -17.9306719,
+  "tags": {
+    "source:file": "http://centrodedescargas.cnig.es/CentroDescargas/equipamiento/BD_Municipios-Entidades.zip",
+    "population": "349",
+    "population:date": "2009",
+    "ref:ine": "38045000300",
+    "source": "Instituto Geográfico Nacional",
+    "source:date": "2011-06",
+    "source:ele": "MDT5",
+    "source:name": "Nomenclátor Geográfico de Municipios y Entidades de Población",
+    "ele": "117",
+    "name": "Marina",
+    "place": "suburb"
+  }
+},
+{
+  "type": "node",
+  "id": 583542110,
+  "lat": 28.6401211,
+  "lon": -17.9319451,
+  "tags": {
+    "amenity": "school"
+  }
+},
+{
+  "type": "node",
+  "id": 583542157,
+  "lat": 28.5928363,
+  "lon": -17.9180103,
+  "tags": {
+    "place": "village",
+    "name": "La Bombilla"
+  }
+},
+{
+  "type": "node",
+  "id": 583542159,
+  "lat": 28.6180245,
+  "lon": -17.8865425,
+  "tags": {
+    "place": "village",
+    "name": "Los Campitos"
+  }
+},
+{
+  "type": "node",
+  "id": 583542177,
+  "lat": 28.6316695,
+  "lon": -17.9073775,
+  "tags": {
+    "name": "La Laguna",
+    "source:name": "Nomenclátor Geográfico de Municipios y Entidades de Población",
+    "population": "1599",
+    "population:date": "2009",
+    "source:file": "http://centrodedescargas.cnig.es/CentroDescargas/equipamiento/BD_Municipios-Entidades.zip",
+    "ref:ine": "38024001400",
+    "ele": "296",
+    "source:ele": "MDT5",
+    "place": "suburb",
+    "source": "Instituto Geográfico Nacional",
+    "source:date": "2011-06"
+  }
+},
+{
+  "type": "node",
+  "id": 583542194,
+  "lat": 28.6425234,
+  "lon": -17.8964757,
+  "tags": {
+    "place": "village",
+    "name": "Celta"
+  }
+},
+{
+  "type": "node",
+  "id": 583542196,
+  "lat": 28.6182192,
+  "lon": -17.8842504,
+  "tags": {
+    "name": "Triana",
+    "place": "village"
+  }
+},
+{
+  "type": "node",
+  "id": 583542198,
+  "lat": 28.6554518,
+  "lon": -17.9272226,
+  "tags": {
+    "place": "village",
+    "name": "Argual Abajo"
+  }
+},
+{
+  "type": "node",
+  "id": 583542201,
+  "lat": 28.6601324,
+  "lon": -17.9238716,
+  "tags": {
+    "source:file": "http://centrodedescargas.cnig.es/CentroDescargas/equipamiento/BD_Municipios-Entidades.zip",
+    "ref:ine": "38024001300",
+    "ele": "320",
+    "population:date": "2009",
+    "population": "2678",
+    "place": "suburb",
+    "name": "Argual",
+    "source:name": "Nomenclátor Geográfico de Municipios y Entidades de Población",
+    "source": "Instituto Geográfico Nacional",
+    "source:date": "2011-06",
+    "source:ele": "MDT5"
+  }
+},
+{
+  "type": "node",
+  "id": 583542205,
+  "lat": 28.6547511,
+  "lon": -17.9053619,
+  "tags": {
+    "name": "Hermosilla",
+    "place": "village"
+  }
+},
+{
+  "type": "node",
+  "id": 583587407,
+  "lat": 28.5532974,
+  "lon": -17.8677254,
+  "tags": {
+    "religion": "christian",
+    "amenity": "place_of_worship",
+    "denomination": "catholic",
+    "name": "Eremita de Santa Cecillia"
+  }
+},
+{
+  "type": "node",
+  "id": 583587408,
+  "lat": 28.5577321,
+  "lon": -17.8641793,
+  "tags": {
+    "place": "village",
+    "name": "Mendo"
+  }
+},
+{
+  "type": "node",
+  "id": 583587411,
+  "lat": 28.5959709,
+  "lon": -17.8886819,
+  "tags": {
+    "source:file": "http://centrodedescargas.cnig.es/CentroDescargas/equipamiento/BD_Municipios-Entidades.zip",
+    "ref:ine": "38027000400;38024000600",
+    "ele": "596",
+    "population:date": "2009",
+    "population": "1560",
+    "name": "Las Manchas",
+    "place": "suburb",
+    "source": "Instituto Geográfico Nacional",
+    "source:date": "2011-06",
+    "source:ele": "MDT5",
+    "source:name": "Nomenclátor Geográfico de Municipios y Entidades de Población"
+  }
+},
+{
+  "type": "node",
+  "id": 583587412,
+  "lat": 28.6017144,
+  "lon": -17.8806521,
+  "tags": {
+    "name": "San Nicolás",
+    "place": "village"
+  }
+},
+{
+  "type": "node",
+  "id": 583587413,
+  "lat": 28.6382841,
+  "lon": -17.8785799,
+  "tags": {
+    "source:file": "http://centrodedescargas.cnig.es/CentroDescargas/equipamiento/BD_Municipios-Entidades.zip",
+    "population": "764",
+    "population:date": "2009",
+    "name": "Tacande",
+    "ref:ine": "38027000800",
+    "source": "Instituto Geográfico Nacional",
+    "source:date": "2011-06",
+    "source:ele": "MDT5",
+    "source:name": "Nomenclátor Geográfico de Municipios y Entidades de Población",
+    "ele": "715",
+    "place": "suburb"
+  }
+},
+{
+  "type": "node",
+  "id": 583587417,
+  "lat": 28.6470587,
+  "lon": -17.8798488,
+  "tags": {
+    "name": "El Calvario",
+    "place": "village"
+  }
+},
+{
+  "type": "node",
+  "id": 583587418,
+  "lat": 28.6520551,
+  "lon": -17.8737504,
+  "tags": {
+    "name": "Padrón",
+    "place": "hamlet"
+  }
+},
+{
+  "type": "node",
+  "id": 583587419,
+  "lat": 28.6638360,
+  "lon": -17.8579562,
+  "tags": {
+    "source:file": "http://centrodedescargas.cnig.es/CentroDescargas/equipamiento/BD_Municipios-Entidades.zip",
+    "population": "314",
+    "population:date": "2009",
+    "name": "Barrial",
+    "ref:ine": "38027000100",
+    "source": "Instituto Geográfico Nacional",
+    "source:date": "2011-06",
+    "source:ele": "MDT5",
+    "source:name": "Nomenclátor Geográfico de Municipios y Entidades de Población",
+    "ele": "745",
+    "place": "suburb"
+  }
+},
+{
+  "type": "node",
+  "id": 583587427,
+  "lat": 28.6622120,
+  "lon": -17.8544186,
+  "tags": {
+    "place": "hamlet",
+    "name": "Barrial de Medio"
+  }
+},
+{
+  "type": "node",
+  "id": 663524443,
+  "lat": 28.6882825,
+  "lon": -17.9474715,
+  "tags": {
+    "source:file": "http://centrodedescargas.cnig.es/CentroDescargas/equipamiento/BD_Municipios-Entidades.zip",
+    "population": "216",
+    "population:date": "2009",
+    "ref:ine": "38047000300",
+    "ele": "509",
+    "place": "hamlet",
+    "source": "Instituto Geográfico Nacional",
+    "source:date": "2011-06",
+    "source:ele": "MDT5",
+    "source:name": "Nomenclátor Geográfico de Municipios y Entidades de Población",
+    "name": "Arecida"
+  }
+},
+{
+  "type": "node",
+  "id": 697135659,
+  "lat": 28.6601667,
+  "lon": -17.9049173,
+  "tags": {
+    "amenity": "place_of_worship"
+  }
+},
+{
+  "type": "node",
+  "id": 702773758,
+  "lat": 28.6417373,
+  "lon": -17.9342376,
+  "tags": {
+    "wheelchair": "yes",
+    "addr:housenumber": "17",
+    "addr:street": "Calle Caballos Fufos",
+    "amenity": "pharmacy",
+    "opening_hours": "Mo off"
+  }
+},
+{
+  "type": "node",
+  "id": 702778728,
+  "lat": 28.6667476,
+  "lon": -17.9363384,
+  "tags": {
+    "source:file": "http://centrodedescargas.cnig.es/CentroDescargas/equipamiento/BD_Municipios-Entidades.zip",
+    "population": "66",
+    "population:date": "2009",
+    "ref:ine": "38047000200",
+    "place": "hamlet",
+    "ele": "398",
+    "source": "Instituto Geográfico Nacional",
+    "source:date": "2011-06",
+    "source:ele": "MDT5",
+    "source:name": "Nomenclátor Geográfico de Municipios y Entidades de Población",
+    "name": "Amagar"
+  }
+},
+{
+  "type": "node",
+  "id": 705045276,
+  "lat": 28.6384317,
+  "lon": -17.8950518,
+  "tags": {
+    "place": "hamlet",
+    "name": "Tendina"
+  }
+},
+{
+  "type": "node",
+  "id": 797141524,
+  "lat": 28.6507238,
+  "lon": -17.8805771,
+  "tags": {
+    "amenity": "pharmacy",
+    "healthcare": "pharmacy"
+  }
+},
+{
+  "type": "node",
+  "id": 797145920,
+  "lat": 28.6577820,
+  "lon": -17.9009490,
+  "tags": {
+    "amenity": "school"
+  }
+},
+{
+  "type": "node",
+  "id": 839480209,
+  "lat": 28.6313610,
+  "lon": -17.9080280,
+  "tags": {
+    "operator": "Cepsa",
+    "amenity": "fuel",
+    "opening_hours": "Mo-Su 06:30-22:30",
+    "fuel:octane_98": "yes",
+    "fuel:octane_95": "yes",
+    "name": "Disa",
+    "fuel:diesel": "yes",
+    "source": "mityc 20100806",
+    "brand:wikipedia": "en:Cepsa",
+    "mapillary": "kgqWlytbw3a4XNtR16QSuQ",
+    "addr:street": "CARRETERA VECINAL A PUERTO NAOS LA LAGUNA KM 3.5",
+    "brand": "Cepsa",
+    "brand:wikidata": "Q608819"
+  }
+},
+{
+  "type": "node",
+  "id": 933645342,
+  "lat": 28.5869687,
+  "lon": -17.9095252,
+  "tags": {
+    "amenity": "pharmacy"
+  }
+},
+{
+  "type": "node",
+  "id": 933645405,
+  "lat": 28.5884321,
+  "lon": -17.9094658,
+  "tags": {
+    "amenity": "school"
+  }
+},
+{
+  "type": "node",
+  "id": 1095066757,
+  "lat": 28.6585916,
+  "lon": -17.9117805,
+  "tags": {
+    "amenity": "pharmacy"
+  }
+},
+{
+  "type": "node",
+  "id": 1148227474,
+  "lat": 28.6602348,
+  "lon": -17.9183101,
+  "tags": {
+    "amenity": "school"
+  }
+},
+{
+  "type": "node",
+  "id": 1193597872,
+  "lat": 28.6393425,
+  "lon": -17.9316026,
+  "tags": {
+    "amenity": "school",
+    "name": "Ceo Juan XXII"
+  }
+},
+{
+  "type": "node",
+  "id": 1195742451,
+  "lat": 28.6575305,
+  "lon": -17.9169863,
+  "tags": {
+    "addr:street": "Calle Francisca de Gazmira",
+    "amenity": "clinic",
+    "name": "Clínica Brismedical",
+    "addr:postcode": "38760",
+    "addr:housenumber": "82",
+    "addr:city": "Los Llanos de Aridane"
+  }
+},
+{
+  "type": "node",
+  "id": 1200962454,
+  "lat": 28.5506334,
+  "lon": -17.8000673,
+  "tags": {
+    "amenity": "place_of_worship"
+  }
+},
+{
+  "type": "node",
+  "id": 1419287803,
+  "lat": 28.6315579,
+  "lon": -17.9078408,
+  "tags": {
+    "name:es": "Bajamar",
+    "amenity": "pharmacy"
+  }
+},
+{
+  "type": "node",
+  "id": 1437814481,
+  "lat": 28.6360406,
+  "lon": -17.9318324,
+  "tags": {
+    "source:file": "http://centrodedescargas.cnig.es/CentroDescargas/equipamiento/BD_Municipios-Entidades.zip",
+    "population": "328",
+    "population:date": "2009",
+    "name": "San Borondón",
+    "ref:ine": "38045000500",
+    "source": "Instituto Geográfico Nacional",
+    "source:date": "2011-06",
+    "source:name": "Nomenclátor Geográfico de Municipios y Entidades de Población",
+    "place": "suburb"
+  }
+},
+{
+  "type": "node",
+  "id": 1437814516,
+  "lat": 28.6591727,
+  "lon": -17.9034562,
+  "tags": {
+    "source:file": "http://centrodedescargas.cnig.es/CentroDescargas/equipamiento/BD_Municipios-Entidades.zip",
+    "ref:ine": "38024001600",
+    "ele": "392",
+    "population:date": "2009",
+    "population": "2594",
+    "source": "Instituto Geográfico Nacional",
+    "source:date": "2011-06",
+    "source:ele": "MDT5",
+    "source:name": "Nomenclátor Geográfico de Municipios y Entidades de Población",
+    "place": "suburb",
+    "name": "Retamar"
+  }
+},
+{
+  "type": "node",
+  "id": 1437814524,
+  "lat": 28.6174872,
+  "lon": -17.9223640,
+  "tags": {
+    "source:file": "http://centrodedescargas.cnig.es/CentroDescargas/equipamiento/BD_Municipios-Entidades.zip",
+    "population": "556",
+    "population:date": "2009",
+    "name": "La Costa",
+    "place": "suburb",
+    "ref:ine": "38045000200",
+    "source": "Instituto Geográfico Nacional",
+    "source:date": "2011-06",
+    "source:name": "Nomenclátor Geográfico de Municipios y Entidades de Población"
+  }
+},
+{
+  "type": "node",
+  "id": 1437814544,
+  "lat": 28.6435613,
+  "lon": -17.9297685,
+  "tags": {
+    "source:file": "http://centrodedescargas.cnig.es/CentroDescargas/equipamiento/BD_Municipios-Entidades.zip",
+    "population": "99",
+    "population:date": "2009",
+    "ref:ine": "38045000100",
+    "source": "Instituto Geográfico Nacional",
+    "source:date": "2011-06",
+    "source:ele": "MDT5",
+    "source:name": "Nomenclátor Geográfico de Municipios y Entidades de Población",
+    "place": "hamlet",
+    "ele": "176",
+    "name": "Cardón"
+  }
+},
+{
+  "type": "node",
+  "id": 1437814553,
+  "lat": 28.6533671,
+  "lon": -17.8861432,
+  "tags": {
+    "source:file": "http://centrodedescargas.cnig.es/CentroDescargas/equipamiento/BD_Municipios-Entidades.zip",
+    "population": "1329",
+    "population:date": "2009",
+    "ref:ine": "38027000600",
+    "ele": "514",
+    "place": "suburb",
+    "name": "Paso de Abajo",
+    "source": "Instituto Geográfico Nacional",
+    "source:date": "2011-06",
+    "source:ele": "MDT5",
+    "source:name": "Nomenclátor Geográfico de Municipios y Entidades de Población"
+  }
+},
+{
+  "type": "node",
+  "id": 1437814574,
+  "lat": 28.6660622,
+  "lon": -17.9523233,
+  "tags": {
+    "source:file": "http://centrodedescargas.cnig.es/CentroDescargas/equipamiento/BD_Municipios-Entidades.zip",
+    "population": "127",
+    "population:date": "2009",
+    "ref:ine": "38047001000",
+    "source": "Instituto Geográfico Nacional",
+    "source:date": "2011-06",
+    "source:ele": "MDT5",
+    "source:name": "Nomenclátor Geográfico de Municipios y Entidades de Población",
+    "place": "hamlet",
+    "ele": "322",
+    "name": "La Costa"
+  }
+},
+{
+  "type": "node",
+  "id": 1437814583,
+  "lat": 28.6467240,
+  "lon": -17.9435009,
+  "tags": {
+    "source:file": "http://centrodedescargas.cnig.es/CentroDescargas/equipamiento/BD_Municipios-Entidades.zip",
+    "population": "41",
+    "population:date": "2009",
+    "ref:ine": "38045000600",
+    "ele": "0",
+    "name": "Tarajal",
+    "place": "hamlet",
+    "source": "Instituto Geográfico Nacional",
+    "source:date": "2011-06",
+    "source:ele": "MDT5",
+    "source:name": "Nomenclátor Geográfico de Municipios y Entidades de Población"
+  }
+},
+{
+  "type": "node",
+  "id": 1437814614,
+  "lat": 28.6572511,
+  "lon": -17.9188941,
+  "tags": {
+    "source:file": "http://centrodedescargas.cnig.es/CentroDescargas/equipamiento/BD_Municipios-Entidades.zip",
+    "ref:ine": "38024001500",
+    "ele": "332",
+    "population:date": "2009",
+    "population": "2567",
+    "source": "Instituto Geográfico Nacional",
+    "source:date": "2011-06",
+    "source:ele": "MDT5",
+    "source:name": "Nomenclátor Geográfico de Municipios y Entidades de Población",
+    "place": "suburb",
+    "name": "Montaña Tenisca"
+  }
+},
+{
+  "type": "node",
+  "id": 1437814752,
+  "lat": 28.6758685,
+  "lon": -17.9449589,
+  "tags": {
+    "source:file": "http://centrodedescargas.cnig.es/CentroDescargas/equipamiento/BD_Municipios-Entidades.zip",
+    "population": "564",
+    "population:date": "2009",
+    "ref:ine": "38047000600",
+    "place": "suburb",
+    "source": "Instituto Geográfico Nacional",
+    "source:date": "2011-06",
+    "source:name": "Nomenclátor Geográfico de Municipios y Entidades de Población",
+    "name": "La Punta"
+  }
+},
+{
+  "type": "node",
+  "id": 1437814820,
+  "lat": 28.6659406,
+  "lon": -17.9133056,
+  "tags": {
+    "source:file": "http://centrodedescargas.cnig.es/CentroDescargas/equipamiento/BD_Municipios-Entidades.zip",
+    "ref:ine": "38024000200",
+    "ele": "370",
+    "population:date": "2009",
+    "population": "2145",
+    "source": "Instituto Geográfico Nacional",
+    "source:date": "2011-06",
+    "source:ele": "MDT5",
+    "source:name": "Nomenclátor Geográfico de Municipios y Entidades de Población",
+    "place": "suburb",
+    "name": "Los Barros"
+  }
+},
+{
+  "type": "node",
+  "id": 1437816604,
+  "lat": 28.6497866,
+  "lon": -17.9094843,
+  "tags": {
+    "source:file": "http://centrodedescargas.cnig.es/CentroDescargas/equipamiento/BD_Municipios-Entidades.zip",
+    "ref:ine": "38024001200",
+    "ele": "333",
+    "population:date": "2009",
+    "population": "1826",
+    "source": "Instituto Geográfico Nacional",
+    "source:date": "2011-06",
+    "source:ele": "MDT5",
+    "source:name": "Nomenclátor Geográfico de Municipios y Entidades de Población",
+    "place": "suburb",
+    "name": "Triana"
+  }
+},
+{
+  "type": "node",
+  "id": 1674375388,
+  "lat": 28.6588268,
+  "lon": -17.9164223,
+  "tags": {
+    "amenity": "fuel"
+  }
+},
+{
+  "type": "node",
+  "id": 1934013563,
+  "lat": 28.5952413,
+  "lon": -17.8888417,
+  "tags": {
+    "name": "Colegio Las Manchas",
+    "amenity": "school"
+  }
+},
+{
+  "type": "node",
+  "id": 1941650075,
+  "lat": 28.6515104,
+  "lon": -17.9452266,
+  "tags": {
+    "name": "Policia local",
+    "amenity": "police"
+  }
+},
+{
+  "type": "node",
+  "id": 2076307444,
+  "lat": 28.6206554,
+  "lon": -17.9052963,
+  "tags": {
+    "opening_hours": "Mo-Sa 09:00-14:00, 16:00-21:00, Su 09:00-14:00",
+    "amenity": "pharmacy"
+  }
+},
+{
+  "type": "node",
+  "id": 2088588399,
+  "lat": 28.6190384,
+  "lon": -17.9050208,
+  "tags": {
+    "amenity": "place_of_worship",
+    "religion": "christian"
+  }
+},
+{
+  "type": "node",
+  "id": 2104752604,
+  "lat": 28.6577733,
+  "lon": -17.9123019,
+  "tags": {
+    "amenity": "pharmacy",
+    "name": "La Plaza"
+  }
+},
+{
+  "type": "node",
+  "id": 2470572068,
+  "lat": 28.6121314,
+  "lon": -17.9131988,
+  "tags": {
+    "place": "hamlet",
+    "name": "El Pampillo"
+  }
+},
+{
+  "type": "node",
+  "id": 2604274151,
+  "lat": 28.6915398,
+  "lon": -17.9552076,
+  "tags": {
+    "name": "Casas de las Traviesas",
+    "place": "hamlet"
+  }
+},
+{
+  "type": "node",
+  "id": 2604274152,
+  "lat": 28.6935776,
+  "lon": -17.9514844,
+  "tags": {
+    "name": "Los Gomeros",
+    "place": "hamlet"
+  }
+},
+{
+  "type": "node",
+  "id": 2625192501,
+  "lat": 28.6564099,
+  "lon": -17.9092207,
+  "tags": {
+    "website": "https://www.sermeva.com/",
+    "name": "Sermeva",
+    "amenity": "clinic"
+  }
+},
+{
+  "type": "node",
+  "id": 2625198527,
+  "lat": 28.6438104,
+  "lon": -17.9342543,
+  "tags": {
+    "amenity": "community_centre",
+    "name": "Casa Massieu"
+  }
+},
+{
+  "type": "node",
+  "id": 2822705955,
+  "lat": 28.6239291,
+  "lon": -17.8463375,
+  "tags": {
+    "name": "Llano del Jable",
+    "place": "locality"
+  }
+},
+{
+  "type": "node",
+  "id": 3417151355,
+  "lat": 28.6545492,
+  "lon": -17.9125162,
+  "tags": {
+    "amenity": "police"
+  }
+},
+{
+  "type": "node",
+  "id": 3670662532,
+  "lat": 28.6526865,
+  "lon": -17.8813314,
+  "tags": {
+    "amenity": "pharmacy",
+    "name": "Farmacia Jurado"
+  }
+},
+{
+  "type": "node",
+  "id": 3680075037,
+  "lat": 28.6554672,
+  "lon": -17.8634808,
+  "tags": {
+    "name": "CEIP La Rosa Camino Viejo",
+    "amenity": "school"
+  }
+},
+{
+  "type": "node",
+  "id": 4426849793,
+  "lat": 28.6580113,
+  "lon": -17.9074242,
+  "tags": {
+    "website": "http://perezpulido.org",
+    "addr:housenumber": "20",
+    "addr:postcode": "38760",
+    "addr:street": "Calle Retamar",
+    "amenity": "school",
+    "name": "ÍES José María Pérez Pulido",
+    "phone": "+34 922461100",
+    "wheelchair": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 4426849794,
+  "lat": 28.6581755,
+  "lon": -17.9173724,
+  "tags": {
+    "addr:postcode": "38760",
+    "name": "Centro de salud Público de Los Llanos de Aridane",
+    "amenity": "hospital",
+    "addr:housenumber": "2",
+    "phone": "+34 922403070",
+    "addr:street": "Calle de Angélica Luis Acosta"
+  }
+},
+{
+  "type": "node",
+  "id": 4678797015,
+  "lat": 28.6987493,
+  "lon": -17.8955920,
+  "tags": {
+    "name": "La Estrechura",
+    "place": "locality"
+  }
+},
+{
+  "type": "node",
+  "id": 4790590505,
+  "lat": 28.6585788,
+  "lon": -17.9166374,
+  "tags": {
+    "amenity": "place_of_worship",
+    "name": "Cruz en Montaña Tenisca",
+    "religion": "christian"
+  }
+},
+{
+  "type": "node",
+  "id": 5433243270,
+  "lat": 28.5518010,
+  "lon": -17.8431526,
+  "tags": {
+    "name": "Llano de las Latas",
+    "place": "locality"
+  }
+},
+{
+  "type": "node",
+  "id": 5468301649,
+  "lat": 28.6580263,
+  "lon": -17.9153693,
+  "tags": {
+    "opening_hours": "Mo-Sa 09:30-13:30, 16:30-19:30",
+    "name": "Farmacia",
+    "amenity": "pharmacy"
+  }
+},
+{
+  "type": "node",
+  "id": 5739165232,
+  "lat": 28.6519384,
+  "lon": -17.8814091,
+  "tags": {
+    "amenity": "marketplace",
+    "name": "Mercadillo del Agricultor y Artesanal El Paso",
+    "opening_hours": "Fr 10:00-19:00; Sa 09:00-14:00"
+  }
+},
+{
+  "type": "node",
+  "id": 5792885568,
+  "lat": 28.6540001,
+  "lon": -17.8529164,
+  "tags": {
+    "amenity": "fire_station"
+  }
+},
+{
+  "type": "node",
+  "id": 5792885862,
+  "lat": 28.6468219,
+  "lon": -17.9435275,
+  "tags": {
+    "amenity": "doctors",
+    "name": "Cruz Roja"
+  }
+},
+{
+  "type": "node",
+  "id": 5799537346,
+  "lat": 28.6983639,
+  "lon": -17.8942927,
+  "tags": {
+    "name": "Morro de la Era",
+    "place": "locality"
+  }
+},
+{
+  "type": "node",
+  "id": 6292076408,
+  "lat": 28.6571970,
+  "lon": -17.9132355,
+  "tags": {
+    "brand:wikipedia": "en:BP",
+    "source": "survey",
+    "operator": "BP",
+    "amenity": "fuel",
+    "brand": "BP",
+    "brand:wikidata": "Q152057",
+    "name": "BP"
+  }
+},
+{
+  "type": "node",
+  "id": 8489225388,
+  "lat": 28.6868956,
+  "lon": -17.9139351,
+  "tags": {
+    "name": "el Campanario",
+    "place": "locality"
+  }
+},
+{
+  "type": "node",
+  "id": 8491786421,
+  "lat": 28.5635813,
+  "lon": -17.8424594,
+  "tags": {
+    "name": "Laderas del Gallo",
+    "place": "locality"
+  }
+},
+{
+  "type": "way",
+  "id": 26840558,
+  "center": {
+    "lat": 28.6444253,
+    "lon": -17.9014263
+  },
+  "tags": {
+    "landuse": "reservoir",
+    "source": "yahoo-maps",
+    "area": "yes"
+  }
+},
+{
+  "type": "way",
+  "id": 28179022,
+  "center": {
+    "lat": 28.6594040,
+    "lon": -17.9166683
+  },
+  "tags": {
+    "name": "Mercado Municipal",
+    "shop": "greengrocer",
+    "building": "yes",
+    "amenity": "marketplace",
+    "opening_hours": "Mo-Fr 06:00-14:30; Sa 06:00-15:00"
+  }
+},
+{
+  "type": "way",
+  "id": 38708471,
+  "center": {
+    "lat": 28.5591766,
+    "lon": -17.8861868
+  },
+  "tags": {
+    "landuse": "reservoir",
+    "source": "yahoo",
+    "note": "additional knowledge from a visit of the site"
+  }
+},
+{
+  "type": "way",
+  "id": 38708472,
+  "center": {
+    "lat": 28.5593435,
+    "lon": -17.8862441
+  },
+  "tags": {
+    "landuse": "reservoir",
+    "source": "yahoo",
+    "note": "additional knowledge from a visit of the site"
+  }
+},
+{
+  "type": "way",
+  "id": 38708473,
+  "center": {
+    "lat": 28.5595081,
+    "lon": -17.8863592
+  },
+  "tags": {
+    "landuse": "reservoir",
+    "source": "yahoo",
+    "note": "additional knowledge from a visit of the site"
+  }
+},
+{
+  "type": "way",
+  "id": 38708474,
+  "center": {
+    "lat": 28.5597708,
+    "lon": -17.8884003
+  },
+  "tags": {
+    "landuse": "reservoir",
+    "source": "yahoo",
+    "note": "additional knowledge from a visit of the site"
+  }
+},
+{
+  "type": "way",
+  "id": 38708475,
+  "center": {
+    "lat": 28.5599878,
+    "lon": -17.8884810
+  },
+  "tags": {
+    "landuse": "reservoir",
+    "source": "yahoo",
+    "note": "additional knowledge from a visit of the site"
+  }
+},
+{
+  "type": "way",
+  "id": 38708476,
+  "center": {
+    "lat": 28.5600650,
+    "lon": -17.8883067
+  },
+  "tags": {
+    "landuse": "reservoir",
+    "source": "yahoo",
+    "note": "additional knowledge from a visit of the site"
+  }
+},
+{
+  "type": "way",
+  "id": 38708477,
+  "center": {
+    "lat": 28.5599220,
+    "lon": -17.8876519
+  },
+  "tags": {
+    "landuse": "reservoir",
+    "source": "yahoo",
+    "note": "additional knowledge from a visit of the site"
+  }
+},
+{
+  "type": "way",
+  "id": 38708479,
+  "center": {
+    "lat": 28.5595701,
+    "lon": -17.8877435
+  },
+  "tags": {
+    "landuse": "reservoir",
+    "source": "yahoo",
+    "note": "additional knowledge from a visit of the site"
+  }
+},
+{
+  "type": "way",
+  "id": 38708480,
+  "center": {
+    "lat": 28.5597805,
+    "lon": -17.8875728
+  },
+  "tags": {
+    "landuse": "reservoir",
+    "source": "yahoo",
+    "note": "additional knowledge from a visit of the site"
+  }
+},
+{
+  "type": "way",
+  "id": 38708481,
+  "center": {
+    "lat": 28.5596343,
+    "lon": -17.8874875
+  },
+  "tags": {
+    "landuse": "reservoir",
+    "source": "yahoo",
+    "note": "additional knowledge from a visit of the site"
+  }
+},
+{
+  "type": "way",
+  "id": 38708483,
+  "center": {
+    "lat": 28.5599050,
+    "lon": -17.8874385
+  },
+  "tags": {
+    "landuse": "reservoir",
+    "source": "yahoo",
+    "note": "additional knowledge from a visit of the site"
+  }
+},
+{
+  "type": "way",
+  "id": 38708485,
+  "center": {
+    "lat": 28.5596753,
+    "lon": -17.8873083
+  },
+  "tags": {
+    "landuse": "reservoir",
+    "source": "yahoo",
+    "note": "additional knowledge from a visit of the site"
+  }
+},
+{
+  "type": "way",
+  "id": 38708486,
+  "center": {
+    "lat": 28.5593127,
+    "lon": -17.8871658
+  },
+  "tags": {
+    "landuse": "reservoir",
+    "source": "yahoo",
+    "note": "additional knowledge from a visit of the site"
+  }
+},
+{
+  "type": "way",
+  "id": 38708487,
+  "center": {
+    "lat": 28.5578464,
+    "lon": -17.8854230
+  },
+  "tags": {
+    "landuse": "reservoir",
+    "source": "yahoo",
+    "note": "additional knowledge from a visit of the site"
+  }
+},
+{
+  "type": "way",
+  "id": 38708488,
+  "center": {
+    "lat": 28.5570672,
+    "lon": -17.8848988
+  },
+  "tags": {
+    "landuse": "reservoir",
+    "source": "yahoo",
+    "note": "additional knowledge from a visit of the site"
+  }
+},
+{
+  "type": "way",
+  "id": 38708489,
+  "center": {
+    "lat": 28.5562421,
+    "lon": -17.8845765
+  },
+  "tags": {
+    "landuse": "reservoir",
+    "source": "yahoo",
+    "note": "additional knowledge from a visit of the site"
+  }
+},
+{
+  "type": "way",
+  "id": 38708490,
+  "center": {
+    "lat": 28.5561343,
+    "lon": -17.8845315
+  },
+  "tags": {
+    "landuse": "reservoir",
+    "source": "yahoo",
+    "note": "additional knowledge from a visit of the site"
+  }
+},
+{
+  "type": "way",
+  "id": 38708491,
+  "center": {
+    "lat": 28.5560371,
+    "lon": -17.8844974
+  },
+  "tags": {
+    "landuse": "reservoir",
+    "source": "yahoo",
+    "note": "additional knowledge from a visit of the site"
+  }
+},
+{
+  "type": "way",
+  "id": 38708492,
+  "center": {
+    "lat": 28.5558696,
+    "lon": -17.8844358
+  },
+  "tags": {
+    "landuse": "reservoir",
+    "source": "yahoo",
+    "note": "additional knowledge from a visit of the site"
+  }
+},
+{
+  "type": "way",
+  "id": 38708493,
+  "center": {
+    "lat": 28.5555033,
+    "lon": -17.8843089
+  },
+  "tags": {
+    "landuse": "reservoir",
+    "source": "yahoo",
+    "note": "additional knowledge from a visit of the site"
+  }
+},
+{
+  "type": "way",
+  "id": 38708494,
+  "center": {
+    "lat": 28.5550830,
+    "lon": -17.8841344
+  },
+  "tags": {
+    "landuse": "reservoir",
+    "source": "yahoo",
+    "note": "additional knowledge from a visit of the site"
+  }
+},
+{
+  "type": "way",
+  "id": 38708495,
+  "center": {
+    "lat": 28.5547275,
+    "lon": -17.8839776
+  },
+  "tags": {
+    "landuse": "reservoir",
+    "source": "yahoo",
+    "note": "additional knowledge from a visit of the site"
+  }
+},
+{
+  "type": "way",
+  "id": 38708496,
+  "center": {
+    "lat": 28.5544144,
+    "lon": -17.8838995
+  },
+  "tags": {
+    "landuse": "reservoir",
+    "source": "yahoo",
+    "note": "additional knowledge from a visit of the site"
+  }
+},
+{
+  "type": "way",
+  "id": 38708497,
+  "center": {
+    "lat": 28.5540881,
+    "lon": -17.8837998
+  },
+  "tags": {
+    "landuse": "reservoir",
+    "source": "yahoo",
+    "note": "additional knowledge from a visit of the site"
+  }
+},
+{
+  "type": "way",
+  "id": 38708498,
+  "center": {
+    "lat": 28.5538460,
+    "lon": -17.8837243
+  },
+  "tags": {
+    "landuse": "reservoir",
+    "source": "yahoo",
+    "note": "additional knowledge from a visit of the site"
+  }
+},
+{
+  "type": "way",
+  "id": 38708499,
+  "center": {
+    "lat": 28.5602110,
+    "lon": -17.8914773
+  },
+  "tags": {
+    "landuse": "reservoir",
+    "source": "yahoo",
+    "note": "additional knowledge from a visit of the site"
+  }
+},
+{
+  "type": "way",
+  "id": 38708500,
+  "center": {
+    "lat": 28.5630530,
+    "lon": -17.8934042
+  },
+  "tags": {
+    "landuse": "reservoir",
+    "source": "yahoo",
+    "note": "additional knowledge from a visit of the site"
+  }
+},
+{
+  "type": "way",
+  "id": 38708501,
+  "center": {
+    "lat": 28.5635024,
+    "lon": -17.8918697
+  },
+  "tags": {
+    "landuse": "reservoir",
+    "source": "yahoo",
+    "note": "additional knowledge from a visit of the site"
+  }
+},
+{
+  "type": "way",
+  "id": 38708502,
+  "center": {
+    "lat": 28.5627888,
+    "lon": -17.8914679
+  },
+  "tags": {
+    "landuse": "reservoir",
+    "source": "yahoo",
+    "note": "additional knowledge from a visit of the site"
+  }
+},
+{
+  "type": "way",
+  "id": 38708503,
+  "center": {
+    "lat": 28.5626232,
+    "lon": -17.8913527
+  },
+  "tags": {
+    "landuse": "reservoir",
+    "source": "yahoo",
+    "note": "additional knowledge from a visit of the site"
+  }
+},
+{
+  "type": "way",
+  "id": 38708504,
+  "center": {
+    "lat": 28.5659060,
+    "lon": -17.8962597
+  },
+  "tags": {
+    "landuse": "reservoir",
+    "source": "yahoo",
+    "note": "additional knowledge from a visit of the site"
+  }
+},
+{
+  "type": "way",
+  "id": 38708505,
+  "center": {
+    "lat": 28.5656534,
+    "lon": -17.8931385
+  },
+  "tags": {
+    "landuse": "reservoir",
+    "source": "yahoo",
+    "note": "additional knowledge from a visit of the site"
+  }
+},
+{
+  "type": "way",
+  "id": 38708506,
+  "center": {
+    "lat": 28.5656969,
+    "lon": -17.8917987
+  },
+  "tags": {
+    "landuse": "reservoir",
+    "source": "yahoo",
+    "note": "additional knowledge from a visit of the site"
+  }
+},
+{
+  "type": "way",
+  "id": 38708507,
+  "center": {
+    "lat": 28.5659322,
+    "lon": -17.8921322
+  },
+  "tags": {
+    "landuse": "reservoir",
+    "source": "yahoo",
+    "note": "additional knowledge from a visit of the site"
+  }
+},
+{
+  "type": "way",
+  "id": 38708508,
+  "center": {
+    "lat": 28.5655657,
+    "lon": -17.8933951
+  },
+  "tags": {
+    "landuse": "reservoir",
+    "source": "yahoo",
+    "note": "additional knowledge from a visit of the site"
+  }
+},
+{
+  "type": "way",
+  "id": 38708509,
+  "center": {
+    "lat": 28.5656496,
+    "lon": -17.8927529
+  },
+  "tags": {
+    "landuse": "reservoir",
+    "source": "yahoo",
+    "note": "additional knowledge from a visit of the site"
+  }
+},
+{
+  "type": "way",
+  "id": 38708511,
+  "center": {
+    "lat": 28.5657918,
+    "lon": -17.8928511
+  },
+  "tags": {
+    "landuse": "reservoir",
+    "source": "yahoo",
+    "note": "additional knowledge from a visit of the site"
+  }
+},
+{
+  "type": "way",
+  "id": 38708512,
+  "center": {
+    "lat": 28.5667813,
+    "lon": -17.8943685
+  },
+  "tags": {
+    "landuse": "reservoir",
+    "source": "yahoo",
+    "note": "additional knowledge from a visit of the site"
+  }
+},
+{
+  "type": "way",
+  "id": 38708513,
+  "center": {
+    "lat": 28.5665640,
+    "lon": -17.8948563
+  },
+  "tags": {
+    "landuse": "reservoir",
+    "source": "yahoo",
+    "note": "additional knowledge from a visit of the site"
+  }
+},
+{
+  "type": "way",
+  "id": 38708514,
+  "center": {
+    "lat": 28.5663238,
+    "lon": -17.8953276
+  },
+  "tags": {
+    "landuse": "reservoir",
+    "source": "yahoo",
+    "note": "additional knowledge from a visit of the site"
+  }
+},
+{
+  "type": "way",
+  "id": 38708515,
+  "center": {
+    "lat": 28.5651753,
+    "lon": -17.8955630
+  },
+  "tags": {
+    "landuse": "reservoir",
+    "source": "yahoo",
+    "note": "additional knowledge from a visit of the site"
+  }
+},
+{
+  "type": "way",
+  "id": 38708516,
+  "center": {
+    "lat": 28.5628785,
+    "lon": -17.8933080
+  },
+  "tags": {
+    "landuse": "reservoir",
+    "source": "yahoo",
+    "note": "additional knowledge from a visit of the site"
+  }
+},
+{
+  "type": "way",
+  "id": 38708517,
+  "center": {
+    "lat": 28.5621268,
+    "lon": -17.8925068
+  },
+  "tags": {
+    "landuse": "reservoir",
+    "source": "yahoo",
+    "note": "additional knowledge from a visit of the site"
+  }
+},
+{
+  "type": "way",
+  "id": 38708518,
+  "center": {
+    "lat": 28.5680839,
+    "lon": -17.8927168
+  },
+  "tags": {
+    "landuse": "reservoir",
+    "source": "yahoo",
+    "note": "additional knowledge from a visit of the site"
+  }
+},
+{
+  "type": "way",
+  "id": 38708519,
+  "center": {
+    "lat": 28.5692345,
+    "lon": -17.8936115
+  },
+  "tags": {
+    "landuse": "reservoir",
+    "source": "yahoo",
+    "note": "additional knowledge from a visit of the site"
+  }
+},
+{
+  "type": "way",
+  "id": 38708520,
+  "center": {
+    "lat": 28.5687908,
+    "lon": -17.8964337
+  },
+  "tags": {
+    "landuse": "reservoir",
+    "source": "yahoo",
+    "note": "additional knowledge from a visit of the site"
+  }
+},
+{
+  "type": "way",
+  "id": 38708521,
+  "center": {
+    "lat": 28.5692928,
+    "lon": -17.8969307
+  },
+  "tags": {
+    "landuse": "reservoir",
+    "source": "yahoo",
+    "note": "additional knowledge from a visit of the site"
+  }
+},
+{
+  "type": "way",
+  "id": 38708522,
+  "center": {
+    "lat": 28.5690323,
+    "lon": -17.8973529
+  },
+  "tags": {
+    "landuse": "reservoir",
+    "source": "yahoo",
+    "note": "additional knowledge from a visit of the site"
+  }
+},
+{
+  "type": "way",
+  "id": 38708523,
+  "center": {
+    "lat": 28.5708426,
+    "lon": -17.8967570
+  },
+  "tags": {
+    "landuse": "reservoir",
+    "source": "yahoo",
+    "note": "additional knowledge from a visit of the site"
+  }
+},
+{
+  "type": "way",
+  "id": 38708524,
+  "center": {
+    "lat": 28.5713377,
+    "lon": -17.8963354
+  },
+  "tags": {
+    "landuse": "reservoir",
+    "source": "yahoo",
+    "note": "additional knowledge from a visit of the site"
+  }
+},
+{
+  "type": "way",
+  "id": 38708525,
+  "center": {
+    "lat": 28.5712711,
+    "lon": -17.8959514
+  },
+  "tags": {
+    "landuse": "reservoir",
+    "source": "yahoo",
+    "note": "additional knowledge from a visit of the site"
+  }
+},
+{
+  "type": "way",
+  "id": 38708526,
+  "center": {
+    "lat": 28.5714180,
+    "lon": -17.8961263
+  },
+  "tags": {
+    "landuse": "reservoir",
+    "source": "yahoo",
+    "note": "additional knowledge from a visit of the site"
+  }
+},
+{
+  "type": "way",
+  "id": 38708527,
+  "center": {
+    "lat": 28.5733679,
+    "lon": -17.8965314
+  },
+  "tags": {
+    "landuse": "reservoir",
+    "source": "yahoo",
+    "note": "additional knowledge from a visit of the site"
+  }
+},
+{
+  "type": "way",
+  "id": 38708528,
+  "center": {
+    "lat": 28.5716045,
+    "lon": -17.8973761
+  },
+  "tags": {
+    "landuse": "reservoir",
+    "source": "yahoo",
+    "note": "additional knowledge from a visit of the site"
+  }
+},
+{
+  "type": "way",
+  "id": 38708529,
+  "center": {
+    "lat": 28.5700233,
+    "lon": -17.8957949
+  },
+  "tags": {
+    "landuse": "reservoir",
+    "source": "yahoo",
+    "note": "additional knowledge from a visit of the site"
+  }
+},
+{
+  "type": "way",
+  "id": 38708530,
+  "center": {
+    "lat": 28.5740270,
+    "lon": -17.8964509
+  },
+  "tags": {
+    "landuse": "reservoir",
+    "source": "yahoo",
+    "note": "additional knowledge from a visit of the site"
+  }
+},
+{
+  "type": "way",
+  "id": 38708532,
+  "center": {
+    "lat": 28.5546849,
+    "lon": -17.8842063
+  },
+  "tags": {
+    "landuse": "reservoir",
+    "source": "yahoo",
+    "note": "additional knowledge from a visit of the site"
+  }
+},
+{
+  "type": "way",
+  "id": 38708533,
+  "center": {
+    "lat": 28.5618550,
+    "lon": -17.8925531
+  },
+  "tags": {
+    "landuse": "reservoir",
+    "source": "yahoo",
+    "note": "additional knowledge from a visit of the site"
+  }
+},
+{
+  "type": "way",
+  "id": 38708534,
+  "center": {
+    "lat": 28.5616924,
+    "lon": -17.8929684
+  },
+  "tags": {
+    "landuse": "reservoir",
+    "source": "yahoo",
+    "note": "additional knowledge from a visit of the site"
+  }
+},
+{
+  "type": "way",
+  "id": 38708535,
+  "center": {
+    "lat": 28.5617508,
+    "lon": -17.8927600
+  },
+  "tags": {
+    "landuse": "reservoir",
+    "source": "yahoo",
+    "note": "additional knowledge from a visit of the site"
+  }
+},
+{
+  "type": "way",
+  "id": 38708536,
+  "center": {
+    "lat": 28.5633358,
+    "lon": -17.8905749
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 38708537,
+  "center": {
+    "lat": 28.5634783,
+    "lon": -17.8906589
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 38708538,
+  "center": {
+    "lat": 28.5650315,
+    "lon": -17.8916755
+  },
+  "tags": {
+    "landuse": "reservoir",
+    "source": "yahoo",
+    "note": "additional knowledge from a visit of the site"
+  }
+},
+{
+  "type": "way",
+  "id": 38708539,
+  "center": {
+    "lat": 28.5648704,
+    "lon": -17.8920081
+  },
+  "tags": {
+    "landuse": "reservoir",
+    "source": "yahoo",
+    "note": "additional knowledge from a visit of the site"
+  }
+},
+{
+  "type": "way",
+  "id": 38708540,
+  "center": {
+    "lat": 28.5672224,
+    "lon": -17.8966014
+  },
+  "tags": {
+    "landuse": "reservoir",
+    "source": "yahoo",
+    "note": "additional knowledge from a visit of the site"
+  }
+},
+{
+  "type": "way",
+  "id": 38708545,
+  "center": {
+    "lat": 28.5651017,
+    "lon": -17.8963684
+  },
+  "tags": {
+    "landuse": "reservoir",
+    "source": "yahoo",
+    "note": "additional knowledge from a visit of the site"
+  }
+},
+{
+  "type": "way",
+  "id": 38708547,
+  "center": {
+    "lat": 28.5625693,
+    "lon": -17.8889299
+  },
+  "tags": {
+    "landuse": "reservoir",
+    "source": "yahoo",
+    "note": "additional knowledge from a visit of the site"
+  }
+},
+{
+  "type": "way",
+  "id": 38708551,
+  "center": {
+    "lat": 28.5756771,
+    "lon": -17.8983006
+  },
+  "tags": {
+    "landuse": "reservoir",
+    "source": "yahoo",
+    "note": "additional knowledge from a visit of the site"
+  }
+},
+{
+  "type": "way",
+  "id": 38708552,
+  "center": {
+    "lat": 28.5741369,
+    "lon": -17.9041507
+  },
+  "tags": {
+    "landuse": "reservoir",
+    "source": "yahoo",
+    "note": "additional knowledge from a visit of the site"
+  }
+},
+{
+  "type": "way",
+  "id": 38708553,
+  "center": {
+    "lat": 28.5763538,
+    "lon": -17.8974868
+  },
+  "tags": {
+    "landuse": "reservoir",
+    "source": "yahoo",
+    "note": "additional knowledge from a visit of the site"
+  }
+},
+{
+  "type": "way",
+  "id": 38708554,
+  "center": {
+    "lat": 28.5755106,
+    "lon": -17.8972414
+  },
+  "tags": {
+    "landuse": "reservoir",
+    "source": "yahoo",
+    "note": "additional knowledge from a visit of the site"
+  }
+},
+{
+  "type": "way",
+  "id": 38708555,
+  "center": {
+    "lat": 28.5753147,
+    "lon": -17.8971483
+  },
+  "tags": {
+    "landuse": "reservoir",
+    "source": "yahoo",
+    "note": "additional knowledge from a visit of the site"
+  }
+},
+{
+  "type": "way",
+  "id": 38708556,
+  "center": {
+    "lat": 28.5797029,
+    "lon": -17.9043821
+  },
+  "tags": {
+    "landuse": "reservoir",
+    "source": "yahoo",
+    "note": "additional knowledge from a visit of the site"
+  }
+},
+{
+  "type": "way",
+  "id": 38708557,
+  "center": {
+    "lat": 28.5785246,
+    "lon": -17.9030240
+  },
+  "tags": {
+    "landuse": "reservoir",
+    "source": "yahoo",
+    "note": "additional knowledge from a visit of the site"
+  }
+},
+{
+  "type": "way",
+  "id": 38708558,
+  "center": {
+    "lat": 28.5787606,
+    "lon": -17.9023995
+  },
+  "tags": {
+    "landuse": "reservoir",
+    "source": "yahoo",
+    "note": "additional knowledge from a visit of the site"
+  }
+},
+{
+  "type": "way",
+  "id": 38708560,
+  "center": {
+    "lat": 28.5782804,
+    "lon": -17.9038168
+  },
+  "tags": {
+    "landuse": "reservoir",
+    "source": "yahoo",
+    "note": "additional knowledge from a visit of the site"
+  }
+},
+{
+  "type": "way",
+  "id": 38708561,
+  "center": {
+    "lat": 28.5829965,
+    "lon": -17.9025086
+  },
+  "tags": {
+    "landuse": "reservoir",
+    "source": "yahoo",
+    "note": "additional knowledge from a visit of the site"
+  }
+},
+{
+  "type": "way",
+  "id": 38708564,
+  "center": {
+    "lat": 28.5813064,
+    "lon": -17.9024336
+  },
+  "tags": {
+    "landuse": "reservoir",
+    "source": "yahoo",
+    "note": "additional knowledge from a visit of the site"
+  }
+},
+{
+  "type": "way",
+  "id": 38708565,
+  "center": {
+    "lat": 28.5823777,
+    "lon": -17.9034767
+  },
+  "tags": {
+    "landuse": "reservoir",
+    "source": "yahoo",
+    "note": "additional knowledge from a visit of the site"
+  }
+},
+{
+  "type": "way",
+  "id": 38708566,
+  "center": {
+    "lat": 28.5847688,
+    "lon": -17.9049904
+  },
+  "tags": {
+    "landuse": "reservoir",
+    "source": "yahoo",
+    "note": "additional knowledge from a visit of the site"
+  }
+},
+{
+  "type": "way",
+  "id": 38708567,
+  "center": {
+    "lat": 28.5846224,
+    "lon": -17.9048778
+  },
+  "tags": {
+    "landuse": "reservoir",
+    "source": "yahoo",
+    "note": "additional knowledge from a visit of the site"
+  }
+},
+{
+  "type": "way",
+  "id": 38708569,
+  "center": {
+    "lat": 28.5875799,
+    "lon": -17.9071306
+  },
+  "tags": {
+    "landuse": "reservoir",
+    "source": "yahoo",
+    "note": "additional knowledge from a visit of the site"
+  }
+},
+{
+  "type": "way",
+  "id": 38708570,
+  "center": {
+    "lat": 28.5887223,
+    "lon": -17.9079299
+  },
+  "tags": {
+    "landuse": "reservoir",
+    "source": "yahoo",
+    "note": "additional knowledge from a visit of the site"
+  }
+},
+{
+  "type": "way",
+  "id": 38708571,
+  "center": {
+    "lat": 28.5870893,
+    "lon": -17.9057418
+  },
+  "tags": {
+    "landuse": "reservoir",
+    "source": "yahoo",
+    "note": "additional knowledge from a visit of the site"
+  }
+},
+{
+  "type": "way",
+  "id": 38708572,
+  "center": {
+    "lat": 28.5866330,
+    "lon": -17.9052402
+  },
+  "tags": {
+    "landuse": "reservoir",
+    "source": "yahoo",
+    "note": "additional knowledge from a visit of the site"
+  }
+},
+{
+  "type": "way",
+  "id": 38708573,
+  "center": {
+    "lat": 28.5797118,
+    "lon": -17.9049678
+  },
+  "tags": {
+    "landuse": "reservoir",
+    "source": "yahoo",
+    "note": "additional knowledge from a visit of the site"
+  }
+},
+{
+  "type": "way",
+  "id": 38709935,
+  "center": {
+    "lat": 28.5893153,
+    "lon": -17.9126592
+  },
+  "tags": {
+    "landuse": "reservoir",
+    "source": "yahoo",
+    "note": "additional knowledge from a visit of the site"
+  }
+},
+{
+  "type": "way",
+  "id": 55990715,
+  "center": {
+    "lat": 28.6727592,
+    "lon": -17.9548974
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 81149608,
+  "center": {
+    "lat": 28.6395883,
+    "lon": -17.9322718
+  },
+  "tags": {
+    "amenity": "townhall",
+    "building": "civic"
+  }
+},
+{
+  "type": "way",
+  "id": 96287832,
+  "center": {
+    "lat": 28.6440888,
+    "lon": -17.9080239
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 96287840,
+  "center": {
+    "lat": 28.6418695,
+    "lon": -17.9131512
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 96287841,
+  "center": {
+    "lat": 28.6468429,
+    "lon": -17.9094415
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 96287845,
+  "center": {
+    "lat": 28.6448654,
+    "lon": -17.9035906
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 96287848,
+  "center": {
+    "lat": 28.6454305,
+    "lon": -17.9106934
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 96287851,
+  "center": {
+    "lat": 28.6479278,
+    "lon": -17.9043240
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 96287855,
+  "center": {
+    "lat": 28.6464846,
+    "lon": -17.9082374
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 96287857,
+  "center": {
+    "lat": 28.6409252,
+    "lon": -17.9101078
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 96287858,
+  "center": {
+    "lat": 28.6397269,
+    "lon": -17.9136119
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 96287862,
+  "center": {
+    "lat": 28.6469462,
+    "lon": -17.9073472
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 96287871,
+  "center": {
+    "lat": 28.6388320,
+    "lon": -17.9122085
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 96287872,
+  "center": {
+    "lat": 28.6476665,
+    "lon": -17.9027413
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 96287875,
+  "center": {
+    "lat": 28.6390430,
+    "lon": -17.9144779
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 96287878,
+  "center": {
+    "lat": 28.6471881,
+    "lon": -17.9056007
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 96287879,
+  "center": {
+    "lat": 28.6445980,
+    "lon": -17.9089201
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 96287881,
+  "center": {
+    "lat": 28.6493078,
+    "lon": -17.9075891
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 96287887,
+  "center": {
+    "lat": 28.6392620,
+    "lon": -17.9126964
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 96287889,
+  "center": {
+    "lat": 28.6413289,
+    "lon": -17.9142510
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 96287893,
+  "center": {
+    "lat": 28.6475165,
+    "lon": -17.9040253
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 96287899,
+  "center": {
+    "lat": 28.6441941,
+    "lon": -17.9069375
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 96287903,
+  "center": {
+    "lat": 28.6506286,
+    "lon": -17.9082162
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 96287907,
+  "center": {
+    "lat": 28.6435080,
+    "lon": -17.9114931
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 96287910,
+  "center": {
+    "lat": 28.6483088,
+    "lon": -17.9044148
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 96287912,
+  "center": {
+    "lat": 28.6479123,
+    "lon": -17.9027553
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 96287923,
+  "center": {
+    "lat": 28.6406055,
+    "lon": -17.9104590
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 96287928,
+  "center": {
+    "lat": 28.6454123,
+    "lon": -17.9063723
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 96287929,
+  "center": {
+    "lat": 28.6468113,
+    "lon": -17.9084138
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 96287935,
+  "center": {
+    "lat": 28.6466939,
+    "lon": -17.9097006
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 96287937,
+  "center": {
+    "lat": 28.6474569,
+    "lon": -17.9050460
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 96287939,
+  "center": {
+    "lat": 28.6467922,
+    "lon": -17.9051761
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 96287941,
+  "center": {
+    "lat": 28.6401612,
+    "lon": -17.9102775
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 96287947,
+  "center": {
+    "lat": 28.6456428,
+    "lon": -17.9108365
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 96287952,
+  "center": {
+    "lat": 28.6471556,
+    "lon": -17.9046528
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 97008545,
+  "center": {
+    "lat": 28.6330506,
+    "lon": -17.9284545
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 97008553,
+  "center": {
+    "lat": 28.6258369,
+    "lon": -17.9274745
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 97008556,
+  "center": {
+    "lat": 28.6253142,
+    "lon": -17.9274070
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 97008576,
+  "center": {
+    "lat": 28.6302872,
+    "lon": -17.9260804
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 97008606,
+  "center": {
+    "lat": 28.6315991,
+    "lon": -17.9269654
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 97008611,
+  "center": {
+    "lat": 28.6347625,
+    "lon": -17.9216134
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 97008613,
+  "center": {
+    "lat": 28.6346417,
+    "lon": -17.9230212
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 97008624,
+  "center": {
+    "lat": 28.6288065,
+    "lon": -17.9249329
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 97008632,
+  "center": {
+    "lat": 28.6346667,
+    "lon": -17.9223610
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 97008640,
+  "center": {
+    "lat": 28.6345313,
+    "lon": -17.9234252
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 97008641,
+  "center": {
+    "lat": 28.6335692,
+    "lon": -17.9266239
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 97013823,
+  "center": {
+    "lat": 28.6430482,
+    "lon": -17.9292778
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 97013826,
+  "center": {
+    "lat": 28.6465884,
+    "lon": -17.9289241
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 97013829,
+  "center": {
+    "lat": 28.6474409,
+    "lon": -17.9256968
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 97062068,
+  "center": {
+    "lat": 28.6382735,
+    "lon": -17.8042146
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 97314777,
+  "center": {
+    "lat": 28.6340457,
+    "lon": -17.9245955
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 97314822,
+  "center": {
+    "lat": 28.6344141,
+    "lon": -17.9244476
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 97314860,
+  "center": {
+    "lat": 28.6338949,
+    "lon": -17.9261090
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 97314865,
+  "center": {
+    "lat": 28.6371763,
+    "lon": -17.9310958
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 98363904,
+  "center": {
+    "lat": 28.6422239,
+    "lon": -17.9050140
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 98363908,
+  "center": {
+    "lat": 28.6414235,
+    "lon": -17.9045549
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 98363910,
+  "center": {
+    "lat": 28.6435739,
+    "lon": -17.9051824
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 98363913,
+  "center": {
+    "lat": 28.6402193,
+    "lon": -17.9060228
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 98363915,
+  "center": {
+    "lat": 28.6394916,
+    "lon": -17.9061102
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 98363928,
+  "center": {
+    "lat": 28.6401733,
+    "lon": -17.9049135
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 98363933,
+  "center": {
+    "lat": 28.6439635,
+    "lon": -17.9058354
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 98371993,
+  "center": {
+    "lat": 28.5597868,
+    "lon": -17.8874009
+  },
+  "tags": {
+    "landuse": "reservoir",
+    "source": "yahoo",
+    "note": "additional knowledge from a visit of the site"
+  }
+},
+{
+  "type": "way",
+  "id": 99466245,
+  "center": {
+    "lat": 28.5845094,
+    "lon": -17.9044846
+  },
+  "tags": {
+    "landuse": "reservoir",
+    "source": "Bing Sat"
+  }
+},
+{
+  "type": "way",
+  "id": 99466262,
+  "center": {
+    "lat": 28.5854845,
+    "lon": -17.9048298
+  },
+  "tags": {
+    "landuse": "reservoir",
+    "source": "Bing Sat"
+  }
+},
+{
+  "type": "way",
+  "id": 102222841,
+  "center": {
+    "lat": 28.6630177,
+    "lon": -17.9215556
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 102222843,
+  "center": {
+    "lat": 28.6637644,
+    "lon": -17.9214448
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 102222844,
+  "center": {
+    "lat": 28.6631241,
+    "lon": -17.9218737
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 102222848,
+  "center": {
+    "lat": 28.6584889,
+    "lon": -17.9245695
+  },
+  "tags": {
+    "landuse": "reservoir",
+    "reservoir_type": "water_storage"
+  }
+},
+{
+  "type": "way",
+  "id": 102222858,
+  "center": {
+    "lat": 28.6630605,
+    "lon": -17.9212077
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 102222873,
+  "center": {
+    "lat": 28.6573540,
+    "lon": -17.9265236
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 103385986,
+  "center": {
+    "lat": 28.6774420,
+    "lon": -17.9440786
+  },
+  "tags": {
+    "amenity": "place_of_worship",
+    "building": "church",
+    "denomination": "catholic",
+    "religion": "christian"
+  }
+},
+{
+  "type": "way",
+  "id": 103459965,
+  "center": {
+    "lat": 28.6629570,
+    "lon": -17.9208841
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 103679032,
+  "center": {
+    "lat": 28.6537337,
+    "lon": -17.8798243
+  },
+  "tags": {
+    "building": "yes",
+    "name": "Centro de Salud El Paso",
+    "contact:phone": "+34922479493",
+    "amenity": "doctors"
+  }
+},
+{
+  "type": "way",
+  "id": 104197935,
+  "center": {
+    "lat": 28.6583001,
+    "lon": -17.9335791
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 104199545,
+  "center": {
+    "lat": 28.6524789,
+    "lon": -17.9116827
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 104199548,
+  "center": {
+    "lat": 28.6540817,
+    "lon": -17.9110056
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 131386118,
+  "center": {
+    "lat": 28.6642893,
+    "lon": -17.9476700
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 131386121,
+  "center": {
+    "lat": 28.6588988,
+    "lon": -17.9474912
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 131386122,
+  "center": {
+    "lat": 28.6613728,
+    "lon": -17.9466229
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 131386128,
+  "center": {
+    "lat": 28.6608264,
+    "lon": -17.9491924
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 131386131,
+  "center": {
+    "lat": 28.6655917,
+    "lon": -17.9477890
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 131386133,
+  "center": {
+    "lat": 28.6678522,
+    "lon": -17.9490223
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 131386134,
+  "center": {
+    "lat": 28.6595022,
+    "lon": -17.9465997
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 131386137,
+  "center": {
+    "lat": 28.6615823,
+    "lon": -17.9467877
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 131386138,
+  "center": {
+    "lat": 28.6575050,
+    "lon": -17.9511682
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 131386140,
+  "center": {
+    "lat": 28.6629060,
+    "lon": -17.9468370
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 131386144,
+  "center": {
+    "lat": 28.6597948,
+    "lon": -17.9456717
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 131386146,
+  "center": {
+    "lat": 28.6650968,
+    "lon": -17.9459805
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 131386148,
+  "center": {
+    "lat": 28.6602927,
+    "lon": -17.9459128
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 131386150,
+  "center": {
+    "lat": 28.6622809,
+    "lon": -17.9505659
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 131386153,
+  "center": {
+    "lat": 28.6601568,
+    "lon": -17.9449378
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 131386156,
+  "center": {
+    "lat": 28.6604331,
+    "lon": -17.9460309
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 131386159,
+  "center": {
+    "lat": 28.6623428,
+    "lon": -17.9449772
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 131386160,
+  "center": {
+    "lat": 28.6631287,
+    "lon": -17.9487786
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 131386163,
+  "center": {
+    "lat": 28.6635189,
+    "lon": -17.9505017
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 131386167,
+  "center": {
+    "lat": 28.6674640,
+    "lon": -17.9446319
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 131386168,
+  "center": {
+    "lat": 28.6614791,
+    "lon": -17.9495595
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 131386174,
+  "center": {
+    "lat": 28.6599392,
+    "lon": -17.9457370
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 131386176,
+  "center": {
+    "lat": 28.6628426,
+    "lon": -17.9474909
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 131386177,
+  "center": {
+    "lat": 28.6596405,
+    "lon": -17.9455838
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 131386181,
+  "center": {
+    "lat": 28.6605626,
+    "lon": -17.9461454
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 131386183,
+  "center": {
+    "lat": 28.6603573,
+    "lon": -17.9480584
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 131386188,
+  "center": {
+    "lat": 28.6630294,
+    "lon": -17.9476079
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 131386189,
+  "center": {
+    "lat": 28.6658162,
+    "lon": -17.9496466
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 131386193,
+  "center": {
+    "lat": 28.6651873,
+    "lon": -17.9482983
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 131386401,
+  "center": {
+    "lat": 28.6695256,
+    "lon": -17.9505523
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 131386402,
+  "center": {
+    "lat": 28.6704780,
+    "lon": -17.9501576
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 131386404,
+  "center": {
+    "lat": 28.6690124,
+    "lon": -17.9509603
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 149165308,
+  "center": {
+    "lat": 28.6615758,
+    "lon": -17.9350012
+  },
+  "tags": {
+    "wikidata": "Q11357181",
+    "source:geometry": "Imagen de Catastro de España",
+    "religion": "christian",
+    "amenity": "place_of_worship",
+    "building": "church",
+    "denomination": "catholic",
+    "layer": "1",
+    "name": "Nuestra Señora de las Angustias"
+  }
+},
+{
+  "type": "way",
+  "id": 183191626,
+  "center": {
+    "lat": 28.6517286,
+    "lon": -17.9443639
+  },
+  "tags": {
+    "image": "https://commons.wikimedia.org/wiki/File:La_Palma_-_Tazacorte_-_El_Puerto_-_Plaza_de_Canarias_%2B_Iglesia_de_Nuestra_Señora_del_Carmen_01_ies.jpg",
+    "wikimedia_commons": "File:La_Palma_-_Tazacorte_-_El_Puerto_-_Plaza_de_Canarias_%2B_Iglesia_de_Nuestra_Señora_del_Carmen_01_ies.jpg",
+    "religion": "christian",
+    "amenity": "place_of_worship",
+    "building": "yes",
+    "denomination": "roman_catholic",
+    "name": "Iglesia del Carmen"
+  }
+},
+{
+  "type": "way",
+  "id": 202730549,
+  "center": {
+    "lat": 28.6591682,
+    "lon": -17.9131116
+  },
+  "tags": {
+    "wheelchair": "yes",
+    "source:geometry": "Imagen de Catastro de España",
+    "religion": "christian",
+    "name": "Iglesia de los Remedios",
+    "denomination": "catholic",
+    "amenity": "place_of_worship",
+    "building": "church"
+  }
+},
+{
+  "type": "way",
+  "id": 239254563,
+  "center": {
+    "lat": 28.6440026,
+    "lon": -17.9334170
+  },
+  "tags": {
+    "amenity": "place_of_worship",
+    "building": "church",
+    "denomination": "catholic",
+    "name": "San Miguel Arcangel",
+    "religion": "christian"
+  }
+},
+{
+  "type": "way",
+  "id": 244432055,
+  "center": {
+    "lat": 28.6482442,
+    "lon": -17.9053206
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 244432057,
+  "center": {
+    "lat": 28.6478111,
+    "lon": -17.9051106
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 244432059,
+  "center": {
+    "lat": 28.6479526,
+    "lon": -17.9046923
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 244706020,
+  "center": {
+    "lat": 28.6076306,
+    "lon": -17.9115744
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 244706068,
+  "center": {
+    "lat": 28.6068355,
+    "lon": -17.9150237
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 244706069,
+  "center": {
+    "lat": 28.6044650,
+    "lon": -17.9158074
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 244706070,
+  "center": {
+    "lat": 28.6041954,
+    "lon": -17.9145934
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 244706920,
+  "center": {
+    "lat": 28.6009562,
+    "lon": -17.9179805
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 244706921,
+  "center": {
+    "lat": 28.6006030,
+    "lon": -17.9180322
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 244706922,
+  "center": {
+    "lat": 28.6041586,
+    "lon": -17.9169094
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 244706923,
+  "center": {
+    "lat": 28.6008039,
+    "lon": -17.9170278
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 244706924,
+  "center": {
+    "lat": 28.6023473,
+    "lon": -17.9178100
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 244706925,
+  "center": {
+    "lat": 28.6004625,
+    "lon": -17.9182163
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 244706926,
+  "center": {
+    "lat": 28.6049035,
+    "lon": -17.9176358
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 244706927,
+  "center": {
+    "lat": 28.6008989,
+    "lon": -17.9175898
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 244706928,
+  "center": {
+    "lat": 28.6011523,
+    "lon": -17.9177007
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 244706929,
+  "center": {
+    "lat": 28.6007246,
+    "lon": -17.9178009
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 244706930,
+  "center": {
+    "lat": 28.6007820,
+    "lon": -17.9181876
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 244707104,
+  "center": {
+    "lat": 28.6085503,
+    "lon": -17.9191376
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 244707105,
+  "center": {
+    "lat": 28.6075797,
+    "lon": -17.9181616
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 244707106,
+  "center": {
+    "lat": 28.6074701,
+    "lon": -17.9177686
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 244707107,
+  "center": {
+    "lat": 28.6072161,
+    "lon": -17.9186597
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 244707689,
+  "center": {
+    "lat": 28.6153579,
+    "lon": -17.9184142
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 244707690,
+  "center": {
+    "lat": 28.6105069,
+    "lon": -17.9182750
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 244707691,
+  "center": {
+    "lat": 28.6151086,
+    "lon": -17.9185640
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 244707692,
+  "center": {
+    "lat": 28.6105009,
+    "lon": -17.9186258
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 244707694,
+  "center": {
+    "lat": 28.6146435,
+    "lon": -17.9184136
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 244707734,
+  "center": {
+    "lat": 28.6168266,
+    "lon": -17.9230323
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 244707900,
+  "center": {
+    "lat": 28.6190964,
+    "lon": -17.9201603
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 244707902,
+  "center": {
+    "lat": 28.6183898,
+    "lon": -17.9209663
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 244707904,
+  "center": {
+    "lat": 28.6179236,
+    "lon": -17.9210440
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 244707905,
+  "center": {
+    "lat": 28.6223660,
+    "lon": -17.9268534
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 244707906,
+  "center": {
+    "lat": 28.6191776,
+    "lon": -17.9255009
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 244707907,
+  "center": {
+    "lat": 28.6183752,
+    "lon": -17.9220018
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 244708216,
+  "center": {
+    "lat": 28.6273674,
+    "lon": -17.9280433
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 244708218,
+  "center": {
+    "lat": 28.6276523,
+    "lon": -17.9283657
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 244711426,
+  "center": {
+    "lat": 28.6741855,
+    "lon": -17.9481697
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 244711427,
+  "center": {
+    "lat": 28.6722057,
+    "lon": -17.9526793
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 244711429,
+  "center": {
+    "lat": 28.6728447,
+    "lon": -17.9523186
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 244711430,
+  "center": {
+    "lat": 28.6718003,
+    "lon": -17.9537081
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 244711453,
+  "center": {
+    "lat": 28.6706646,
+    "lon": -17.9543210
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 244711454,
+  "center": {
+    "lat": 28.6709938,
+    "lon": -17.9537557
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 244711455,
+  "center": {
+    "lat": 28.6710968,
+    "lon": -17.9525936
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 244711524,
+  "center": {
+    "lat": 28.6741345,
+    "lon": -17.9584018
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 244753002,
+  "center": {
+    "lat": 28.6751499,
+    "lon": -17.9562952
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 244753244,
+  "center": {
+    "lat": 28.6758397,
+    "lon": -17.9549059
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 244753251,
+  "center": {
+    "lat": 28.6744413,
+    "lon": -17.9582431
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 244753252,
+  "center": {
+    "lat": 28.6737033,
+    "lon": -17.9561440
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 244758496,
+  "center": {
+    "lat": 28.6696714,
+    "lon": -17.9601927
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 244758497,
+  "center": {
+    "lat": 28.6708164,
+    "lon": -17.9563799
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 244758503,
+  "center": {
+    "lat": 28.6710686,
+    "lon": -17.9587035
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 244758507,
+  "center": {
+    "lat": 28.6696991,
+    "lon": -17.9598340
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 244758649,
+  "center": {
+    "lat": 28.6691164,
+    "lon": -17.9564695
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 244759200,
+  "center": {
+    "lat": 28.6712871,
+    "lon": -17.9550148
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 244759202,
+  "center": {
+    "lat": 28.6680409,
+    "lon": -17.9538583
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 244759207,
+  "center": {
+    "lat": 28.6690447,
+    "lon": -17.9550398
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 244759209,
+  "center": {
+    "lat": 28.6680006,
+    "lon": -17.9570717
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 244759644,
+  "center": {
+    "lat": 28.6690764,
+    "lon": -17.9516938
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 244759655,
+  "center": {
+    "lat": 28.6695562,
+    "lon": -17.9510192
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 244760674,
+  "center": {
+    "lat": 28.6658272,
+    "lon": -17.9516160
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 244760682,
+  "center": {
+    "lat": 28.6669562,
+    "lon": -17.9503846
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 244760685,
+  "center": {
+    "lat": 28.6664834,
+    "lon": -17.9529764
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 244760688,
+  "center": {
+    "lat": 28.6655508,
+    "lon": -17.9520302
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 244760691,
+  "center": {
+    "lat": 28.6670016,
+    "lon": -17.9500724
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 244761919,
+  "center": {
+    "lat": 28.6629375,
+    "lon": -17.9505635
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 244761923,
+  "center": {
+    "lat": 28.6654410,
+    "lon": -17.9474128
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 244761924,
+  "center": {
+    "lat": 28.6659358,
+    "lon": -17.9472922
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 244761933,
+  "center": {
+    "lat": 28.6633670,
+    "lon": -17.9474213
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 244762230,
+  "center": {
+    "lat": 28.6723337,
+    "lon": -17.9493466
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 244762235,
+  "center": {
+    "lat": 28.6721548,
+    "lon": -17.9497158
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 244762505,
+  "center": {
+    "lat": 28.6715075,
+    "lon": -17.9476624
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 244762507,
+  "center": {
+    "lat": 28.6719520,
+    "lon": -17.9465844
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 244762510,
+  "center": {
+    "lat": 28.6723647,
+    "lon": -17.9463854
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 244762514,
+  "center": {
+    "lat": 28.6716271,
+    "lon": -17.9474653
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 244762732,
+  "center": {
+    "lat": 28.6736713,
+    "lon": -17.9460369
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 244762889,
+  "center": {
+    "lat": 28.6732456,
+    "lon": -17.9431146
+  },
+  "tags": {
+    "religion": "christian",
+    "amenity": "place_of_worship",
+    "building": "yes",
+    "denomination": "lutheran",
+    "name": "Iglesia Evangélica Bautista de La Palma"
+  }
+},
+{
+  "type": "way",
+  "id": 244764398,
+  "center": {
+    "lat": 28.6890924,
+    "lon": -17.9496687
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 245080919,
+  "center": {
+    "lat": 28.6671030,
+    "lon": -17.9465962
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 245081285,
+  "center": {
+    "lat": 28.6683337,
+    "lon": -17.9447387
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 245081296,
+  "center": {
+    "lat": 28.6680934,
+    "lon": -17.9464707
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 245081384,
+  "center": {
+    "lat": 28.6728331,
+    "lon": -17.9426944
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 245083081,
+  "center": {
+    "lat": 28.6749417,
+    "lon": -17.9425438
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 245083082,
+  "center": {
+    "lat": 28.6747243,
+    "lon": -17.9423245
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 245083975,
+  "center": {
+    "lat": 28.6629312,
+    "lon": -17.9440126
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 245083980,
+  "center": {
+    "lat": 28.6615694,
+    "lon": -17.9442731
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 245084278,
+  "center": {
+    "lat": 28.6608193,
+    "lon": -17.9459742
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 245084560,
+  "center": {
+    "lat": 28.6564985,
+    "lon": -17.9494740
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 245084741,
+  "center": {
+    "lat": 28.6592377,
+    "lon": -17.9482390
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 245084742,
+  "center": {
+    "lat": 28.6585119,
+    "lon": -17.9473759
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 245084748,
+  "center": {
+    "lat": 28.6596349,
+    "lon": -17.9479644
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 245085818,
+  "center": {
+    "lat": 28.6580041,
+    "lon": -17.9500601
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 245086017,
+  "center": {
+    "lat": 28.6602186,
+    "lon": -17.9486930
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 245086202,
+  "center": {
+    "lat": 28.6632275,
+    "lon": -17.9466927
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 245086373,
+  "center": {
+    "lat": 28.6649509,
+    "lon": -17.9472386
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 245086833,
+  "center": {
+    "lat": 28.6655958,
+    "lon": -17.9539494
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 245086835,
+  "center": {
+    "lat": 28.6651963,
+    "lon": -17.9544839
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 245087223,
+  "center": {
+    "lat": 28.6590703,
+    "lon": -17.9530681
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 245087587,
+  "center": {
+    "lat": 28.6621891,
+    "lon": -17.9488706
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 245108731,
+  "center": {
+    "lat": 28.6536311,
+    "lon": -17.9343336
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 245108733,
+  "center": {
+    "lat": 28.6488738,
+    "lon": -17.9326796
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 245108734,
+  "center": {
+    "lat": 28.6533054,
+    "lon": -17.9344997
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 245108737,
+  "center": {
+    "lat": 28.6487377,
+    "lon": -17.9324508
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 245109105,
+  "center": {
+    "lat": 28.6510166,
+    "lon": -17.9374402
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 245109109,
+  "center": {
+    "lat": 28.6522104,
+    "lon": -17.9368166
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 245109110,
+  "center": {
+    "lat": 28.6519045,
+    "lon": -17.9363021
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 245109118,
+  "center": {
+    "lat": 28.6517111,
+    "lon": -17.9365913
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 245109119,
+  "center": {
+    "lat": 28.6524524,
+    "lon": -17.9371570
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 245109120,
+  "center": {
+    "lat": 28.6519942,
+    "lon": -17.9367238
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 245109124,
+  "center": {
+    "lat": 28.6516483,
+    "lon": -17.9359436
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 245109125,
+  "center": {
+    "lat": 28.6513811,
+    "lon": -17.9391700
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 245109126,
+  "center": {
+    "lat": 28.6520319,
+    "lon": -17.9369537
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 245109795,
+  "center": {
+    "lat": 28.6537564,
+    "lon": -17.9357246
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 245111566,
+  "center": {
+    "lat": 28.6462943,
+    "lon": -17.9285128
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 245169581,
+  "center": {
+    "lat": 28.6232920,
+    "lon": -17.9266441
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 245169591,
+  "center": {
+    "lat": 28.6156655,
+    "lon": -17.9233173
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 245170313,
+  "center": {
+    "lat": 28.6101075,
+    "lon": -17.9136104
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 245170315,
+  "center": {
+    "lat": 28.6081644,
+    "lon": -17.9152275
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 245170319,
+  "center": {
+    "lat": 28.6084804,
+    "lon": -17.9149094
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 245170322,
+  "center": {
+    "lat": 28.6103018,
+    "lon": -17.9114113
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 245170323,
+  "center": {
+    "lat": 28.6099356,
+    "lon": -17.9118899
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 245170325,
+  "center": {
+    "lat": 28.6104586,
+    "lon": -17.9108014
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 245170517,
+  "center": {
+    "lat": 28.6132165,
+    "lon": -17.9136868
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 245170519,
+  "center": {
+    "lat": 28.6124522,
+    "lon": -17.9139620
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 245170521,
+  "center": {
+    "lat": 28.6119879,
+    "lon": -17.9158239
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 245170522,
+  "center": {
+    "lat": 28.6131492,
+    "lon": -17.9149940
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 245170666,
+  "center": {
+    "lat": 28.6195404,
+    "lon": -17.9172553
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 245170667,
+  "center": {
+    "lat": 28.6197619,
+    "lon": -17.9172548
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 245170768,
+  "center": {
+    "lat": 28.6214200,
+    "lon": -17.9208315
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 245170953,
+  "center": {
+    "lat": 28.6209053,
+    "lon": -17.9078797
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 245170956,
+  "center": {
+    "lat": 28.6218174,
+    "lon": -17.9092296
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 245170958,
+  "center": {
+    "lat": 28.6233031,
+    "lon": -17.9204080
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 245170960,
+  "center": {
+    "lat": 28.6211996,
+    "lon": -17.9081640
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 245170962,
+  "center": {
+    "lat": 28.6206039,
+    "lon": -17.9087676
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 245170963,
+  "center": {
+    "lat": 28.6220352,
+    "lon": -17.9081722
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 245171249,
+  "center": {
+    "lat": 28.6198944,
+    "lon": -17.9089246
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 245171252,
+  "center": {
+    "lat": 28.6200506,
+    "lon": -17.9077402
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 245171253,
+  "center": {
+    "lat": 28.6207652,
+    "lon": -17.9072962
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 245171254,
+  "center": {
+    "lat": 28.6198958,
+    "lon": -17.9094628
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 245171404,
+  "center": {
+    "lat": 28.6224583,
+    "lon": -17.9053885
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 245186848,
+  "center": {
+    "lat": 28.6145597,
+    "lon": -17.9070144
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 245187430,
+  "center": {
+    "lat": 28.6030272,
+    "lon": -17.9141444
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 245187436,
+  "center": {
+    "lat": 28.6046519,
+    "lon": -17.9125802
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 245187437,
+  "center": {
+    "lat": 28.6030255,
+    "lon": -17.9136278
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 245187440,
+  "center": {
+    "lat": 28.6040392,
+    "lon": -17.9130405
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 245187445,
+  "center": {
+    "lat": 28.6031082,
+    "lon": -17.9149191
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 245187785,
+  "center": {
+    "lat": 28.5987433,
+    "lon": -17.9174794
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 245187786,
+  "center": {
+    "lat": 28.5984632,
+    "lon": -17.9170871
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 245187787,
+  "center": {
+    "lat": 28.5987006,
+    "lon": -17.9178853
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 245188313,
+  "center": {
+    "lat": 28.6089468,
+    "lon": -17.9179427
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 245188713,
+  "center": {
+    "lat": 28.5894022,
+    "lon": -17.9121045
+  },
+  "tags": {
+    "landuse": "reservoir",
+    "source": "yahoo",
+    "note": "additional knowledge from a visit of the site"
+  }
+},
+{
+  "type": "way",
+  "id": 245188721,
+  "center": {
+    "lat": 28.5895156,
+    "lon": -17.9119126
+  },
+  "tags": {
+    "landuse": "reservoir",
+    "source": "yahoo",
+    "note": "additional knowledge from a visit of the site"
+  }
+},
+{
+  "type": "way",
+  "id": 245333424,
+  "center": {
+    "lat": 28.6323492,
+    "lon": -17.9053682
+  },
+  "tags": {
+    "amenity": "school"
+  }
+},
+{
+  "type": "way",
+  "id": 245334235,
+  "center": {
+    "lat": 28.6340391,
+    "lon": -17.9054396
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 245334552,
+  "center": {
+    "lat": 28.6316697,
+    "lon": -17.9046454
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 245334556,
+  "center": {
+    "lat": 28.6309949,
+    "lon": -17.9046538
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 245334562,
+  "center": {
+    "lat": 28.6324777,
+    "lon": -17.9041920
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 245336362,
+  "center": {
+    "lat": 28.6351061,
+    "lon": -17.9090800
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 245336372,
+  "center": {
+    "lat": 28.6348535,
+    "lon": -17.9102259
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 245336743,
+  "center": {
+    "lat": 28.6305069,
+    "lon": -17.9077533
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 245337125,
+  "center": {
+    "lat": 28.6297187,
+    "lon": -17.9050579
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 245337369,
+  "center": {
+    "lat": 28.6285403,
+    "lon": -17.9044721
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 245337542,
+  "center": {
+    "lat": 28.6303557,
+    "lon": -17.9020384
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 245337765,
+  "center": {
+    "lat": 28.6279666,
+    "lon": -17.9069446
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 245417121,
+  "center": {
+    "lat": 28.6247740,
+    "lon": -17.9100023
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 245417129,
+  "center": {
+    "lat": 28.6236610,
+    "lon": -17.9089252
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 245417137,
+  "center": {
+    "lat": 28.6225701,
+    "lon": -17.9050566
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 245417359,
+  "center": {
+    "lat": 28.6264503,
+    "lon": -17.9059714
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 245418816,
+  "center": {
+    "lat": 28.6302657,
+    "lon": -17.9086165
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 245419025,
+  "center": {
+    "lat": 28.6305874,
+    "lon": -17.9086313
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 245419593,
+  "center": {
+    "lat": 28.6311794,
+    "lon": -17.9080206
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 245419595,
+  "center": {
+    "lat": 28.6319550,
+    "lon": -17.9062518
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 245420529,
+  "center": {
+    "lat": 28.6337937,
+    "lon": -17.9052518
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 245420601,
+  "center": {
+    "lat": 28.6329034,
+    "lon": -17.9065217
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 245420603,
+  "center": {
+    "lat": 28.6333717,
+    "lon": -17.9069599
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 245421551,
+  "center": {
+    "lat": 28.6357249,
+    "lon": -17.9077636
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 245421556,
+  "center": {
+    "lat": 28.6353608,
+    "lon": -17.9067869
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 245421562,
+  "center": {
+    "lat": 28.6352757,
+    "lon": -17.9063540
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 245421563,
+  "center": {
+    "lat": 28.6349946,
+    "lon": -17.9067777
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 245422134,
+  "center": {
+    "lat": 28.6366876,
+    "lon": -17.9092507
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 245422135,
+  "center": {
+    "lat": 28.6374874,
+    "lon": -17.9078522
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 245422138,
+  "center": {
+    "lat": 28.6365492,
+    "lon": -17.9093685
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 245422141,
+  "center": {
+    "lat": 28.6372943,
+    "lon": -17.9088990
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 245422142,
+  "center": {
+    "lat": 28.6372891,
+    "lon": -17.9087019
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 245422585,
+  "center": {
+    "lat": 28.6379511,
+    "lon": -17.9078048
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 245422800,
+  "center": {
+    "lat": 28.6365274,
+    "lon": -17.9103626
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 245422801,
+  "center": {
+    "lat": 28.6372831,
+    "lon": -17.9111588
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 245422804,
+  "center": {
+    "lat": 28.6364125,
+    "lon": -17.9105305
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 245422806,
+  "center": {
+    "lat": 28.6368995,
+    "lon": -17.9105543
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 245422929,
+  "center": {
+    "lat": 28.6380377,
+    "lon": -17.9105311
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 245422930,
+  "center": {
+    "lat": 28.6378223,
+    "lon": -17.9101654
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 245423134,
+  "center": {
+    "lat": 28.6385734,
+    "lon": -17.9086130
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 245423354,
+  "center": {
+    "lat": 28.6363555,
+    "lon": -17.9115531
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 245423355,
+  "center": {
+    "lat": 28.6373084,
+    "lon": -17.9114806
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 245423357,
+  "center": {
+    "lat": 28.6373331,
+    "lon": -17.9116406
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 245423359,
+  "center": {
+    "lat": 28.6365769,
+    "lon": -17.9114099
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 245423360,
+  "center": {
+    "lat": 28.6362109,
+    "lon": -17.9116952
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 245423589,
+  "center": {
+    "lat": 28.6361674,
+    "lon": -17.9128436
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 245424073,
+  "center": {
+    "lat": 28.6347945,
+    "lon": -17.9111273
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 245424074,
+  "center": {
+    "lat": 28.6355637,
+    "lon": -17.9118227
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 245424076,
+  "center": {
+    "lat": 28.6356754,
+    "lon": -17.9119772
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 245424078,
+  "center": {
+    "lat": 28.6352929,
+    "lon": -17.9124906
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 245425237,
+  "center": {
+    "lat": 28.6341311,
+    "lon": -17.9088226
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 245425240,
+  "center": {
+    "lat": 28.6345364,
+    "lon": -17.9114069
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 245428064,
+  "center": {
+    "lat": 28.6366844,
+    "lon": -17.9054528
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 245428071,
+  "center": {
+    "lat": 28.6368247,
+    "lon": -17.9055172
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 245428080,
+  "center": {
+    "lat": 28.6376286,
+    "lon": -17.9068311
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 245431902,
+  "center": {
+    "lat": 28.6391242,
+    "lon": -17.9061825
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 245432414,
+  "center": {
+    "lat": 28.6394402,
+    "lon": -17.9084194
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 245432420,
+  "center": {
+    "lat": 28.6392464,
+    "lon": -17.9078480
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 245432422,
+  "center": {
+    "lat": 28.6396573,
+    "lon": -17.9083385
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 245433153,
+  "center": {
+    "lat": 28.6418477,
+    "lon": -17.9091539
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 245433215,
+  "center": {
+    "lat": 28.6436177,
+    "lon": -17.9091544
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 245433216,
+  "center": {
+    "lat": 28.6431247,
+    "lon": -17.9089688
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 245433217,
+  "center": {
+    "lat": 28.6427340,
+    "lon": -17.9094211
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 245433218,
+  "center": {
+    "lat": 28.6428554,
+    "lon": -17.9091769
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 245433555,
+  "center": {
+    "lat": 28.6439538,
+    "lon": -17.9086967
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 245433559,
+  "center": {
+    "lat": 28.6439174,
+    "lon": -17.9072860
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 245434126,
+  "center": {
+    "lat": 28.6452307,
+    "lon": -17.9098018
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 245434127,
+  "center": {
+    "lat": 28.6450405,
+    "lon": -17.9100957
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 245434130,
+  "center": {
+    "lat": 28.6430812,
+    "lon": -17.9075114
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 245434133,
+  "center": {
+    "lat": 28.6431341,
+    "lon": -17.9078436
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 245436953,
+  "center": {
+    "lat": 28.6412409,
+    "lon": -17.9113040
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 245436955,
+  "center": {
+    "lat": 28.6411542,
+    "lon": -17.9109942
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 245436957,
+  "center": {
+    "lat": 28.6423526,
+    "lon": -17.9119196
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 245436959,
+  "center": {
+    "lat": 28.6412251,
+    "lon": -17.9103984
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 245484539,
+  "center": {
+    "lat": 28.6421865,
+    "lon": -17.9182987
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 245486443,
+  "center": {
+    "lat": 28.6429974,
+    "lon": -17.9177956
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 245486444,
+  "center": {
+    "lat": 28.6424983,
+    "lon": -17.9159829
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 245486445,
+  "center": {
+    "lat": 28.6394882,
+    "lon": -17.9160567
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 245486449,
+  "center": {
+    "lat": 28.6449486,
+    "lon": -17.9209246
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 245486451,
+  "center": {
+    "lat": 28.6425490,
+    "lon": -17.9177654
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 245486455,
+  "center": {
+    "lat": 28.6387462,
+    "lon": -17.9156192
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 245486457,
+  "center": {
+    "lat": 28.6381254,
+    "lon": -17.9145381
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 245486460,
+  "center": {
+    "lat": 28.6427025,
+    "lon": -17.9190209
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 245486461,
+  "center": {
+    "lat": 28.6447924,
+    "lon": -17.9207131
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 245486463,
+  "center": {
+    "lat": 28.6390551,
+    "lon": -17.9159857
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 245486465,
+  "center": {
+    "lat": 28.6392724,
+    "lon": -17.9157229
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 245486466,
+  "center": {
+    "lat": 28.6399150,
+    "lon": -17.9182602
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 245486467,
+  "center": {
+    "lat": 28.6392859,
+    "lon": -17.9150725
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 245486470,
+  "center": {
+    "lat": 28.6420568,
+    "lon": -17.9169240
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 245486475,
+  "center": {
+    "lat": 28.6403835,
+    "lon": -17.9184300
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 245487191,
+  "center": {
+    "lat": 28.6463525,
+    "lon": -17.9210339
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 245488169,
+  "center": {
+    "lat": 28.6524772,
+    "lon": -17.9196184
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 245488177,
+  "center": {
+    "lat": 28.6522425,
+    "lon": -17.9192994
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 245493543,
+  "center": {
+    "lat": 28.6370868,
+    "lon": -17.9328041
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 245518068,
+  "center": {
+    "lat": 28.6938029,
+    "lon": -17.9531691
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 245518882,
+  "center": {
+    "lat": 28.6927532,
+    "lon": -17.9570656
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 245518889,
+  "center": {
+    "lat": 28.6934302,
+    "lon": -17.9584505
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 245518893,
+  "center": {
+    "lat": 28.6936148,
+    "lon": -17.9569550
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 245521252,
+  "center": {
+    "lat": 28.6917507,
+    "lon": -17.9653740
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 245521262,
+  "center": {
+    "lat": 28.6917647,
+    "lon": -17.9652023
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 245659290,
+  "center": {
+    "lat": 28.6769976,
+    "lon": -17.9603619
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 245659598,
+  "center": {
+    "lat": 28.6772310,
+    "lon": -17.9566365
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 245659599,
+  "center": {
+    "lat": 28.6769910,
+    "lon": -17.9564864
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 245659601,
+  "center": {
+    "lat": 28.6774038,
+    "lon": -17.9567214
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 245659602,
+  "center": {
+    "lat": 28.6779196,
+    "lon": -17.9569755
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 245659603,
+  "center": {
+    "lat": 28.6775630,
+    "lon": -17.9561913
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 245662895,
+  "center": {
+    "lat": 28.6859343,
+    "lon": -17.9543250
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 245662896,
+  "center": {
+    "lat": 28.6849808,
+    "lon": -17.9556300
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 246461361,
+  "center": {
+    "lat": 28.6083327,
+    "lon": -17.9145624
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 246461364,
+  "center": {
+    "lat": 28.6079266,
+    "lon": -17.9161283
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 246461369,
+  "center": {
+    "lat": 28.6080137,
+    "lon": -17.9156775
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 246462636,
+  "center": {
+    "lat": 28.6093716,
+    "lon": -17.9186165
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 246463482,
+  "center": {
+    "lat": 28.6114275,
+    "lon": -17.9197794
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 246463483,
+  "center": {
+    "lat": 28.6120655,
+    "lon": -17.9188594
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 246789801,
+  "center": {
+    "lat": 28.6021790,
+    "lon": -17.8804851
+  },
+  "tags": {
+    "wikidata": "Q5911002",
+    "religion": "christian",
+    "amenity": "place_of_worship",
+    "building": "church",
+    "denomination": "catholic",
+    "historic": "monument",
+    "name": "Iglesia de San Nicolás de Bari",
+    "protection_title": "Monumento",
+    "ref:bic": "RI-51-0007209"
+  }
+},
+{
+  "type": "way",
+  "id": 246789802,
+  "center": {
+    "lat": 28.6520071,
+    "lon": -17.8791382
+  },
+  "tags": {
+    "wheelchair": "yes",
+    "addr:city": "El Paso",
+    "addr:postcode": "38750",
+    "amenity": "place_of_worship",
+    "building": "church",
+    "denomination": "roman_catholic",
+    "name": "Nuestra Señora de la Inmaculada Concepción Bonanza",
+    "religion": "christian"
+  }
+},
+{
+  "type": "way",
+  "id": 248793411,
+  "center": {
+    "lat": 28.6081685,
+    "lon": -17.9085931
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 248793412,
+  "center": {
+    "lat": 28.6079011,
+    "lon": -17.9094690
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 248793413,
+  "center": {
+    "lat": 28.6081216,
+    "lon": -17.9087464
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 248794698,
+  "center": {
+    "lat": 28.6056050,
+    "lon": -17.9086387
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 248796810,
+  "center": {
+    "lat": 28.6070156,
+    "lon": -17.9083555
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 248862887,
+  "center": {
+    "lat": 28.6529190,
+    "lon": -17.8804383
+  },
+  "tags": {
+    "amenity": "community_centre",
+    "building": "public",
+    "name": "Casa de la cultura"
+  }
+},
+{
+  "type": "way",
+  "id": 248881336,
+  "center": {
+    "lat": 28.6519772,
+    "lon": -17.8802660
+  },
+  "tags": {
+    "name": "Ayuntamiento de El Paso",
+    "building": "civic",
+    "amenity": "townhall",
+    "addr:street": "Avenida Islas Canarias",
+    "addr:housenumber": "18"
+  }
+},
+{
+  "type": "way",
+  "id": 248881344,
+  "center": {
+    "lat": 28.6526511,
+    "lon": -17.8804994
+  },
+  "tags": {
+    "amenity": "social_facility",
+    "building": "public"
+  }
+},
+{
+  "type": "way",
+  "id": 248888117,
+  "center": {
+    "lat": 28.6543363,
+    "lon": -17.8810434
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 248968535,
+  "center": {
+    "lat": 28.6542463,
+    "lon": -17.8792590
+  },
+  "tags": {
+    "amenity": "school"
+  }
+},
+{
+  "type": "way",
+  "id": 248971772,
+  "center": {
+    "lat": 28.6540540,
+    "lon": -17.8758785
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 248971773,
+  "center": {
+    "lat": 28.6538368,
+    "lon": -17.8760831
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 249041989,
+  "center": {
+    "lat": 28.6162602,
+    "lon": -17.9033206
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 249041991,
+  "center": {
+    "lat": 28.6163648,
+    "lon": -17.9030598
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 249041993,
+  "center": {
+    "lat": 28.6155211,
+    "lon": -17.9041828
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 249043206,
+  "center": {
+    "lat": 28.6150485,
+    "lon": -17.9027406
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 249168002,
+  "center": {
+    "lat": 28.6182339,
+    "lon": -17.9065962
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 249168003,
+  "center": {
+    "lat": 28.6192319,
+    "lon": -17.9066839
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 249168004,
+  "center": {
+    "lat": 28.6192628,
+    "lon": -17.9069424
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 249203242,
+  "center": {
+    "lat": 28.6173072,
+    "lon": -17.9018189
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 249203987,
+  "center": {
+    "lat": 28.6155824,
+    "lon": -17.9038286
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 249204194,
+  "center": {
+    "lat": 28.6171724,
+    "lon": -17.9046008
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 249204195,
+  "center": {
+    "lat": 28.6168227,
+    "lon": -17.9040077
+  },
+  "tags": {
+    "amenity": "school"
+  }
+},
+{
+  "type": "way",
+  "id": 249205285,
+  "center": {
+    "lat": 28.6160926,
+    "lon": -17.9073107
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 249205286,
+  "center": {
+    "lat": 28.6167219,
+    "lon": -17.9071965
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 249205288,
+  "center": {
+    "lat": 28.6168355,
+    "lon": -17.9067305
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 249205608,
+  "center": {
+    "lat": 28.6142353,
+    "lon": -17.9059567
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 249205609,
+  "center": {
+    "lat": 28.6147522,
+    "lon": -17.9054580
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 249225579,
+  "center": {
+    "lat": 28.6039603,
+    "lon": -17.9055877
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 249233469,
+  "center": {
+    "lat": 28.6002758,
+    "lon": -17.9051728
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 249233470,
+  "center": {
+    "lat": 28.6003795,
+    "lon": -17.9042643
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 249233471,
+  "center": {
+    "lat": 28.5998732,
+    "lon": -17.9028932
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 249233472,
+  "center": {
+    "lat": 28.5987648,
+    "lon": -17.9079748
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 249233473,
+  "center": {
+    "lat": 28.5993718,
+    "lon": -17.9092484
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 249233474,
+  "center": {
+    "lat": 28.5994898,
+    "lon": -17.9096512
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 249233475,
+  "center": {
+    "lat": 28.5990572,
+    "lon": -17.9102883
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 249233477,
+  "center": {
+    "lat": 28.5968433,
+    "lon": -17.9105671
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 249233480,
+  "center": {
+    "lat": 28.5988412,
+    "lon": -17.9101399
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 249233482,
+  "center": {
+    "lat": 28.5998951,
+    "lon": -17.9032349
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 249233483,
+  "center": {
+    "lat": 28.5999010,
+    "lon": -17.9035446
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 249233484,
+  "center": {
+    "lat": 28.5986382,
+    "lon": -17.9065562
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 249233485,
+  "center": {
+    "lat": 28.5982414,
+    "lon": -17.9079129
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 249236337,
+  "center": {
+    "lat": 28.5970229,
+    "lon": -17.9026032
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 249236339,
+  "center": {
+    "lat": 28.5973363,
+    "lon": -17.9024745
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 249236345,
+  "center": {
+    "lat": 28.5969295,
+    "lon": -17.9023405
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 249236346,
+  "center": {
+    "lat": 28.5965964,
+    "lon": -17.9027925
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 249236347,
+  "center": {
+    "lat": 28.5962308,
+    "lon": -17.9091380
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 249236350,
+  "center": {
+    "lat": 28.5964729,
+    "lon": -17.9041395
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 249236351,
+  "center": {
+    "lat": 28.5962073,
+    "lon": -17.9042030
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 249237243,
+  "center": {
+    "lat": 28.5989695,
+    "lon": -17.9127886
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 249238524,
+  "center": {
+    "lat": 28.5963971,
+    "lon": -17.9149260
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 249238526,
+  "center": {
+    "lat": 28.5958755,
+    "lon": -17.9160559
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 249238531,
+  "center": {
+    "lat": 28.5988320,
+    "lon": -17.9151546
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 249238532,
+  "center": {
+    "lat": 28.5964280,
+    "lon": -17.9137301
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 249238534,
+  "center": {
+    "lat": 28.5973283,
+    "lon": -17.9143240
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 249238590,
+  "center": {
+    "lat": 28.6003977,
+    "lon": -17.9188281
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 249239194,
+  "center": {
+    "lat": 28.6043103,
+    "lon": -17.9134567
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 249240847,
+  "center": {
+    "lat": 28.5943771,
+    "lon": -17.9131075
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 249240848,
+  "center": {
+    "lat": 28.5947702,
+    "lon": -17.9132415
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 249243993,
+  "center": {
+    "lat": 28.5940311,
+    "lon": -17.9123452
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 249244422,
+  "center": {
+    "lat": 28.5952988,
+    "lon": -17.9141866
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 249244426,
+  "center": {
+    "lat": 28.5952351,
+    "lon": -17.9158034
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 249244428,
+  "center": {
+    "lat": 28.5954146,
+    "lon": -17.9158856
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 249244431,
+  "center": {
+    "lat": 28.5949803,
+    "lon": -17.9158984
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 249244433,
+  "center": {
+    "lat": 28.5956339,
+    "lon": -17.9159615
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 249244438,
+  "center": {
+    "lat": 28.5949890,
+    "lon": -17.9145868
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 249296498,
+  "center": {
+    "lat": 28.6104484,
+    "lon": -17.9056157
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 249296499,
+  "center": {
+    "lat": 28.6103408,
+    "lon": -17.9048678
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 249298274,
+  "center": {
+    "lat": 28.6110842,
+    "lon": -17.9054488
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 249332421,
+  "center": {
+    "lat": 28.6124915,
+    "lon": -17.9163758
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 249332422,
+  "center": {
+    "lat": 28.6131146,
+    "lon": -17.9156241
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 249332948,
+  "center": {
+    "lat": 28.6120625,
+    "lon": -17.9175775
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 249332949,
+  "center": {
+    "lat": 28.6110915,
+    "lon": -17.9151950
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 249334932,
+  "center": {
+    "lat": 28.6123679,
+    "lon": -17.9146429
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 249336462,
+  "center": {
+    "lat": 28.6123469,
+    "lon": -17.9122113
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 249358815,
+  "center": {
+    "lat": 28.6139907,
+    "lon": -17.9114996
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 249358816,
+  "center": {
+    "lat": 28.6146388,
+    "lon": -17.9111056
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 249358817,
+  "center": {
+    "lat": 28.6138220,
+    "lon": -17.9116583
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 249358818,
+  "center": {
+    "lat": 28.6151215,
+    "lon": -17.9110761
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 249359677,
+  "center": {
+    "lat": 28.6143265,
+    "lon": -17.9088443
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 249417215,
+  "center": {
+    "lat": 28.6101215,
+    "lon": -17.9149921
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 249421162,
+  "center": {
+    "lat": 28.6141451,
+    "lon": -17.9077706
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 249421164,
+  "center": {
+    "lat": 28.6120283,
+    "lon": -17.9092180
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 249421165,
+  "center": {
+    "lat": 28.6129891,
+    "lon": -17.9091209
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 249423550,
+  "center": {
+    "lat": 28.6122897,
+    "lon": -17.9072153
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 249423558,
+  "center": {
+    "lat": 28.6118924,
+    "lon": -17.9071819
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 249423559,
+  "center": {
+    "lat": 28.6124762,
+    "lon": -17.9071280
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 249430189,
+  "center": {
+    "lat": 28.6135328,
+    "lon": -17.9049591
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 249464516,
+  "center": {
+    "lat": 28.6182603,
+    "lon": -17.9004196
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 249464517,
+  "center": {
+    "lat": 28.6182030,
+    "lon": -17.9007238
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 249464521,
+  "center": {
+    "lat": 28.6182338,
+    "lon": -17.9000471
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 249464524,
+  "center": {
+    "lat": 28.6185158,
+    "lon": -17.9018806
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 249465434,
+  "center": {
+    "lat": 28.6154451,
+    "lon": -17.9001456
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 249467491,
+  "center": {
+    "lat": 28.6177355,
+    "lon": -17.8978032
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 249467851,
+  "center": {
+    "lat": 28.6181340,
+    "lon": -17.8997990
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 249469692,
+  "center": {
+    "lat": 28.6185480,
+    "lon": -17.8976645
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 249469693,
+  "center": {
+    "lat": 28.6155935,
+    "lon": -17.8980854
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 249469694,
+  "center": {
+    "lat": 28.6159740,
+    "lon": -17.8988495
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 249471813,
+  "center": {
+    "lat": 28.6175543,
+    "lon": -17.8971849
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 249770803,
+  "center": {
+    "lat": 28.6396378,
+    "lon": -17.9289918
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 249834985,
+  "center": {
+    "lat": 28.6499573,
+    "lon": -17.9267352
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 249834986,
+  "center": {
+    "lat": 28.6502192,
+    "lon": -17.9277957
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 249834987,
+  "center": {
+    "lat": 28.6477365,
+    "lon": -17.9282755
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 249834989,
+  "center": {
+    "lat": 28.6510945,
+    "lon": -17.9273930
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 249834990,
+  "center": {
+    "lat": 28.6506055,
+    "lon": -17.9274397
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 249834991,
+  "center": {
+    "lat": 28.6506750,
+    "lon": -17.9266077
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 249986389,
+  "center": {
+    "lat": 28.6547508,
+    "lon": -17.9275294
+  },
+  "tags": {
+    "name": "Ermita Nuestra Señora de Las Angustias",
+    "religion": "christian",
+    "amenity": "place_of_worship",
+    "building": "church",
+    "denomination": "catholic"
+  }
+},
+{
+  "type": "way",
+  "id": 249992826,
+  "center": {
+    "lat": 28.6535460,
+    "lon": -17.9268977
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 249992827,
+  "center": {
+    "lat": 28.6529690,
+    "lon": -17.9260084
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 249994868,
+  "center": {
+    "lat": 28.6531234,
+    "lon": -17.9241525
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 249994871,
+  "center": {
+    "lat": 28.6537055,
+    "lon": -17.9240280
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 249994880,
+  "center": {
+    "lat": 28.6539776,
+    "lon": -17.9250740
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 249998132,
+  "center": {
+    "lat": 28.6466382,
+    "lon": -17.9302609
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 250001230,
+  "center": {
+    "lat": 28.6440614,
+    "lon": -17.9274714
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 250021516,
+  "center": {
+    "lat": 28.6022625,
+    "lon": -17.9222455
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 250022945,
+  "center": {
+    "lat": 28.6040548,
+    "lon": -17.9197347
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 250022947,
+  "center": {
+    "lat": 28.6041588,
+    "lon": -17.9208795
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 250178312,
+  "center": {
+    "lat": 28.5795948,
+    "lon": -17.9024636
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 250178313,
+  "center": {
+    "lat": 28.5818902,
+    "lon": -17.9017435
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 250178314,
+  "center": {
+    "lat": 28.5794126,
+    "lon": -17.9020955
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 250178315,
+  "center": {
+    "lat": 28.5790893,
+    "lon": -17.9020243
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 250178316,
+  "center": {
+    "lat": 28.5791256,
+    "lon": -17.9023500
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 250178317,
+  "center": {
+    "lat": 28.5786927,
+    "lon": -17.9025484
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 250178318,
+  "center": {
+    "lat": 28.5785776,
+    "lon": -17.9024947
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 250178319,
+  "center": {
+    "lat": 28.5807944,
+    "lon": -17.9020991
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 250178320,
+  "center": {
+    "lat": 28.5805906,
+    "lon": -17.9020754
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 250180017,
+  "center": {
+    "lat": 28.5767931,
+    "lon": -17.8995710
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 250181691,
+  "center": {
+    "lat": 28.5812365,
+    "lon": -17.9045520
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 250181692,
+  "center": {
+    "lat": 28.5802927,
+    "lon": -17.9051332
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 250185802,
+  "center": {
+    "lat": 28.5753004,
+    "lon": -17.8986542
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 250196927,
+  "center": {
+    "lat": 28.5589433,
+    "lon": -17.8863431
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 250456631,
+  "center": {
+    "lat": 28.6621920,
+    "lon": -17.9124118
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 250456632,
+  "center": {
+    "lat": 28.6622823,
+    "lon": -17.9119497
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 250456847,
+  "center": {
+    "lat": 28.6631580,
+    "lon": -17.9091166
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 250456848,
+  "center": {
+    "lat": 28.6626478,
+    "lon": -17.9087767
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 250456849,
+  "center": {
+    "lat": 28.6626465,
+    "lon": -17.9100316
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 250456850,
+  "center": {
+    "lat": 28.6631923,
+    "lon": -17.9087841
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 250456851,
+  "center": {
+    "lat": 28.6628947,
+    "lon": -17.9089337
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 250457462,
+  "center": {
+    "lat": 28.6637593,
+    "lon": -17.9096860
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 250457465,
+  "center": {
+    "lat": 28.6621689,
+    "lon": -17.9100229
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 250586520,
+  "center": {
+    "lat": 28.6912559,
+    "lon": -17.9479803
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 250633087,
+  "center": {
+    "lat": 28.6862372,
+    "lon": -17.9484444
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 250635079,
+  "center": {
+    "lat": 28.6865703,
+    "lon": -17.9472636
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 250635373,
+  "center": {
+    "lat": 28.6871703,
+    "lon": -17.9464924
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 250660581,
+  "center": {
+    "lat": 28.6670449,
+    "lon": -17.9417371
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 250816863,
+  "center": {
+    "lat": 28.6588215,
+    "lon": -17.9095121
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 250833790,
+  "center": {
+    "lat": 28.6598453,
+    "lon": -17.9109719
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 252113600,
+  "center": {
+    "lat": 28.6038413,
+    "lon": -17.9160576
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 252114565,
+  "center": {
+    "lat": 28.6049210,
+    "lon": -17.9166109
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 252115508,
+  "center": {
+    "lat": 28.6068293,
+    "lon": -17.9198427
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 252115510,
+  "center": {
+    "lat": 28.6045803,
+    "lon": -17.9154392
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 252115511,
+  "center": {
+    "lat": 28.6066494,
+    "lon": -17.9193369
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 252115512,
+  "center": {
+    "lat": 28.6064626,
+    "lon": -17.9171952
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 252115513,
+  "center": {
+    "lat": 28.6072369,
+    "lon": -17.9192987
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 252115514,
+  "center": {
+    "lat": 28.6071155,
+    "lon": -17.9192021
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 252115694,
+  "center": {
+    "lat": 28.6078118,
+    "lon": -17.9196903
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 252116519,
+  "center": {
+    "lat": 28.6058456,
+    "lon": -17.9148263
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 252116523,
+  "center": {
+    "lat": 28.6060760,
+    "lon": -17.9143216
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 252116525,
+  "center": {
+    "lat": 28.6063377,
+    "lon": -17.9136888
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 252116527,
+  "center": {
+    "lat": 28.6066936,
+    "lon": -17.9154459
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 252117218,
+  "center": {
+    "lat": 28.6085914,
+    "lon": -17.9138803
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 252117219,
+  "center": {
+    "lat": 28.6089370,
+    "lon": -17.9131557
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 252117323,
+  "center": {
+    "lat": 28.6071169,
+    "lon": -17.9115823
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 252117571,
+  "center": {
+    "lat": 28.6065134,
+    "lon": -17.9133165
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 252161635,
+  "center": {
+    "lat": 28.6737281,
+    "lon": -17.9163335
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 252161636,
+  "center": {
+    "lat": 28.6730293,
+    "lon": -17.9166322
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 252161637,
+  "center": {
+    "lat": 28.6736329,
+    "lon": -17.9161326
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 252162395,
+  "center": {
+    "lat": 28.6729896,
+    "lon": -17.9191977
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 252164726,
+  "center": {
+    "lat": 28.6726940,
+    "lon": -17.9194575
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 252165749,
+  "center": {
+    "lat": 28.6739666,
+    "lon": -17.9152487
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 252165750,
+  "center": {
+    "lat": 28.6744910,
+    "lon": -17.9154463
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 252165751,
+  "center": {
+    "lat": 28.6743314,
+    "lon": -17.9153789
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 252167512,
+  "center": {
+    "lat": 28.6708498,
+    "lon": -17.9148827
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 252167519,
+  "center": {
+    "lat": 28.6696496,
+    "lon": -17.9151866
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 252167911,
+  "center": {
+    "lat": 28.6698021,
+    "lon": -17.9169767
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 252169016,
+  "center": {
+    "lat": 28.6716842,
+    "lon": -17.9184464
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 252169037,
+  "center": {
+    "lat": 28.6726985,
+    "lon": -17.9161022
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 252170610,
+  "center": {
+    "lat": 28.6703763,
+    "lon": -17.9192429
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 252170611,
+  "center": {
+    "lat": 28.6720900,
+    "lon": -17.9183953
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 252170612,
+  "center": {
+    "lat": 28.6707983,
+    "lon": -17.9194429
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 252170613,
+  "center": {
+    "lat": 28.6718300,
+    "lon": -17.9185831
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 252170614,
+  "center": {
+    "lat": 28.6721093,
+    "lon": -17.9181130
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 252170615,
+  "center": {
+    "lat": 28.6705609,
+    "lon": -17.9195416
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 252170616,
+  "center": {
+    "lat": 28.6704770,
+    "lon": -17.9194260
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 252171320,
+  "center": {
+    "lat": 28.6752847,
+    "lon": -17.9149231
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 252171323,
+  "center": {
+    "lat": 28.6744981,
+    "lon": -17.9146061
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 252171324,
+  "center": {
+    "lat": 28.6750642,
+    "lon": -17.9147005
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 252174186,
+  "center": {
+    "lat": 28.6719837,
+    "lon": -17.9124244
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 252185389,
+  "center": {
+    "lat": 28.6675447,
+    "lon": -17.9197677
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 252185391,
+  "center": {
+    "lat": 28.6675448,
+    "lon": -17.9189492
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 252185392,
+  "center": {
+    "lat": 28.6671344,
+    "lon": -17.9201824
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 252185393,
+  "center": {
+    "lat": 28.6675615,
+    "lon": -17.9181946
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 252185394,
+  "center": {
+    "lat": 28.6680736,
+    "lon": -17.9176791
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 252185395,
+  "center": {
+    "lat": 28.6670783,
+    "lon": -17.9199955
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 252185396,
+  "center": {
+    "lat": 28.6669958,
+    "lon": -17.9186204
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 252185397,
+  "center": {
+    "lat": 28.6688004,
+    "lon": -17.9202714
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 252185398,
+  "center": {
+    "lat": 28.6675247,
+    "lon": -17.9191331
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 252185400,
+  "center": {
+    "lat": 28.6675027,
+    "lon": -17.9194419
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 252185401,
+  "center": {
+    "lat": 28.6678105,
+    "lon": -17.9170224
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 252185402,
+  "center": {
+    "lat": 28.6671028,
+    "lon": -17.9178539
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 252185404,
+  "center": {
+    "lat": 28.6669310,
+    "lon": -17.9181547
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 252185405,
+  "center": {
+    "lat": 28.6669265,
+    "lon": -17.9189552
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 252185406,
+  "center": {
+    "lat": 28.6670704,
+    "lon": -17.9197227
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 252189591,
+  "center": {
+    "lat": 28.6694213,
+    "lon": -17.9199541
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 252189593,
+  "center": {
+    "lat": 28.6686777,
+    "lon": -17.9161600
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 252189596,
+  "center": {
+    "lat": 28.6686181,
+    "lon": -17.9189782
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 252189598,
+  "center": {
+    "lat": 28.6687443,
+    "lon": -17.9194819
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 252189600,
+  "center": {
+    "lat": 28.6698194,
+    "lon": -17.9197227
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 252189606,
+  "center": {
+    "lat": 28.6692793,
+    "lon": -17.9121814
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 252189607,
+  "center": {
+    "lat": 28.6676404,
+    "lon": -17.9184705
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 252189611,
+  "center": {
+    "lat": 28.6681727,
+    "lon": -17.9194299
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 252189612,
+  "center": {
+    "lat": 28.6701306,
+    "lon": -17.9216635
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 252195169,
+  "center": {
+    "lat": 28.6711706,
+    "lon": -17.9103675
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 252195170,
+  "center": {
+    "lat": 28.6697374,
+    "lon": -17.9101111
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 252195171,
+  "center": {
+    "lat": 28.6702368,
+    "lon": -17.9104005
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 252198009,
+  "center": {
+    "lat": 28.6703538,
+    "lon": -17.9213530
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 278960245,
+  "center": {
+    "lat": 28.6677287,
+    "lon": -17.8694312
+  },
+  "tags": {
+    "man_made": "water_works"
+  }
+},
+{
+  "type": "way",
+  "id": 288582611,
+  "center": {
+    "lat": 28.6657134,
+    "lon": -17.9201191
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 288582612,
+  "center": {
+    "lat": 28.6651015,
+    "lon": -17.9217236
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 288582613,
+  "center": {
+    "lat": 28.6657685,
+    "lon": -17.9204723
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 288582614,
+  "center": {
+    "lat": 28.6655642,
+    "lon": -17.9211186
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 288582615,
+  "center": {
+    "lat": 28.6677625,
+    "lon": -17.9220605
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 288582621,
+  "center": {
+    "lat": 28.6717600,
+    "lon": -17.9227234
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 288582622,
+  "center": {
+    "lat": 28.6656282,
+    "lon": -17.9212526
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 288582623,
+  "center": {
+    "lat": 28.6650078,
+    "lon": -17.9214219
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 288582624,
+  "center": {
+    "lat": 28.6651701,
+    "lon": -17.9227109
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 288582625,
+  "center": {
+    "lat": 28.6683334,
+    "lon": -17.9243422
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 288582639,
+  "center": {
+    "lat": 28.6653708,
+    "lon": -17.9218357
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 288582643,
+  "center": {
+    "lat": 28.6669689,
+    "lon": -17.9253887
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 288582645,
+  "center": {
+    "lat": 28.6656083,
+    "lon": -17.9217831
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 288582647,
+  "center": {
+    "lat": 28.6657336,
+    "lon": -17.9217489
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 288582648,
+  "center": {
+    "lat": 28.6655084,
+    "lon": -17.9208052
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 288583849,
+  "center": {
+    "lat": 28.6655852,
+    "lon": -17.9222969
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 288583852,
+  "center": {
+    "lat": 28.6586163,
+    "lon": -17.9315115
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 288583853,
+  "center": {
+    "lat": 28.6603362,
+    "lon": -17.9296244
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 288583855,
+  "center": {
+    "lat": 28.6582930,
+    "lon": -17.9319319
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 288583856,
+  "center": {
+    "lat": 28.6618509,
+    "lon": -17.9280602
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 288583859,
+  "center": {
+    "lat": 28.6597347,
+    "lon": -17.9278779
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 288583860,
+  "center": {
+    "lat": 28.6573565,
+    "lon": -17.9297635
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 288583861,
+  "center": {
+    "lat": 28.6583104,
+    "lon": -17.9296481
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 288583863,
+  "center": {
+    "lat": 28.6585063,
+    "lon": -17.9316679
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 288583864,
+  "center": {
+    "lat": 28.6592617,
+    "lon": -17.9266576
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 288583865,
+  "center": {
+    "lat": 28.6627062,
+    "lon": -17.9275303
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 288583866,
+  "center": {
+    "lat": 28.6600500,
+    "lon": -17.9287735
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 288583871,
+  "center": {
+    "lat": 28.6637057,
+    "lon": -17.9309828
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 288583875,
+  "center": {
+    "lat": 28.6593869,
+    "lon": -17.9283133
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 288583876,
+  "center": {
+    "lat": 28.6638595,
+    "lon": -17.9310242
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 288583878,
+  "center": {
+    "lat": 28.6590373,
+    "lon": -17.9261602
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 288583879,
+  "center": {
+    "lat": 28.6638397,
+    "lon": -17.9275361
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 288583882,
+  "center": {
+    "lat": 28.6640238,
+    "lon": -17.9273447
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 288583884,
+  "center": {
+    "lat": 28.6638348,
+    "lon": -17.9285431
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 288583886,
+  "center": {
+    "lat": 28.6592544,
+    "lon": -17.9280642
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 288715801,
+  "center": {
+    "lat": 28.6640719,
+    "lon": -17.9209464
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 288715804,
+  "center": {
+    "lat": 28.6652992,
+    "lon": -17.9240729
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 288715805,
+  "center": {
+    "lat": 28.6633808,
+    "lon": -17.9259538
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 288715806,
+  "center": {
+    "lat": 28.6613393,
+    "lon": -17.9240693
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 288715812,
+  "center": {
+    "lat": 28.6639129,
+    "lon": -17.9217098
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 288715813,
+  "center": {
+    "lat": 28.6649220,
+    "lon": -17.9245958
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 288715815,
+  "center": {
+    "lat": 28.6633941,
+    "lon": -17.9211841
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 288715817,
+  "center": {
+    "lat": 28.6635019,
+    "lon": -17.9258407
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 288715818,
+  "center": {
+    "lat": 28.6617609,
+    "lon": -17.9215685
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 288715819,
+  "center": {
+    "lat": 28.6625598,
+    "lon": -17.9219454
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 288715820,
+  "center": {
+    "lat": 28.6613329,
+    "lon": -17.9242500
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 288906370,
+  "center": {
+    "lat": 28.6626707,
+    "lon": -17.9194835
+  },
+  "tags": {
+    "amenity": "school"
+  }
+},
+{
+  "type": "way",
+  "id": 324092905,
+  "center": {
+    "lat": 28.6370382,
+    "lon": -17.8834362
+  },
+  "tags": {
+    "name": "Trinkwasserspeicher",
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 336621007,
+  "center": {
+    "lat": 28.6585868,
+    "lon": -17.9131834
+  },
+  "tags": {
+    "building": "yes",
+    "source:geometry": "Imagen de Catastro de España",
+    "amenity": "townhall"
+  }
+},
+{
+  "type": "way",
+  "id": 369406841,
+  "center": {
+    "lat": 28.6383124,
+    "lon": -17.8814089
+  },
+  "tags": {
+    "power": "substation"
+  }
+},
+{
+  "type": "way",
+  "id": 374758306,
+  "center": {
+    "lat": 28.6039340,
+    "lon": -17.9172937
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 380196506,
+  "center": {
+    "lat": 28.6039431,
+    "lon": -17.8807295
+  },
+  "tags": {
+    "name": "Campo de Lucha Canaria Federico Simón",
+    "leisure": "sports_centre",
+    "building": "yes",
+    "amenity": "community_centre"
+  }
+},
+{
+  "type": "way",
+  "id": 380196507,
+  "center": {
+    "lat": 28.5995152,
+    "lon": -17.8810813
+  },
+  "tags": {
+    "name": "PCAN",
+    "amenity": "fuel"
+  }
+},
+{
+  "type": "way",
+  "id": 380196508,
+  "center": {
+    "lat": 28.5993196,
+    "lon": -17.8807028
+  },
+  "tags": {
+    "name": "Casa Caminero",
+    "amenity": "community_centre",
+    "building": "yes"
+  }
+},
+{
+  "type": "way",
+  "id": 398416629,
+  "center": {
+    "lat": 28.6929259,
+    "lon": -17.9571499
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 446689437,
+  "center": {
+    "lat": 28.6557469,
+    "lon": -17.9261530
+  },
+  "tags": {
+    "place": "square",
+    "opening_hours": "Su 07:00-14:00",
+    "name": "Plaza de Sotomayor",
+    "description": "Rastro - Fleamarket - Flohmarkt",
+    "highway": "pedestrian",
+    "amenity": "marketplace"
+  }
+},
+{
+  "type": "way",
+  "id": 459132115,
+  "center": {
+    "lat": 28.6967199,
+    "lon": -17.9551169
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 470173834,
+  "center": {
+    "lat": 28.5888700,
+    "lon": -17.9020874
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 470173843,
+  "center": {
+    "lat": 28.5889462,
+    "lon": -17.9052848
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 470173846,
+  "center": {
+    "lat": 28.5891527,
+    "lon": -17.9021033
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 470173847,
+  "center": {
+    "lat": 28.5889904,
+    "lon": -17.9022439
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 470173849,
+  "center": {
+    "lat": 28.5872316,
+    "lon": -17.9012461
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 471738800,
+  "center": {
+    "lat": 28.5853616,
+    "lon": -17.8950822
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 472675028,
+  "center": {
+    "lat": 28.5916565,
+    "lon": -17.8962226
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 472699509,
+  "center": {
+    "lat": 28.5905923,
+    "lon": -17.8933613
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 472699516,
+  "center": {
+    "lat": 28.5907131,
+    "lon": -17.8933211
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 472699517,
+  "center": {
+    "lat": 28.5909258,
+    "lon": -17.8936302
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 472745955,
+  "center": {
+    "lat": 28.5875008,
+    "lon": -17.9072810
+  },
+  "tags": {
+    "landuse": "reservoir",
+    "source": "Bing Sat"
+  }
+},
+{
+  "type": "way",
+  "id": 472873557,
+  "center": {
+    "lat": 28.6598749,
+    "lon": -17.9119433
+  },
+  "tags": {
+    "landuse": "reservoir",
+    "area": "yes"
+  }
+},
+{
+  "type": "way",
+  "id": 476992572,
+  "center": {
+    "lat": 28.5928947,
+    "lon": -17.9068792
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 548881003,
+  "center": {
+    "lat": 28.6163707,
+    "lon": -17.9254297
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 556527360,
+  "center": {
+    "lat": 28.6192799,
+    "lon": -17.9227687
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 556527361,
+  "center": {
+    "lat": 28.6188576,
+    "lon": -17.9227935
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 560494195,
+  "center": {
+    "lat": 28.6976070,
+    "lon": -17.9116412
+  },
+  "tags": {
+    "landuse": "reservoir"
+  }
+},
+{
+  "type": "way",
+  "id": 682015224,
+  "center": {
+    "lat": 28.6605264,
+    "lon": -17.9123569
+  },
+  "tags": {
+    "name": "CEIP Mayantigo",
+    "website": "gobiernodecanarias.org",
+    "description": "Colegio de Educación Infantil y Primaria",
+    "amenity": "school"
+  }
+},
+{
+  "type": "way",
+  "id": 750235143,
+  "center": {
+    "lat": 28.6520834,
+    "lon": -17.9230530
+  },
+  "tags": {
+    "man_made": "wastewater_plant",
+    "name": "Depuradora Municipal Los Llanos de Aridane"
+  }
+},
+{
+  "type": "way",
+  "id": 758367027,
+  "center": {
+    "lat": 28.6644565,
+    "lon": -17.9159374
+  },
+  "tags": {
+    "power": "substation"
+  }
+},
+{
+  "type": "way",
+  "id": 758367047,
+  "center": {
+    "lat": 28.6580156,
+    "lon": -17.9388916
+  },
+  "tags": {
+    "building": "yes",
+    "power": "substation"
+  }
+},
+{
+  "type": "way",
+  "id": 758367051,
+  "center": {
+    "lat": 28.6473673,
+    "lon": -17.9390579
+  },
+  "tags": {
+    "building": "yes",
+    "power": "substation"
+  }
+},
+{
+  "type": "way",
+  "id": 807534825,
+  "center": {
+    "lat": 28.6398936,
+    "lon": -17.8775989
+  },
+  "tags": {
+    "leisure": "yes",
+    "name": "CEIP Tacande",
+    "amenity": "school"
+  }
+},
+{
+  "type": "way",
+  "id": 809992796,
+  "center": {
+    "lat": 28.6505921,
+    "lon": -17.8813746
+  },
+  "tags": {
+    "brand:wikipedia": "en:Cepsa",
+    "amenity": "fuel",
+    "official_name": "Compañía Española de Petróleos, S.A.U.",
+    "name": "Cepsa",
+    "brand": "Cepsa",
+    "brand:wikidata": "Q608819"
+  }
+},
+{
+  "type": "way",
+  "id": 860585884,
+  "center": {
+    "lat": 28.6054558,
+    "lon": -17.8822275
+  },
+  "tags": {
+    "man_made": "reservoir_covered"
+  }
+},
+{
+  "type": "way",
+  "id": 885474887,
+  "center": {
+    "lat": 28.6717425,
+    "lon": -17.9444027
+  },
+  "tags": {
+    "building": "service",
+    "power": "substation"
+  }
+}
+
+  ]
+}
