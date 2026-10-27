@@ -11,15 +11,15 @@ Va de 0 a 10 y compara los últimos 7 días de cada zona con su propio año ante
 Tasa y energía no puntúan con menos de 5 sismos por encima de Mc en la semana. El índice es la media de las componentes disponibles × 10. **No es una probabilidad de erupción.**
 
 ### Historial (2011–2026)
-Calculado cada 2 días en las 7 zonas. Con el índice anterior (cocientes sin Mc), hubo 84 episodios por encima de 4, la mayoría en zonas casi sin sismos. Con el actual:
+Calculado cada 2 días en las 7 zonas (cada isla con su mar hasta 25 km, sin solaparse). Con el índice anterior (cocientes sin Mc), hubo 84 episodios por encima de 4, la mayoría en zonas casi sin sismos. Con el actual:
 
 | Índice ≥ | Episodios | Precedieron a una erupción | Antelación |
 |---|---|---|---|
-| 3 | 35 | 2 de 2 | El Hierro 80 días · La Palma 6 días |
+| 3 | 34 | 2 de 2 | El Hierro 80 días · La Palma 6 días |
 | 4 | 15 | 2 de 2 | El Hierro 80 días · La Palma 6 días |
-| 5 | 10 | 2 de 2 | El Hierro 12 días · La Palma 6 días |
-| 6 | 8 | 2 de 2 | El Hierro 10 días · La Palma 6 días |
-| 7 | 4 | 1 de 2 | La Palma 6 días |
+| 5 | 14 | 2 de 2 | El Hierro 12 días · La Palma 6 días |
+| 6 | 7 | 2 de 2 | El Hierro 10 días · La Palma 6 días |
+| 7 | 3 | 1 de 2 | La Palma 6 días |
 
 Los demás episodios fueron agitación real sin erupción (enjambres profundos de La Palma 2017–2020, El Hierro 2013). Dos erupciones no bastan para calcular una probabilidad. La tabla es una tasa de referencia, y se recalcula cada semana en la pestaña «Canarias en directo».
 

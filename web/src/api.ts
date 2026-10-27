@@ -26,7 +26,7 @@ export type Meta = {
   places: Place[]; observations: { at: string; area_ha: number }[]; milestones: { date: string; text: string }[]; sources: string[]
 }
 export type Zone = {
-  key: string; name: string; note: string; centroid: [number, number]; box: number[]; index: number | null
+  key: string; name: string; note: string; centroid: [number, number]; bbox: number[]; index: number | null
   components: Record<string, number | null>; rate_ratio: number | null; n7: number; n30: number; max_mag30: number | null
   depth_median30: number | null; daily30: number[]; b: null | { b: number; sigma: number; mc: number; n: number }
   mc: number | null; rate_surprise: number | null; history: string | null
