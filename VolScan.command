@@ -2,6 +2,7 @@
 # VolScan — arranque local en Mac (doble clic o ./VolScan.command)
 set -e
 cd "$(dirname "$0")"
+export PATH="/opt/homebrew/bin:/usr/local/bin:$PATH"
 # Python ≥ 3.10 (the macOS system one is 3.9): we look for the newest one available
 PY=${PYTHON:-}
 if [ -z "$PY" ]; then

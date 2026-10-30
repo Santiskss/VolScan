@@ -323,12 +323,13 @@ def _weighted_count_quantiles(counts_per_member: np.ndarray, w: np.ndarray):
     return tuple(float(v) for v in q)
 
 
-def impact(fc: LavaForecast, exp: Exposure, t_until: float, already_mask: np.ndarray | None = None) -> dict:
+def impact(fc: LavaForecast, exp: Exposure, t_until: float, already_mask: np.ndarray | None = None,
+           t_now: float = 0.0) -> dict:
     """Impact by `t_until` (hours since the eruption began).
 
     `already_mask` (flat cells already covered by observed lava) separates what
     is already lost from what is still to come: the forecast counts NEW losses
-    only.
+    only. `t_now` shifts facility ETAs so they are reported as hours from now.
     """
     w = fc.weights
     lost_b = np.zeros(exp.bld_cell.shape, bool)
@@ -339,7 +340,7 @@ def impact(fc: LavaForecast, exp: Exposure, t_until: float, already_mask: np.nda
     p_b = hits_b.astype(float) @ w
     count_b = hits_b.sum(axis=0).astype(float)
 
-    lost_r = np.array([bool(already_mask is not None and c.size and already_mask[c].any()) for c in exp.road_seg_cells])
+    lost_r = np.array([bool(already_mask is not None and c.size and already_mask[c].any()) for c in exp.road_seg_cells], bool)
     r_cells = [c if not lost else np.array([], int) for c, lost in zip(exp.road_seg_cells, lost_r)]
     hits_r = member_hits(fc, r_cells, t_until)
     km_r = (hits_r * exp.road_len_m[:, None]).sum(axis=0) / 1000.0
@@ -352,7 +353,8 @@ def impact(fc: LavaForecast, exp: Exposure, t_until: float, already_mask: np.nda
         p = float(w[reached].sum())
         lost = bool(already_mask is not None and f["cell"] >= 0 and already_mask[f["cell"]])
         if p >= 0.01 or lost:
-            q = weighted_quantiles(np.where(np.isfinite(arr), arr, np.nan), w, (0.1, 0.5, 0.9))
+            fut = np.where(np.isfinite(arr) & (arr > t_now if t_now > 0 else arr >= 0), arr - t_now, np.nan)
+            q = weighted_quantiles(fut, w, (0.1, 0.5, 0.9))
             facilities.append(dict(name=f["name"], kind=f["kind"], lon=f["lon"], lat=f["lat"], p=round(p, 3),
                                    already_lost=lost, eta_h=[None if np.isnan(v) else round(v, 1) for v in q]))
     facilities.sort(key=lambda d: (-d["already_lost"], -d["p"]))
@@ -378,40 +380,45 @@ def isolation(fc: LavaForecast, exp: Exposure, t_until: float, already_mask: np.
     node_of_cell = {int(c): k for k, c in enumerate(nodes)}
     c, p, t = _arrival_lookup(fc, nodes)
     ok = t <= t_until
-    covered_by_member: dict[int, list] = {}
-    for ci, pi in zip(c[ok].tolist(), p[ok].tolist()):
-        covered_by_member.setdefault(pi, []).append(node_of_cell[ci])
     base_cut = np.zeros(n, bool)
     if already_mask is not None:
         base_cut = already_mask[nodes]
+    covered_by_member: dict[int, set[int]] = {}
+    for ci, pi in zip(c[ok].tolist(), p[ok].tolist()):
+        nd = node_of_cell[ci]
+        if not base_cut[nd]:
+            covered_by_member.setdefault(pi, set()).add(nd)
     places = [pl for pl in exp.places if pl.get("node", -1) >= 0]
-    # places with no road link to a safe hub even before the lava (gaps in the road data, or grid edge) can't be
-    # "isolated by the lava": leave them out instead of reporting them at 100 %
     keep0 = ~base_cut[edges[:, 0]] & ~base_cut[edges[:, 1]]
     e0 = edges[keep0]
     _, lab0 = connected_components(coo_matrix((np.ones(len(e0)), (e0[:, 0], e0[:, 1])), shape=(n, n)), directed=False)
     safe0 = set(lab0[safe & ~base_cut].tolist())
     places = [pl for pl in places if base_cut[pl["node"]] or lab0[pl["node"]] in safe0]
+    if not places:
+        return []
+    place_nodes = np.array([pl["node"] for pl in places], int)
+    r0 = base_cut[place_nodes]
+    i0 = ~r0 & ~np.isin(lab0[place_nodes], list(safe0))
+    cache: dict[tuple[int, ...], tuple[np.ndarray, np.ndarray]] = {(): (r0, i0)}
     iso = np.zeros((len(places), fc.n_paths), bool)
     reached = np.zeros((len(places), fc.n_paths), bool)
-    cache: dict = {}
     for m in range(fc.n_paths):
-        cut = base_cut.copy()
-        cut[covered_by_member.get(m, [])] = True
-        key = cut.tobytes()
+        extra = covered_by_member.get(m)
+        key = tuple(sorted(extra)) if extra else ()
         if key not in cache:
+            cut = base_cut.copy()
+            cut[list(key)] = True
             keep = ~cut[edges[:, 0]] & ~cut[edges[:, 1]]
             e = edges[keep]
             A = coo_matrix((np.ones(len(e)), (e[:, 0], e[:, 1])), shape=(n, n))
             _, lab = connected_components(A, directed=False)
-            safe_labels = set(lab[safe & ~cut].tolist())
-            cache[key] = (lab, safe_labels, cut)
-        lab, safe_labels, cut_m = cache[key]
-        for k, pl in enumerate(places):
-            if cut_m[pl["node"]]:
-                reached[k, m] = True
-            elif lab[pl["node"]] not in safe_labels:
-                iso[k, m] = True
+            safe_labels = list(set(lab[safe & ~cut].tolist()))
+            r_vec = cut[place_nodes]
+            i_vec = ~r_vec & ~np.isin(lab[place_nodes], safe_labels)
+            cache[key] = (r_vec, i_vec)
+        r_vec, i_vec = cache[key]
+        reached[:, m] = r_vec
+        iso[:, m] = i_vec
     w = fc.weights
     out = []
     for k, pl in enumerate(places):

@@ -23,6 +23,17 @@ def test_rings_outer_and_hole():
     assert ring[0] == ring[-1] and -18 < ring[0][0] < -17 and 28 < ring[0][1] < 29
 
 
+def test_nested_outer_ring_does_not_duplicate_hole():
+    m = np.zeros((14, 14), bool)
+    m[1:13, 1:13] = True
+    m[3:11, 3:11] = False
+    m[5:9, 5:9] = True
+    m[6:8, 6:8] = False
+    polys = mask_polygons(G, m, tol_cells=0.0, min_cells=1)
+    assert len(polys) == 2
+    assert sum(len(p["coordinates"]) - 1 for p in polys) == 2
+
+
 def test_bands_and_cap_message():
     yy, xx = np.mgrid[0:40, 0:40]
     p = np.clip(1 - np.hypot(yy - 20, xx - 20) / 15, 0, 1)

@@ -117,9 +117,15 @@ def mask_polygons(grid, mask: np.ndarray, tol_cells: float = 1.0, min_cells: int
         if abs(a) < min_cells:
             continue
         (outers if a < 0 else holes).append(r)       # row-down coordinates flip the sign
+    outers.sort(key=lambda r: abs(signed_area(r)))
+    used_holes: set[int] = set()
     polys = []
     for o in outers:
-        mine = [h for h in holes if _point_in_ring(h[0][0] + 0.5, h[0][1] + 0.5, o) or _point_in_ring(*h[0], o)]
+        mine = []
+        for hi, h in enumerate(holes):
+            if hi not in used_holes and (_point_in_ring(h[0][0] + 0.5, h[0][1] + 0.5, o) or _point_in_ring(*h[0], o)):
+                used_holes.add(hi)
+                mine.append(h)
         os_ = simplify(o, tol_cells)
         polys.append(dict(type="Polygon", coordinates=[to_lonlat(grid, os_)] +
                           [to_lonlat(grid, simplify(h, tol_cells)) for h in mine]))

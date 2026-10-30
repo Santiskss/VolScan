@@ -47,7 +47,8 @@ export type Indicators = { zone: string; deformation: { level: string; stations:
   so2_series: { date: string; so2_kt: number }[]; notes: { deformation: string; so2: string } }
 export type Status = {
   version: string; now: string
-  llm: { ok: boolean; provider: string; model: string; base?: string; error?: string; models?: string[] }
+  llm: { ok: boolean; provider: string; model: string; adapter?: string; base?: string; error?: string; models?: string[] }
+  vision?: { port: string; adapter: string; family: string; model: string; mode: string; ready: boolean; note: string }
   catalog: { n_events: number; first: string | null; last: string | null; refresh_error: string | null; citation: string
     health?: { level: string; ok: boolean; message: string; last_download_age_h: number | null; last_event_age_h: number | null; backup_events: number } }
 }
@@ -119,10 +120,28 @@ function onStatus(r: Response, url: string) {
   if (!r.ok) throw new Error(r.status === 403 ? 'tu rol no permite esta acción' : `${r.status} ${url}`)
 }
 
+const GET_CACHE = new Map<string, Promise<unknown>>()
+const UNCACHEABLE_PREFIXES = ['/api/status', '/api/auth/config', '/api/audit']
+
+export function clearApiCache() {
+  GET_CACHE.clear()
+}
+
 async function get<T>(url: string): Promise<T> {
-  const r = await fetch(STATIC ? staticUrl(url) : url, STATIC ? undefined : { headers: authHeaders() })
-  onStatus(r, url)
-  return r.json() as Promise<T>
+  const canCache = !UNCACHEABLE_PREFIXES.some((p) => url.startsWith(p))
+  if (canCache && GET_CACHE.has(url)) {
+    return GET_CACHE.get(url) as Promise<T>
+  }
+  const p = (async () => {
+    const r = await fetch(STATIC ? staticUrl(url) : url, STATIC ? undefined : { headers: authHeaders() })
+    onStatus(r, url)
+    return r.json() as Promise<T>
+  })()
+  if (canCache) {
+    GET_CACHE.set(url, p)
+    p.catch(() => GET_CACHE.delete(url))
+  }
+  return p
 }
 
 /** Authenticated download (PDF, CAP, GeoJSON...) saved with the given file name. */
@@ -155,8 +174,8 @@ export type AuditEntry = { t: string; user: string | null; role: string | null; 
 
 export const api = {
   authConfig: () => STATIC ? Promise.resolve({ enabled: false, user: null as AuthUser | null, roles: [] as string[] }) : get<{ enabled: boolean; user: AuthUser | null; roles: string[] }>('/api/auth/config'),
-  login: (name: string, password: string) => post<{ token: string; user: AuthUser }>('/api/login', { name, password }),
-  logout: () => post<{ ok: boolean }>('/api/logout', {}),
+  login: (name: string, password: string) => { clearApiCache(); return post<{ token: string; user: AuthUser }>('/api/login', { name, password }) },
+  logout: () => { clearApiCache(); return post<{ ok: boolean }>('/api/logout', {}) },
   audit: (limit = 200) => get<{ entries: AuditEntry[]; chain: { ok: boolean; lines: number; broken_at?: number }; auth_enabled: boolean }>(`/api/audit?limit=${limit}`),
   status: () => get<Status>('/api/status'),
   terrain: (name: 'lapalma' | 'archipelago' | 'tenerife') => get<Terrain>(`/api/terrain/${name}`),
@@ -171,18 +190,73 @@ export const api = {
   calibration: () => get<Calibration>('/api/canarias/calibration'),
   indicators: (zone: string) => get<Indicators>(`/api/canarias/indicators?zone=${zone}`),
   quakes: (days = 30) => get<{ n: number; quakes: Quake[]; citation: string }>(`/api/canarias/quakes?days=${days}`),
-  refresh: () => post<Status['catalog']>('/api/canarias/refresh', {}),
+  refresh: () => { clearApiCache(); return post<Status['catalog']>('/api/canarias/refresh', {}) },
   solunar: (zone: string, start = '2011-01-01') => get<any>(`/api/solunar?zone=${zone}&start=${start}`),
   lpImpact: (d: string) => get<ImpactDay>(`/api/lapalma2021/impact/${d}`),
   lpValidation: () => get<ValidationData>('/api/lapalma2021/validation'),
+  lpSam3: (d: string) => get<Sam3Day>(`/api/lapalma2021/sam3/${d}`),
+  lpSam3Validation: () => get<Sam3Validation>('/api/lapalma2021/sam3-validation'),
   reportMonths: () => get<{ months: string[]; zones: { key: string; name: string }[] }>('/api/reports/months'),
   report: (zone: string, month: string) => get<Report>(`/api/reports/monthly?zone=${zone}&month=${month}`),
+  catastropheReport: () => get<CatastropheReport>('/api/reports/catastrophe/lapalma2021'),
   reportRewrite: (zone: string, month: string) => post<{ text: string | null; ai: boolean; error?: string; model: Status['llm'] }>('/api/reports/rewrite', { zone, month }),
   chat: (question: string, context?: string) =>
-    post<{ answer: string | null; ai: boolean; error?: string; model: Status['llm']; citations: Citation[] }>('/api/chat', { question, context }),
+    post<AgentResponse>('/api/chat', { question, context }),
 }
 
+export type CatastropheReport = {
+  title: string; subtitle: string
+  summary_kpis: {
+    eruption_days: number; real_area_ha: number; real_buildings_destroyed: number; real_quakes_total: number
+    volscan_days_within_p10_p90: number; volscan_eval_days: number; volscan_bias_pct: number | null
+    sam3_mean_iou: number; sam3_lead_gain_h: number
+  }
+  provenance: { layer: string; kind: 'REAL' | 'ESTIMADO'; source: string; usage: string }[]
+  rheology_phases: {
+    phase: string; period: string; lava_type: string; rheology_real: string; rheology_model: string; coincidence: string
+    stats: { days: number; within: number; coverage_pct?: number; pred_mean_72h?: number; obs_mean_72h?: number }
+  }[]
+  timeline: {
+    date: string; milestone: string; phase: 'pre-eruptive' | 'eruptive'
+    real: { quakes_24h: number; depth_median_km: number | null; cems_area_ha: number; lost_buildings_cum: number; obs_new_buildings_72h: number | null }
+    estimated: { unrest_index: number | null; nearest_vent_km: number | null; pred_new_buildings_72h: number | null; p10_p90: number[] | null; sea_prob: number | null; sea_eta_p50_h?: number | null; sam3_area_ha: number | null; sam3_iou: number | null }
+    tide: { lunar_elong_deg: number; regime: string; semidiurnal_deg: number }
+    verdict: string
+  }[]
+  tides_crisis: null | {
+    onset_utc: string; onset_lunar_elong_deg: number; onset_regime: string; onset_semidiurnal_deg: number
+    swarm_precursor: { period: string; n_raw: number; n_declustered: number; semidiurnal: null | { n: number; c: number; p_shift: number } }
+    syn_eruptive: { period: string; n_raw: number; n_declustered: number; semidiurnal: null | { n: number; c: number; p_shift: number }; fortnightly: null | { n: number; c: number; p_shift: number } }
+    explanation: string
+  }
+}
+
+export type Sam3Day = {
+  date: string; phase: 'pre-eruptive' | 'eruptive'; available: boolean; note?: string
+  observation_index?: number; observed_at?: string; cems_already_delivered_at_now?: boolean; lead_time_advantage_h?: number
+  segmentation?: { adapter: string; model: string; mode: string; latency_ms: number; area_ha: number; reach_m: number; n_prompt_points: number }
+  comparison_vs_cems?: { cems_area_ha: number; sam3_area_ha: number; cems_reach_m: number; sam3_reach_m: number; iou: number; precision: number; recall: number; f1: number }
+  assimilated_forecast?: { n_passes_assimilated: number; ess: number; sea_p_ever: number; sea_eta_h: (number | null)[] }
+  overlay?: Overlay
+  adapter: NonNullable<Status['vision']>
+}
+export type Sam3Validation = {
+  adapter: NonNullable<Status['vision']>; n_scenes: number; note: string
+  summary: { mean_iou: number; median_iou: number; min_iou: number; max_iou: number; mean_precision: number; mean_recall: number; mean_f1: number; mean_latency_ms: number; cems_delivery_delay_h: number; sam3_delivery_delay_h: number; lead_time_gain_h: number }
+  scenes: { k: number; observed_at: string; date: string; cems_area_ha: number; sam3_area_ha: number; cems_reach_m: number; sam3_reach_m: number; latency_ms: number; n_prompts: number; iou: number; precision: number; recall: number; f1: number }[]
+}
+export type AgentResponse = {
+  answer: string | null; ai: boolean; error?: string; model: Status['llm']
+  segmentation_adapter?: Status['vision']
+  tool_calls?: { name: string; arguments: Record<string, unknown>; duration_ms: number; output: Record<string, unknown> }[]
+  citations: Citation[]
+}
+
+const HEIGHTS_CACHE = new WeakMap<Terrain, Float32Array>()
+
 export function decodeHeights(t: Terrain): Float32Array {
+  const cached = HEIGHTS_CACHE.get(t)
+  if (cached) return cached
   const bin = atob(t.heights_i16_b64)
   const buf = new ArrayBuffer(bin.length)
   const u8 = new Uint8Array(buf)
@@ -190,6 +264,7 @@ export function decodeHeights(t: Terrain): Float32Array {
   const i16 = new Int16Array(buf)
   const out = new Float32Array(i16.length)
   for (let i = 0; i < i16.length; i++) out[i] = i16[i] === t.nodata ? NaN : i16[i]
+  HEIGHTS_CACHE.set(t, out)
   return out
 }
 

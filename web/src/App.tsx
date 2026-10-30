@@ -9,22 +9,22 @@ import TenerifeScenarios from './views/TenerifeScenarios'
 import Validation from './views/Validation'
 
 const TABS = [
-  ['atlas', 'Atlas volcánico · 3D'],
-  ['canarias', 'Canarias en directo'],
-  ['tenerife', 'Tenerife · escenarios'],
-  ['validacion', 'Validación 2021'],
-  ['informes', 'Informes mensuales'],
-  ['registro', 'Registro'],
+  ['atlas', 'Atlas 3D · Caso Real 2021'],
+  ['canarias', 'Canarias en directo (IGN)'],
+  ['tenerife', 'Tenerife · Simulación'],
+  ['validacion', 'Validación (Real vs Estimado)'],
+  ['informes', 'Dossier de Crisis e Informes'],
+  ['registro', 'Registro ENS'],
 ] as const
 type Tab = (typeof TABS)[number][0]
 
 const HEADERS: Record<Tab, [string, string, string]> = {
-  atlas: ['La Palma', 'Tajogaite · 19 sep – 13 dic 2021 · EMSR546', 'Histórico real · reconstrucción, no en directo'],
-  canarias: ['Canarias', 'Sismicidad, deformación y gases por zona volcánica', 'En directo · catálogo IGN'],
-  tenerife: ['Tenerife', 'Escenarios de impacto por sistema volcánico', 'Planificación · no es un pronóstico'],
-  validacion: ['La Palma', 'Pronóstico de impacto frente a lo observado', 'Acierto medido, no prometido'],
-  registro: ['VolScan', 'Quién ha hecho qué y cuándo', 'Trazabilidad · ENS'],
-  informes: ['Canarias', 'Vigilancia volcánica por zona: sismos, deformación y gases', 'IGN · NGL · NASA · no es una alerta'],
+  atlas: ['La Palma 2021', 'Dato real (IGN + Copernicus EMS) + Pronóstico asimilado VolScan a 72 h', 'Caso real + Modelo'],
+  canarias: ['Canarias hoy', 'Telemetría real en directo (IGN sismos · NGL GNSS · NASA SO2) + Índice VolScan', '100 % Dato en directo'],
+  tenerife: ['Tenerife', 'Simulación condicional a 30 días sobre MDE real si abriera una boca', 'Simulación de planificación'],
+  validacion: ['Auditoría 2021', 'Comparación de los 83 pronósticos de VolScan frente a lo cartografiado por Copernicus', 'Acierto medido: 81 %'],
+  registro: ['VolScan', 'Trazabilidad criptográfica SHA-256 de acciones y exportaciones', 'Seguridad · ENS'],
+  informes: ['Informes y Crisis', 'Dossier de Catástrofe (Tajogaite 2021: reología, evolución, mareas) y boletines por isla', 'Dato real vs Estimado'],
 }
 
 function Logo() {
@@ -38,6 +38,7 @@ function Logo() {
 
 export default function App() {
   const [tab, setTab] = useState<Tab>(() => ((TABS.map((t) => t[0]) as string[]).includes(location.hash.slice(1).split('@')[0]) ? location.hash.slice(1).split('@')[0] as Tab : 'atlas'))
+  const [visited, setVisited] = useState<Record<string, boolean>>(() => ({ [tab]: true }))
   const [status, setStatus] = useState<Status | null>(null)
   const [auth, setAuth] = useState<{ enabled: boolean; user: AuthUser | null } | null>(null)
   useEffect(() => {
@@ -46,7 +47,10 @@ export default function App() {
     authEvents.addEventListener('unauthorized', h)
     return () => authEvents.removeEventListener('unauthorized', h)
   }, [])
-  useEffect(() => { if (location.hash.slice(1).split('@')[0] !== tab) location.hash = tab }, [tab])
+  useEffect(() => {
+    setVisited((v) => (v[tab] ? v : { ...v, [tab]: true }))
+    if (location.hash.slice(1).split('@')[0] !== tab) location.hash = tab
+  }, [tab])
   useEffect(() => {
     const load = () => api.status().then(setStatus).catch(() => setStatus(null))
     load()
@@ -63,7 +67,8 @@ export default function App() {
       <div className="topbar">
         {tabs.map(([k, label]) => <button key={k} className={`tab ${tab === k ? 'active' : ''}`} onClick={() => setTab(k)}>{label}</button>)}
         <span className="spacer" />
-        <span className="chip"><span className={`dot ${llm?.ok ? 'ok' : 'warn'}`} />{STATIC ? 'IA: solo en versión local' : <>IA: {llm ? (llm.provider === 'meta' ? 'Meta · ' : 'Local · ') + llm.model : '—'}{llm && !llm.ok ? ' (sin conexión)' : ''}</>}</span>
+        {status?.vision && <span className="chip" title={status.vision.note}><span className="dot ok" />Visión: {status.vision.family} ({status.vision.mode === 'remote_api' ? 'API' : status.vision.mode === 'local_weights' ? 'local' : 'prompts SWIR'})</span>}
+        <span className="chip"><span className={`dot ${llm?.ok ? 'ok' : 'warn'}`} />{STATIC ? 'IA: solo en versión local' : <>IA: {llm ? (llm.provider === 'meta' ? 'Meta · ' : 'Local · ') + llm.model : '—'}{llm && !llm.ok ? ' (modo determinista)' : ''}</>}</span>
         <span className="chip" title={status?.catalog.health?.message ?? ''}><span className={`dot ${!STATIC && status?.catalog.health && !status.catalog.health.ok ? 'warn' : 'ok'}`} />IGN: {status ? `${fmt.int(status.catalog.n_events)} sismos` : '—'}{!STATIC && status?.catalog.health && !status.catalog.health.ok ? ` · ${status.catalog.health.level}` : ''}</span>
         {STATIC && status && <span className="chip"><span className="dot warn" />Instantánea · {fmt.dateTime(status.now)}</span>}
         {auth?.enabled && auth.user && <span className="chip"><span className="dot ok" />{auth.user.name} · {auth.user.role}<button className="linklike" onClick={() => { api.logout().finally(() => { setToken(null); setAuth({ enabled: true, user: null }) }) }}>Salir</button></span>}
@@ -77,12 +82,12 @@ export default function App() {
         <span style={{ flex: 1 }} />
         <span className="badge">{badge}</span>
       </div>
-      {tab === 'atlas' && <AtlasLaPalma />}
-      {tab === 'canarias' && <CanariasLive />}
-      {tab === 'tenerife' && <TenerifeScenarios />}
-      {tab === 'validacion' && <Validation />}
-      {tab === 'informes' && <Reports />}
-      {tab === 'registro' && <AuditLog />}
+      {visited.atlas && <div style={{ display: tab === 'atlas' ? 'contents' : 'none' }}><AtlasLaPalma /></div>}
+      {visited.canarias && <div style={{ display: tab === 'canarias' ? 'contents' : 'none' }}><CanariasLive /></div>}
+      {visited.tenerife && <div style={{ display: tab === 'tenerife' ? 'contents' : 'none' }}><TenerifeScenarios /></div>}
+      {visited.validacion && <div style={{ display: tab === 'validacion' ? 'contents' : 'none' }}><Validation /></div>}
+      {visited.informes && <div style={{ display: tab === 'informes' ? 'contents' : 'none' }}><Reports /></div>}
+      {visited.registro && <div style={{ display: tab === 'registro' ? 'contents' : 'none' }}><AuditLog /></div>}
     </>
   )
 }

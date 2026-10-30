@@ -50,5 +50,9 @@ def test_api_requires_login_and_role_when_enabled(tmp_path, monkeypatch):
     assert c.post("/api/canarias/refresh", headers=h).status_code == 403      # lector can't refresh
     assert c.get("/api/audit", headers=h).status_code == 403
     log = [json.loads(x) for x in (tmp_path / "a.jsonl").read_text().splitlines()]
-    assert any(e.get("event") == "login_failed" for e in log) and any(e["status"] == 403 for e in log)
+    login_entries = [e for e in log if e["path"] == "/api/login"]
+    assert len(login_entries) == 2 and all(e.get("event") in ("login_failed", "login_ok") for e in login_entries)
+    assert any(e["status"] == 403 for e in log)
+    sec.audit(dict(user="lucia", path="/api/long", query="q=" + "x" * 6000, status=200), tmp_path / "a.jsonl")
+    sec.audit(dict(user="lucia", path="/api/after_long", query="", status=200), tmp_path / "a.jsonl")
     assert sec.verify_audit(tmp_path / "a.jsonl")["ok"]

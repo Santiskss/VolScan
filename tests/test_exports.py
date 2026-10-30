@@ -20,3 +20,16 @@ def test_impact_pdf_handles_missing_values():
     pdf = X.impact_pdf("t", "s", [("Edificios", "10", "5–20")], fac, [], [dict(name="A", p=0.2)], "m", "f")
     assert pdf[:5] == b"%PDF-"
     assert "CEIP X" in X.impact_csv(fac, []).decode("utf-8-sig")
+
+
+def test_api_export_endpoints_handle_pre_cems_and_invalid_inputs():
+    from fastapi.testclient import TestClient
+    from volscan.api.app import app
+
+    c = TestClient(app)
+    r_pdf = c.get("/api/export/impact/lapalma2021/2021-09-19.pdf")
+    assert r_pdf.status_code == 200 and r_pdf.content[:5] == b"%PDF-"
+    assert c.get("/api/export/impact/lapalma2021/2021-09-19.xlsx").status_code == 404
+    assert c.get("/api/export/impact/lapalma2021/not-a-date.pdf").status_code == 400
+    assert c.get("/api/export/report/tenerife/bad-month.pdf").status_code == 400
+

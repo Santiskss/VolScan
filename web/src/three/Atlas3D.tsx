@@ -24,6 +24,41 @@ type Props = {
 
 const km = 1000
 
+function clearGroup(g: THREE.Group) {
+  g.traverse((o: any) => {
+    o.geometry?.dispose?.()
+    if (Array.isArray(o.material)) o.material.forEach((m: any) => m?.dispose?.())
+    else o.material?.dispose?.()
+    if (o instanceof CSS2DObject) o.element.remove()
+  })
+  g.clear()
+}
+
+const IMAGE_CACHE = new Map<string, HTMLImageElement>()
+
+export function preloadImage(src: string | undefined | null): void {
+  if (!src || IMAGE_CACHE.has(src)) return
+  const img = new Image()
+  img.src = src
+  IMAGE_CACHE.set(src, img)
+}
+
+function getOrLoadImage(src: string, onReady: (img: HTMLImageElement) => void): void {
+  const cached = IMAGE_CACHE.get(src)
+  if (cached) {
+    if (cached.complete && cached.naturalWidth > 0) {
+      onReady(cached)
+    } else {
+      cached.addEventListener('load', () => onReady(cached), { once: true })
+    }
+    return
+  }
+  const img = new Image()
+  IMAGE_CACHE.set(src, img)
+  img.onload = () => onReady(img)
+  img.src = src
+}
+
 export default function Atlas3D({ terrain, overlay, quakes = [], labels = [], exaggeration = 1.6, depthScale = 0.5,
   terrainOpacity = 0.86, maxDepthKm = 40, focus, quakeScale = 1, surfacePoints = [] }: Props) {
   const host = useRef<HTMLDivElement>(null)
@@ -32,7 +67,7 @@ export default function Atlas3D({ terrain, overlay, quakes = [], labels = [], ex
   // ---------- scene setup (once)
   useEffect(() => {
     const el = host.current!
-    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, preserveDrawingBuffer: true })
+    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: 'high-performance' })
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
     renderer.setClearColor(0x000000, 0)
     el.appendChild(renderer.domElement)
@@ -52,6 +87,7 @@ export default function Atlas3D({ terrain, overlay, quakes = [], labels = [], ex
     Object.values(groups).forEach((g) => scene.add(g))
     const resize = () => {
       const w = el.clientWidth, h = el.clientHeight
+      if (w === 0 || h === 0) return
       renderer.setSize(w, h)
       labelsR.setSize(w, h)
       camera.aspect = w / Math.max(h, 1)
@@ -62,9 +98,11 @@ export default function Atlas3D({ terrain, overlay, quakes = [], labels = [], ex
     resize()
     let raf = 0
     const loop = () => {
-      controls.update()
-      renderer.render(scene, camera)
-      labelsR.render(scene, camera)
+      if (el.clientWidth > 0 && el.clientHeight > 0) {
+        controls.update()
+        renderer.render(scene, camera)
+        labelsR.render(scene, camera)
+      }
       raf = requestAnimationFrame(loop)
     }
     loop()
@@ -72,6 +110,8 @@ export default function Atlas3D({ terrain, overlay, quakes = [], labels = [], ex
     return () => {
       cancelAnimationFrame(raf)
       ro.disconnect()
+      Object.values(groups).forEach(clearGroup)
+      S.current.tex?.dispose?.()
       controls.dispose()
       renderer.dispose()
       el.innerHTML = ''
@@ -83,11 +123,11 @@ export default function Atlas3D({ terrain, overlay, quakes = [], labels = [], ex
     const s = S.current
     if (!terrain || !s.scene) return
     const g: THREE.Group = s.groups.terrain
-    g.clear()
+    clearGroup(g)
     const { rows, cols, step } = terrain
     const cx = terrain.west + (cols * step) / 2, cy = terrain.north - (rows * step) / 2
     s.center = { cx, cy }
-    const h = decodeHeights(terrain)
+    const h = s.heights ?? (s.heights = decodeHeights(terrain))
     const pos = new Float32Array(rows * cols * 3)
     const uv = new Float32Array(rows * cols * 2)
     for (let i = 0; i < rows; i++) for (let j = 0; j < cols; j++) {
@@ -111,10 +151,12 @@ export default function Atlas3D({ terrain, overlay, quakes = [], labels = [], ex
     geo.setAttribute('uv', new THREE.BufferAttribute(uv, 2))
     geo.setIndex(idx)
     geo.computeVertexNormals()
-    const canvas = document.createElement('canvas')
-    const tex = new THREE.CanvasTexture(canvas)
+    const canvas = s.texCanvas ?? document.createElement('canvas')
+    const tex = s.tex ?? new THREE.CanvasTexture(canvas)
     tex.colorSpace = THREE.SRGBColorSpace
-    tex.anisotropy = 8
+    tex.generateMipmaps = false
+    tex.minFilter = THREE.LinearFilter
+    tex.magFilter = THREE.LinearFilter
     const mat = new THREE.MeshBasicMaterial({ map: tex, transparent: true, opacity: terrainOpacity, side: THREE.DoubleSide, depthWrite: true })
     const mesh = new THREE.Mesh(geo, mat)
     mesh.renderOrder = 2
@@ -124,22 +166,37 @@ export default function Atlas3D({ terrain, overlay, quakes = [], labels = [], ex
     sea.rotation.x = -Math.PI / 2
     sea.position.y = -0.04
     g.add(sea)
+    const terrainChanged = s.terrainMeta?.name !== terrain.name
+    if (terrainChanged) s.heights = decodeHeights(terrain)
     s.terrainMesh = mesh
     s.texCanvas = canvas
     s.tex = tex
     s.terrainMeta = terrain
-    const base = new Image()
-    base.onload = () => { s.baseImg = base; composeTexture() }
-    base.src = terrain.texture
-    // initial camera framing
-    const span = Math.max(rows, cols) * step / km
-    s.camera.position.set(-span * 0.55, span * 0.55, span * 0.75)
-    s.controls.target.set(0, 0, 0)
-    s.controls.maxDistance = span * 3
-    s.scene.fog = new THREE.Fog(0xe9e3d6, span * 1.4, span * 4.5)
-    // depth guides
+    if (terrainChanged || !s.baseImg) {
+      const span = Math.max(rows, cols) * step / km
+      s.camera.position.set(-span * 0.55, span * 0.55, span * 0.75)
+      s.controls.target.set(0, 0, 0)
+      s.controls.maxDistance = span * 3
+      s.scene.fog = new THREE.Fog(0xe9e3d6, span * 1.4, span * 4.5)
+      getOrLoadImage(terrain.texture, (base) => {
+        s.baseImg = base
+        s.lastComposedPng = undefined
+        composeTexture()
+      })
+    } else {
+      s.lastComposedPng = undefined
+      composeTexture()
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [terrain, exaggeration])
+
+  // ---------- depth guides
+  useEffect(() => {
+    const s = S.current
+    if (!terrain || !s.scene) return
+    const { rows, cols, step } = terrain
     const gd: THREE.Group = s.groups.guides
-    gd.clear()
+    clearGroup(gd)
     for (const d of [10, 20, 30, 40].filter((d) => d <= maxDepthKm)) {
       const yy = -d * depthScale
       const ring = new THREE.LineLoop(
@@ -153,12 +210,14 @@ export default function Atlas3D({ terrain, overlay, quakes = [], labels = [], ex
       lab.position.set(-cols * step / km / 2, yy, rows * step / km / 2)
       gd.add(lab)
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [terrain, exaggeration, depthScale, maxDepthKm])
+  }, [terrain, depthScale, maxDepthKm])
 
   const composeTexture = () => {
     const s = S.current
     if (!s.baseImg || !s.texCanvas) return
+    const curPng = s.overlayMeta?.png ?? null
+    if (s.lastComposedPng === curPng && s.texCanvas.width === s.baseImg.width) return
+    s.lastComposedPng = curPng
     const c: HTMLCanvasElement = s.texCanvas
     if (c.width !== s.baseImg.width || c.height !== s.baseImg.height) {
       // WebGL2 textures are immutable in size: on resize we create a new one
@@ -166,12 +225,14 @@ export default function Atlas3D({ terrain, overlay, quakes = [], labels = [], ex
       c.height = s.baseImg.height
       const nt = new THREE.CanvasTexture(c)
       nt.colorSpace = THREE.SRGBColorSpace
-      nt.anisotropy = 8
+      nt.generateMipmaps = false
+      nt.minFilter = THREE.LinearFilter
+      nt.magFilter = THREE.LinearFilter
       s.tex?.dispose()
       s.tex = nt
       if (s.terrainMesh) { s.terrainMesh.material.map = nt; s.terrainMesh.material.needsUpdate = true }
     }
-    const ctx = c.getContext('2d')!
+    const ctx = c.getContext('2d', { alpha: false }) ?? c.getContext('2d')!
     ctx.drawImage(s.baseImg, 0, 0)
     const t: Terrain = s.terrainMeta
     const k = c.width / t.cols
@@ -188,9 +249,14 @@ export default function Atlas3D({ terrain, overlay, quakes = [], labels = [], ex
   useEffect(() => {
     const s = S.current
     if (!overlay) { s.overlayImg = null; s.overlayMeta = null; composeTexture(); return }
-    const img = new Image()
-    img.onload = () => { s.overlayImg = img; s.overlayMeta = overlay; composeTexture() }
-    img.src = overlay.png
+    let cancelled = false
+    getOrLoadImage(overlay.png, (img) => {
+      if (cancelled) return
+      s.overlayImg = img
+      s.overlayMeta = overlay
+      composeTexture()
+    })
+    return () => { cancelled = true }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [overlay])
 
@@ -204,7 +270,7 @@ export default function Atlas3D({ terrain, overlay, quakes = [], labels = [], ex
     const s = S.current
     if (!s.scene || !s.center) return
     const g: THREE.Group = s.groups.quakes
-    g.clear()
+    clearGroup(g)
     if (!quakes.length) return
     const geo = new THREE.SphereGeometry(1, 14, 10)
     const mat = new THREE.MeshBasicMaterial({ transparent: true, opacity: 0.92, depthWrite: false })
@@ -229,7 +295,7 @@ export default function Atlas3D({ terrain, overlay, quakes = [], labels = [], ex
     const s = S.current
     if (!s.scene || !s.center || !s.terrainMeta) return
     const g: THREE.Group = s.groups.labels
-    g.clear()
+    clearGroup(g)
     const t: Terrain = s.terrainMeta
     const h = s.heights ?? (s.heights = decodeHeights(t))
     labels.forEach((l) => {
@@ -244,14 +310,12 @@ export default function Atlas3D({ terrain, overlay, quakes = [], labels = [], ex
     })
   }, [labels, terrain, exaggeration])
 
-  useEffect(() => { S.current.heights = null }, [terrain])
-
   // ---------- assets on the surface (e.g. buildings at risk), coloured by probability
   useEffect(() => {
     const s = S.current
     if (!s.scene || !s.center || !s.terrainMeta) return
     const g: THREE.Group = s.groups.points
-    g.clear()
+    clearGroup(g)
     if (!surfacePoints.length) return
     const t: Terrain = s.terrainMeta
     const h = s.heights ?? (s.heights = decodeHeights(t))
@@ -279,15 +343,22 @@ export default function Atlas3D({ terrain, overlay, quakes = [], labels = [], ex
     const d = focus.distKm
     const from = s.camera.position.clone(), fromT = s.controls.target.clone()
     const to = new THREE.Vector3(tx - d * 0.55, d * 0.6, tz + d * 0.7), toT = new THREE.Vector3(tx, 0, tz)
-    let k = 0
+    let k = 0, raf = 0, stopped = false
+    const stop = () => { stopped = true; cancelAnimationFrame(raf) }
+    s.controls.addEventListener('start', stop)
     const anim = () => {
+      if (stopped) return
       k = Math.min(1, k + 0.035)
       const e = k * k * (3 - 2 * k)
       s.camera.position.lerpVectors(from, to, e)
       s.controls.target.lerpVectors(fromT, toT, e)
-      if (k < 1) requestAnimationFrame(anim)
+      if (k < 1) raf = requestAnimationFrame(anim)
     }
-    anim()
+    raf = requestAnimationFrame(anim)
+    return () => {
+      stop()
+      s.controls?.removeEventListener?.('start', stop)
+    }
   }, [focus])
 
   return <div className="atlas3d" ref={host} />

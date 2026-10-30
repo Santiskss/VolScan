@@ -61,7 +61,7 @@ def relief_rgb(z: np.ndarray, step: float, zmax: float | None = None, sea=SEA) -
 def png_data_url(arr: np.ndarray, mode: str) -> str:
     from PIL import Image
     buf = io.BytesIO()
-    Image.fromarray(arr, mode).save(buf, format="PNG", optimize=True)
+    Image.fromarray(arr, mode).save(buf, format="PNG", compress_level=1)
     return "data:image/png;base64," + base64.b64encode(buf.getvalue()).decode()
 
 

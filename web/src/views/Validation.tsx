@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { api, fmt, type ValidationData, type ValidationRow } from '../api'
+import { api, fmt, type Sam3Validation, type ValidationData, type ValidationRow } from '../api'
 
 const pc = (v: number | null | undefined) => (v == null ? '—' : `${Math.round(100 * v)} %`)
 
@@ -48,8 +48,12 @@ function Chart({ rows }: { rows: ValidationRow[] }) {
 
 export default function Validation() {
   const [d, setD] = useState<ValidationData | null>(null)
+  const [samVal, setSamVal] = useState<Sam3Validation | null>(null)
   const [err, setErr] = useState<string | null>(null)
-  useEffect(() => { api.lpValidation().then(setD).catch((e) => setErr(String(e))) }, [])
+  useEffect(() => {
+    api.lpValidation().then(setD).catch((e) => setErr(String(e)))
+    api.lpSam3Validation().then(setSamVal).catch(() => setSamVal(null))
+  }, [])
   const s = d?.summary
   const first = d?.rows.find((r) => r.obs_72 != null)
   const sens = d?.delay_sensitivity
@@ -77,6 +81,35 @@ export default function Validation() {
         <div className="card"><h3>Retraso de los mapas</h3><p className="note">Copernicus entrega cada mapa entre 7 h (modo rápido) y 48 h (modo estándar) después de recibir la imagen. Aquí se supone {fmt.num(d.map_delay_h)} h. {sens ? `Con 7 h: ${sens['7'].within_p10_p90_72h}/${sens['7'].days} días en rango y sesgo ${fmt.num(sens['7'].bias_pct)} %. Con 48 h: ${sens['48'].within_p10_p90_72h}/${sens['48'].days} y ${fmt.num(sens['48'].bias_pct)} %.` : ''}</p></div>
         <div className="card"><h3>Verdad de terreno</h3><p className="note">{d.truth}. Una institución puede defender una decisión con una herramienta cuyo acierto está medido; por eso esta página existe.</p></div>
       </div>}
+
+      {samVal && (
+        <div style={{ marginTop: 28 }}>
+          <h3>Segmentación térmica satelital · Meta SAM 3.1 frente a Copernicus EMS ({samVal.n_scenes} escenas EMSR546)</h3>
+          <p className="note">{samVal.note}</p>
+          <div className="kpis kpis-page" style={{ marginTop: 10 }}>
+            <div className="kpi">
+              <div className="k">IoU medio (Jaccard)</div>
+              <div className="v">{fmt.num(samVal.summary.mean_iou, 3)}</div>
+              <div className="s">mediana {fmt.num(samVal.summary.median_iou, 3)} en {samVal.n_scenes} pasadas satelitales</div>
+            </div>
+            <div className="kpi">
+              <div className="k">Precisión / Recall</div>
+              <div className="v">{pc(samVal.summary.mean_precision)}<small> / {pc(samVal.summary.mean_recall)}</small></div>
+              <div className="s">F1 medio {fmt.num(samVal.summary.mean_f1, 3)} frente a delineación humana CEMS</div>
+            </div>
+            <div className="kpi">
+              <div className="k">Ganancia de antelación</div>
+              <div className="v">+{fmt.num(samVal.summary.lead_time_gain_h, 1)}<small> h</small></div>
+              <div className="s">0,25 h recepción+SAM 3.1 frente a {fmt.num(samVal.summary.cems_delivery_delay_h, 0)} h fotointerpretación CEMS</div>
+            </div>
+            <div className="kpi">
+              <div className="k">Latencia por escena</div>
+              <div className="v">{fmt.num(samVal.summary.mean_latency_ms, 1)}<small> ms</small></div>
+              <div className="s">{samVal.adapter.adapter} ({samVal.adapter.model})</div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

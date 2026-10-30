@@ -81,3 +81,34 @@ def test_validation_summary_counts_range_bias_and_watch():
     assert s["bias_pct"] == round(100 * (120 - 420) / 420, 1)
     assert s["watch"]["high"]["recall"] == round(5 / 40, 3)
     assert s["watch"]["with_pocket"]["recall"] == round(16 / 40, 3)
+
+
+def test_impact_facility_eta_is_relative_to_t_now():
+    from volscan.grid import Grid
+    from volscan.impact import Exposure, impact
+    from volscan.lava import LavaForecast
+    g = Grid(elev=np.zeros((2, 2)), west=0.0, north=50.0, step=25.0)
+    fc = LavaForecast(g, cell=np.array([1, 1]), path=np.array([0, 1]), t_h=np.array([120.0, 150.0]),
+                      weights=np.array([0.5, 0.5]), stop_reason=np.array(["length", "length"]))
+    exp = Exposure(g, bld_cell=np.array([1]), bld_destroyed=np.array([False]), bld_xy=np.zeros((1, 2)),
+                   road_seg_cells=[], road_len_m=np.array([]), road_destroyed=np.array([], bool), road_lonlat=[],
+                   facilities=[dict(name="Centro Salud", kind="Centro de salud", x=30.0, y=40.0, lon=-17.9, lat=28.6, cell=1)],
+                   places=[])
+    res = impact(fc, exp, t_until=172.0, t_now=100.0)
+    assert res["facilities"][0]["eta_h"] == [20.0, 20.0, 50.0]
+
+
+def test_catastrophe_report_lapalma2021_endpoint():
+    from fastapi.testclient import TestClient
+    from volscan.api.app import app
+
+    c = TestClient(app)
+    r = c.get("/api/reports/catastrophe/lapalma2021")
+    assert r.status_code == 200
+    body = r.json()
+    assert len(body["provenance"]) == 7
+    assert len(body["rheology_phases"]) == 3
+    assert len(body["timeline"]) == 11
+    assert body["tides_crisis"] is not None
+    assert body["summary_kpis"]["volscan_days_within_p10_p90"] == 67
+

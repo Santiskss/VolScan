@@ -134,7 +134,8 @@ def _last_hash(path: Path) -> str:
     if not path.exists() or path.stat().st_size == 0:
         return "0" * 64
     with open(path, "rb") as fh:
-        fh.seek(max(0, path.stat().st_size - 4096))
+        size = path.stat().st_size
+        fh.seek(max(0, size - 65536))
         last = fh.read().splitlines()[-1]
     return hashlib.sha256(last).hexdigest()
 

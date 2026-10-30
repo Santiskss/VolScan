@@ -12,7 +12,7 @@ const ZONE_XY: Record<string, [number, number]> = {
 function Spark({ data }: { data: number[] }) {
   const max = Math.max(1, ...data)
   const w = 120, h = 26
-  const pts = data.map((v, i) => `${(i / (data.length - 1)) * w},${h - (v / max) * h}`).join(' ')
+  const pts = data.map((v, i) => `${(i / Math.max(1, data.length - 1)) * w},${h - (v / max) * h}`).join(' ')
   return <svg width={w} height={h} style={{ display: 'block' }}><polyline points={pts} fill="none" stroke="var(--accent)" strokeWidth="1.4" /></svg>
 }
 
@@ -88,7 +88,7 @@ export default function CanariasLive() {
             ))}
           </div>
           <p className="note">El índice (0–10) compara los últimos 7 días con el año anterior de cada zona, contando solo sismos por encima de la magnitud de completitud (Mc): lo improbable de la tasa, la energía frente a la peor semana del año y la somerización. <b>No es una probabilidad de erupción</b>. El semáforo oficial lo gestiona el PEVOLCA.</p>
-          {zones[0]?.history && <p className="note">{zones.find((z) => z.key === (active ?? zones[0].key))?.history}</p>}
+          {zones.find((z) => z.key === (active ?? zones[0]?.key))?.history && <p className="note">{zones.find((z) => z.key === (active ?? zones[0]?.key))?.history}</p>}
           {!STATIC && <button className="btn olive" disabled={refreshing} onClick={() => { setRefreshing(true); api.refresh().finally(() => { setRefreshing(false); load() }) }}>{refreshing ? 'Actualizando desde IGN…' : 'Actualizar desde IGN'}</button>}
         </section>
         <section>

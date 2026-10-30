@@ -72,7 +72,10 @@ class LaPalma2021:
         self.fc = self._ensemble()
         self._coast = self._coast_cells()
         self._place_cells = {p["name"]: self._cells_near(p["lon"], p["lat"], 150.0) for p in self.places["places"]}
+        self._sea_t = A.member_arrival_at(self.fc, self._coast)
+        self._place_arr = {name: A.member_arrival_at(self.fc, cells) for name, cells in self._place_cells.items() if cells.size > 0}
         self._ll = {}
+        self._lava_states: dict[str, dict] = {}
 
     # ---------- setup
     def _ensemble(self) -> LavaForecast:
@@ -132,40 +135,41 @@ class LaPalma2021:
     def lava_state(self, now: dt.datetime) -> dict:
         if now < LAPALMA_2021_ONSET:
             return dict(phase="pre-eruptive")
+        cache_key = now.isoformat()
+        if cache_key in self._lava_states:
+            return self._lava_states[cache_key]
         w = self.weights_at(now)
         fc = self.fc.reweighted(w)
         t_now = self.hours(now)
         ks = self.obs_until(now)
         last = self.obs[ks[-1]] if ks else None
         obs_info = None
-        if ks:
-            m = self.mask(ks[-1])
-            reach = A.observed_reach(m, self.dist)
+        last_mask = self.mask(ks[-1]) if ks else None
+        if ks and last_mask is not None:
+            reach = A.observed_reach(last_mask, self.dist)
             prev = [k for k in ks if (last.observed_at - self.obs[k].observed_at).total_seconds() >= 40 * 3600]
             stalled = growing = None
             if prev:
                 mp = self.mask(prev[-1])
                 stalled = reach - A.observed_reach(mp, self.dist) < 150
-                growing = m.sum() > 1.05 * mp.sum()
+                growing = last_mask.sum() > 1.05 * mp.sum()
             obs_info = dict(observed_at=last.observed_at.isoformat(), age_h=round(t_now - self.hours(last.observed_at), 1),
-                            area_ha=round(float(m.sum()) * self.grid.step ** 2 / 1e4, 1), reach_m=round(reach),
+                            area_ha=round(float(last_mask.sum()) * self.grid.step ** 2 / 1e4, 1), reach_m=round(reach),
                             front_stalled=stalled, area_growing=growing, n_observations=len(ks))
-        sea_t = A.member_arrival_at(self.fc, self._coast)
+        sea_t = self._sea_t
         sea_future = np.where(sea_t > t_now, sea_t, np.nan)
-        reached_sea_obs = bool(ks) and bool(self.mask(ks[-1])[self._coast].any())
+        reached_sea_obs = bool(ks and last_mask is not None and last_mask[self._coast].any())
         q = A.weighted_quantiles(sea_future, w, (0.1, 0.5, 0.9))
         p_sea = float(w[np.isfinite(sea_t)].sum())
         places = []
-        for name, cells in self._place_cells.items():
-            if cells.size == 0:
-                continue
-            arr = A.member_arrival_at(self.fc, cells)
-            reached = bool(ks) and bool(self.mask(ks[-1])[cells].any())
+        for name, arr in self._place_arr.items():
+            cells = self._place_cells[name]
+            reached = bool(ks and last_mask is not None and last_mask[cells].any())
             qq = A.weighted_quantiles(np.where(arr > t_now, arr, np.nan), w, (0.1, 0.5, 0.9))
             places.append(dict(name=name, p_ever=round(float(w[np.isfinite(arr)].sum()), 3), observed_reached=reached,
                                eta_h=[None if np.isnan(v) else round(v - t_now, 1) for v in qq]))
         places.sort(key=lambda d: -d["p_ever"])
-        return dict(
+        res = dict(
             phase="eruptive", hours_since_onset=round(t_now, 1), ess=round(A.ess(w), 1), n_members=self.fc.n_paths,
             observation=obs_info,
             sea=dict(p_ever=round(p_sea, 3), observed_reached=reached_sea_obs,
@@ -174,6 +178,8 @@ class LaPalma2021:
             places=places,
             _fc=fc,
         )
+        self._lava_states[cache_key] = res
+        return res
 
     def seismic_state(self, now: dt.datetime) -> dict | None:
         if self.catalog is None:
@@ -261,7 +267,21 @@ class ImpactReplay:
         self.exp = load_exposure(base.grid, CASE / "exposure")
         self._scen = {}
         self._pocket: dict = {}
+        self._raw_cache_file = CACHE / f"lapalma2021_raw_{int(round(base.delay.total_seconds() / 3600))}h.json"
         self._raw: dict = {}
+        if self._raw_cache_file.exists():
+            try:
+                loaded = json.loads(self._raw_cache_file.read_text())
+                self._raw = {dt.date.fromisoformat(k): v for k, v in loaded.items()}
+            except Exception:
+                self._raw = {}
+
+    def _save_raw_cache(self) -> None:
+        try:
+            self._raw_cache_file.parent.mkdir(parents=True, exist_ok=True)
+            self._raw_cache_file.write_text(json.dumps({k.isoformat(): v for k, v in self._raw.items()}))
+        except Exception:
+            pass
 
     @staticmethod
     def _public(I: dict) -> dict:
@@ -362,7 +382,7 @@ class ImpactReplay:
         t_now = r.hours(now)
         ks = r.obs_until(now)
         already = r.mask(ks[-1]) if ks else None
-        I = impact(fc, self.exp, t_now + horizon_h, already)
+        I = impact(fc, self.exp, t_now + horizon_h, already, t_now=t_now)
         iso = isolation(fc, self.exp, t_now + horizon_h, already)
         later = now + dt.timedelta(hours=horizon_h)
         kl = r.obs_acquired_until(later)
@@ -511,11 +531,14 @@ class ImpactReplay:
         """
         ratios = []
         d = LAPALMA_2021_ONSET.date()
+        n_before = len(self._raw)
         while d < now.date():
             row = self.raw_row(d)
             if row and "obs_72" in row and dt.datetime.fromisoformat(row["_truth_known_72"]) <= now:
                 ratios.append((row["obs_72"] + CAL_SMOOTH) / (row["pred_72"]["expected"] + CAL_SMOOTH))
             d += dt.timedelta(days=1)
+        if len(self._raw) != n_before:
+            self._save_raw_cache()
         if len(ratios) < 5:
             return None
         lo, hi = np.quantile(ratios, [0.1, 0.9])
@@ -526,6 +549,7 @@ class ImpactReplay:
         """Every day of the eruption: the 72 h forecast VolScan would have issued, against what CEMS later mapped."""
         out = []
         d = LAPALMA_2021_ONSET.date()
+        n_before = len(self._raw)
         while d <= dt.date(2021, 12, 13):
             row = self.raw_row(d)
             if row:
@@ -540,6 +564,8 @@ class ImpactReplay:
                                       calibrated=bool(cal), infill_high=hi_inf)
                 out.append(row)
             d += dt.timedelta(days=1)
+        if len(self._raw) != n_before:
+            self._save_raw_cache()
         return out
 
 

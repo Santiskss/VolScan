@@ -1,8 +1,8 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { api, fmt, type Citation, type DayState, type ImpactDay, type Meta, type Quake, type Terrain } from '../api'
+import { api, fmt, type AgentResponse, type Citation, type DayState, type ImpactDay, type Meta, type Quake, type Sam3Day, type Terrain } from '../api'
 import ImpactPanel from './ImpactPanel'
 import { LevelChip, So2Bars } from './Indicators'
-import Atlas3D, { type Label, type QuakePoint, type SurfacePoint } from '../three/Atlas3D'
+import Atlas3D, { preloadImage, type Label, type QuakePoint, type SurfacePoint } from '../three/Atlas3D'
 
 type Brief = { text: string; ai: boolean; error?: string; model: { provider: string; model: string }; citations: Citation[] }
 
@@ -23,6 +23,12 @@ export default function AtlasLaPalma() {
   const [depthScale, setDepthScale] = useState(0.5)
   const [brief, setBrief] = useState<Brief | null>(null)
   const [briefLoading, setBriefLoading] = useState(false)
+  const [sam3, setSam3] = useState<Sam3Day | null>(null)
+  const [sam3Loading, setSam3Loading] = useState(false)
+  const [useSam3Overlay, setUseSam3Overlay] = useState(false)
+  const [agentQ, setAgentQ] = useState('')
+  const [agentRes, setAgentRes] = useState<AgentResponse | null>(null)
+  const [agentLoading, setAgentLoading] = useState(false)
   const [focus, setFocus] = useState<{ x: number; y: number; distKm: number } | null>(null)
   const [imp, setImp] = useState<ImpactDay | null>(null)
   const [impLoading, setImpLoading] = useState(false)
@@ -31,45 +37,78 @@ export default function AtlasLaPalma() {
   const cache = useRef(new Map<string, DayState>())
 
   useEffect(() => {
+    let alive = true
     api.lpMeta().then((m) => {
+      if (!alive) return
       setMeta(m)
       const want = location.hash.split('@')[1]
       const k = want ? m.days.indexOf(want) : -1
       setIdx(k >= 0 ? k : m.days.indexOf('2021-09-18'))
       setTimeout(() => setFocus({ x: m.vent.xy[0] - 2500, y: m.vent.xy[1] - 1500, distKm: 22 }), 400)
+      // Pre-warm milestone dates first, then progressively warm all 106 days in small batches
+      const milestoneDates = m.milestones.map((ms) => ms.date)
+      const ordered = [...new Set([...milestoneDates, ...m.days])]
+      let cursor = 0
+      const pump = () => {
+        if (!alive || cursor >= ordered.length) return
+        const batch = ordered.slice(cursor, cursor + 6)
+        cursor += 6
+        Promise.all(batch.map((dStr) => {
+          if (cache.current.has(dStr)) return Promise.resolve()
+          return api.lpDay(dStr).then((v) => { preloadImage(v.overlay?.png); cache.current.set(dStr, v) }).catch(() => {})
+        })).finally(() => {
+          if (alive && cursor < ordered.length) setTimeout(pump, 35)
+        })
+      }
+      setTimeout(pump, 250)
+      milestoneDates.forEach((dStr) => {
+        if (!impCache.current.has(dStr)) {
+          api.lpImpact(dStr).then((v) => { preloadImage(v.scenario?.overlay?.png); impCache.current.set(dStr, v) }).catch(() => {})
+        }
+      })
     })
-    api.terrain('lapalma').then(setTerrain)
+    api.terrain('lapalma').then((t) => { preloadImage(t.texture); setTerrain(t) })
     api.lpQuakes().then((q) => setQuakes(q.quakes))
+    return () => { alive = false }
   }, [])
 
   const date = meta?.days[idx]
 
   useEffect(() => {
     if (!date) return
-    const c = cache.current.get(date)
-    if (c) { setDay(c); return }
     let alive = true
-    api.lpDay(date).then((d) => { cache.current.set(date, d); if (alive) setDay(d) })
-    // prefetch the next two days for smooth playback
-    meta?.days.slice(idx + 1, idx + 3).forEach((d) => { if (!cache.current.has(d)) api.lpDay(d).then((v) => cache.current.set(d, v)) })
-    return () => { alive = false }
-  }, [date])
-
-  useEffect(() => { setBrief(null) }, [date])
-
-  useEffect(() => {
-    if (!date) return
-    const c = impCache.current.get(date)
-    if (c) { setImp(c); return }
-    let alive = true
+    const cDay = cache.current.get(date)
+    const cImp = impCache.current.get(date)
+    if (cDay) setDay(cDay)
+    else {
+      api.lpDay(date).then((d) => {
+        preloadImage(d.overlay?.png)
+        cache.current.set(date, d)
+        if (alive) setDay(d)
+      }).catch(() => {})
+    }
+    if (cImp) {
+      setImp(cImp)
+      setImpLoading(false)
+      return () => { alive = false }
+    }
     setImpLoading(true)
-    api.lpImpact(date).then((d) => { impCache.current.set(date, d); if (alive) setImp(d) }).catch(() => alive && setImp(null)).finally(() => alive && setImpLoading(false))
-    return () => { alive = false }
+    const timer = setTimeout(() => {
+      if (!alive) return
+      api.lpImpact(date)
+        .then((d) => { preloadImage(d.scenario?.overlay?.png); impCache.current.set(date, d); if (alive) setImp(d) })
+        .catch(() => { if (alive) setImp(null) })
+        .finally(() => { if (alive) setImpLoading(false) })
+    }, 55)
+    return () => { alive = false; clearTimeout(timer) }
   }, [date])
+
+  useEffect(() => { setBrief(null); setSam3(null); setUseSam3Overlay(false) }, [date])
 
   const assets: SurfacePoint[] = useMemo(() => (!showAssets || !imp?.buildings_at_risk_xy || imp.date !== date) ? [] :
     [...(imp.watch?.pocket_xy ?? []).map(([x, y]) => ({ x, y, v: -1 })), ...imp.buildings_at_risk_xy.map(([x, y, v]) => ({ x, y, v }))], [imp, showAssets, date])
   const scenarioOverlay = imp && imp.date === date && imp.phase === 'pre-eruptive' ? imp.scenario?.overlay ?? null : null
+  const activeOverlay = useSam3Overlay && sam3?.overlay ? sam3.overlay : (day?.overlay ?? scenarioOverlay)
 
   useEffect(() => {
     if (!playing || !meta) return
@@ -105,13 +144,27 @@ export default function AtlasLaPalma() {
     api.lpBriefing(date, regen).then(setBrief).finally(() => setBriefLoading(false))
   }
 
+  const loadSam3 = () => {
+    if (!date) return
+    setSam3Loading(true)
+    api.lpSam3(date).then((res) => { preloadImage(res.overlay?.png); setSam3(res); if (res.available) setUseSam3Overlay(true) }).finally(() => setSam3Loading(false))
+  }
+
+  const askAgent = (qText?: string) => {
+    const q = (qText ?? agentQ).trim()
+    if (!q || !date) return
+    setAgentQ(q)
+    setAgentLoading(true)
+    api.chat(q, `lapalma2021:${date}`).then(setAgentRes).finally(() => setAgentLoading(false))
+  }
+
   const daysSinceOnset = eruptive ? eruptive.hours_since_onset / 24 : null
 
   return (
     <div className="view">
       <div className="stage">
         <div className="canvas-wrap">
-          <Atlas3D terrain={terrain} overlay={showLava ? day?.overlay ?? scenarioOverlay : null} quakes={qpoints} labels={labels} surfacePoints={assets}
+          <Atlas3D terrain={terrain} overlay={showLava ? activeOverlay : null} quakes={qpoints} labels={labels} surfacePoints={assets}
             depthScale={depthScale} terrainOpacity={opacity} focus={focus} />
           <div className="corner tl">La Palma · Cumbre Vieja · relieve previo a 2021 · profundidad ×{depthScale.toString().replace('.', ',')}</div>
           {date && (
@@ -122,7 +175,7 @@ export default function AtlasLaPalma() {
           )}
           <div className="legend-strip">
             {showQuakes && <div className="item">Sismos IGN bajo la isla · <b style={{ color: '#e23d14' }}>●</b> 24 h <b style={{ color: '#f08a35' }}>●</b> 7 d <b style={{ color: '#8f8577' }}>●</b> anteriores · tamaño = magnitud</div>}
-            {showLava && eruptive && <div className="item">Probabilidad de colada (72 h)<span className="grad" />· mancha oscura con borde naranja = colada observada CEMS</div>}
+            {showLava && eruptive && <div className="item">Probabilidad de colada (72 h)<span className="grad" />· mancha oscura con borde naranja = {useSam3Overlay ? 'máscara Meta SAM 3.1' : 'colada observada CEMS'}</div>}
             <div className="item">Reconstrucción con datos reales · usa solo lo disponible ese día</div>
           </div>
           <div className="controls-row">
@@ -187,17 +240,84 @@ export default function AtlasLaPalma() {
       <aside className="side">
         <ImpactPanel imp={imp && imp.date === date ? imp : null} loading={impLoading} />
 
+        {eruptive && (
+          <section className="incident">
+            <h3>Asimilación satelital · Meta SAM 3.1</h3>
+            {!sam3 && (
+              <button className="btn olive" disabled={sam3Loading || !date} onClick={loadSam3}>
+                {sam3Loading ? 'Segmentando SWIR/TIRS…' : 'Segmentar pasada térmica (SAM 3.1)'}
+              </button>
+            )}
+            {sam3 && !sam3.available && <div className="note">{sam3.note}</div>}
+            {sam3 && sam3.available && sam3.comparison_vs_cems && sam3.assimilated_forecast && (
+              <>
+                <div className="kv" style={{ marginTop: 4 }}>
+                  <span className="k">Adaptador hexagonal</span>
+                  <span>{sam3.segmentation?.adapter} · {sam3.segmentation?.model}</span>
+                  <span className="k">Área SAM 3.1 vs CEMS</span>
+                  <span><b>{fmt.num(sam3.comparison_vs_cems.sam3_area_ha)} ha</b> vs {fmt.num(sam3.comparison_vs_cems.cems_area_ha)} ha (IoU <b>{fmt.num(sam3.comparison_vs_cems.iou, 3)}</b>)</span>
+                  <span className="k">Alcance frente</span>
+                  <span>{fmt.int(sam3.comparison_vs_cems.sam3_reach_m)} m vs {fmt.int(sam3.comparison_vs_cems.cems_reach_m)} m</span>
+                  <span className="k">Antelación a CEMS</span>
+                  <span><b>+{fmt.num(sam3.lead_time_advantage_h)} h</b> ({sam3.cems_already_delivered_at_now ? 'CEMS ya entregado' : 'CEMS aún NO entregado ese día'})</span>
+                  <span className="k">Mar (asimilado SAM 3.1)</span>
+                  <span>{fmt.pct(sam3.assimilated_forecast.sea_p_ever)} (ESS {fmt.num(sam3.assimilated_forecast.ess)})</span>
+                </div>
+                <label className="check" style={{ marginTop: 8 }}>
+                  <input type="checkbox" checked={useSam3Overlay} onChange={(e) => setUseSam3Overlay(e.target.checked)} />
+                  <span>Proyectar máscara SAM 3.1 en el relieve 3D<span className="hint">{sam3.segmentation?.n_prompt_points} prompts espaciales · {fmt.num(sam3.segmentation?.latency_ms)} ms</span></span>
+                </label>
+              </>
+            )}
+          </section>
+        )}
+
         <section className="incident">
           <h3>Parte de situación · IA</h3>
           {!brief && <button className="btn olive" disabled={briefLoading || !date} onClick={() => loadBrief()}>{briefLoading ? 'Redactando…' : 'Ver parte de este día'}</button>}
           {brief && <>
             <div className={`brief ${brief.ai ? '' : 'na'}`}>{brief.text}</div>
             <div className="brief-meta">
-              <span>{brief.ai ? `${brief.model.provider === 'meta' ? 'Meta' : 'Local'} · ${brief.model.model}` : 'Sin modelo disponible'}</span>
+              <span>{brief.ai ? `${brief.model.provider === 'meta' ? 'Meta' : 'Local'} · ${brief.model.model}` : 'Síntesis determinista sin LLM'}</span>
               {brief.ai && <button className="btn" style={{ padding: '2px 8px' }} onClick={() => loadBrief(true)}>Rehacer</button>}
             </div>
             {brief.citations.length > 0 && <div className="note" style={{ marginTop: 6 }}>Fuentes: {brief.citations.map((c) => `[${c.n}] ${c.doc}`).join(' · ')}</div>}
           </>}
+        </section>
+
+        <section className="incident">
+          <h3>Agente operativo · Tool-Calling</h3>
+          <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 6 }}>
+            <button className="btn" style={{ fontSize: 11, padding: '2px 7px' }} onClick={() => askAgent(`¿Qué mide Meta SAM 3.1 el ${date} frente a Copernicus?`)}>SAM 3.1 hoy</button>
+            <button className="btn" style={{ fontSize: 11, padding: '2px 7px' }} onClick={() => askAgent('Simula el escenario Dorsal Noroeste en Tenerife')}>Tenerife Dorsal NO</button>
+            <button className="btn" style={{ fontSize: 11, padding: '2px 7px' }} onClick={() => askAgent(`Previsualiza la alerta CAP 1.2 para 112 del ${date}`)}>CAP 1.2 · 112</button>
+          </div>
+          <div style={{ display: 'flex', gap: 6 }}>
+            <input
+              type="text"
+              value={agentQ}
+              onChange={(e) => setAgentQ(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && askAgent()}
+              placeholder="Pregunta al agente (ejecuta herramientas reales)…"
+              style={{ flex: 1, fontSize: 12, padding: '5px 8px', border: '1px solid var(--line)', borderRadius: 4, background: 'var(--bg)' }}
+            />
+            <button className="btn olive" disabled={agentLoading || !agentQ.trim()} onClick={() => askAgent()}>
+              {agentLoading ? '…' : 'Consultar'}
+            </button>
+          </div>
+          {agentRes && (
+            <div style={{ marginTop: 8 }}>
+              {agentRes.tool_calls && agentRes.tool_calls.length > 0 && (
+                <div className="note" style={{ marginBottom: 4 }}>
+                  <b>Herramientas ejecutadas:</b> {agentRes.tool_calls.map((t) => `${t.name} (${fmt.num(t.duration_ms, 0)} ms)`).join(' · ')}
+                </div>
+              )}
+              <div className={`brief ${agentRes.ai ? '' : 'na'}`}>{agentRes.answer}</div>
+              <div className="brief-meta">
+                <span>{agentRes.ai ? `${agentRes.model.provider === 'meta' ? 'Meta' : 'Local'} · ${agentRes.model.model}` : 'Motor determinista + RAG'}</span>
+              </div>
+            </div>
+          )}
         </section>
 
         <section>

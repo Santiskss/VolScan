@@ -39,7 +39,7 @@ app = FastAPI(title="VolScan", version=__version__)
 from .. import security as sec  # noqa: E402
 
 PUBLIC = {"/api/auth/config", "/api/login"}
-NOT_AUDITED = {"/api/status"}
+NOT_AUDITED = {"/api/status", "/api/login"}
 
 
 @app.middleware("http")
@@ -147,13 +147,15 @@ def _auto_refresh():
 
 @app.get("/api/status")
 def status():
+    from ..application import get_container
+    c = get_container()
     if time.time() - _llm_status["at"] > 60:
-        _llm_status["value"] = llm.ping()
+        _llm_status["value"] = c.llm.status()
         _llm_status["at"] = time.time()
     store.load_events()
     _auto_refresh()
-    return J(dict(version=__version__, llm=_llm_status["value"], catalog=store.status(),
-                  now=dt.datetime.now(dt.timezone.utc).isoformat()))
+    return J(dict(version=__version__, llm=_llm_status["value"], vision=c.segmentation.status(),
+                  catalog=store.status(), now=dt.datetime.now(dt.timezone.utc).isoformat()))
 
 
 # ------------------------------------------------------------------ terrain
@@ -164,19 +166,44 @@ def _terrain(name: str, texture_k: int):
              "archipelago": DATA / "canarias" / "terrain_archipelago_500m.npz"}
     if name not in files:
         raise HTTPException(404, "terreno desconocido")
+    cf = CACHE / f"terrain_{name}_k{texture_k}.json"
+    if cf.exists():
+        try:
+            return json.loads(cf.read_text())
+        except Exception:
+            pass
     g = load_grid_npz(files[name])
     zt = upsample(g.elev, texture_k) if texture_k > 1 else g.elev
     tex = relief_rgb(zt, g.step / texture_k, zmax=2200.0 if name == 'archipelago' else None,
                      sea=(203, 211, 214) if name == 'archipelago' else (214, 219, 221))
-    return dict(name=name, crs="EPSG:4083", west=g.west, north=g.north, step=g.step, rows=g.shape[0], cols=g.shape[1],
-                heights_i16_b64=heights_b64(g.elev), nodata=-32768, texture=png_data_url(tex, "RGB"),
-                max_elev=float(np.nanmax(g.elev)),
-                attribution="Copernicus DEM GLO-30 © DLR/Airbus, provided under COPERNICUS by the EU and ESA")
+    res = dict(name=name, crs="EPSG:4083", west=g.west, north=g.north, step=g.step, rows=g.shape[0], cols=g.shape[1],
+               heights_i16_b64=heights_b64(g.elev), nodata=-32768, texture=png_data_url(tex, "RGB"),
+               max_elev=float(np.nanmax(g.elev)),
+               attribution="Copernicus DEM GLO-30 © DLR/Airbus, provided under COPERNICUS by the EU and ESA")
+    try:
+        cf.parent.mkdir(parents=True, exist_ok=True)
+        cf.write_text(json.dumps(res))
+    except Exception:
+        pass
+    return res
+
+
+@lru_cache(maxsize=4)
+def _terrain_bytes(name: str, texture_k: int) -> bytes:
+    cf = CACHE / f"terrain_{name}_k{texture_k}.json"
+    if cf.exists():
+        try:
+            return cf.read_bytes()
+        except Exception:
+            pass
+    return json.dumps(_terrain(name, texture_k)).encode("utf-8")
 
 
 @app.get("/api/terrain/{name}")
 def terrain(name: str):
-    return J(_terrain(name, 4 if name == "lapalma" else 3 if name == "tenerife" else 2))
+    if name not in ("lapalma", "tenerife", "archipelago"):
+        raise HTTPException(404, "terreno desconocido")
+    return Response(content=_terrain_bytes(name, 2), media_type="application/json")
 
 
 # ------------------------------------------------------------------ Tenerife scenarios
@@ -191,14 +218,23 @@ def tf_scenarios():
 _tf_lock = threading.Lock()
 
 
-@app.get("/api/tenerife/scenario/{key}")
-def tf_scenario(key: str):
+@lru_cache(maxsize=16)
+def _tf_scenario_bytes(key: str, n_cat: int) -> bytes | None:
     from ..tenerife import scenario
     with _tf_lock:
         out = scenario(key, _catalog())
     if out is None:
+        return None
+    return json.dumps(_clean(out)).encode("utf-8")
+
+
+@app.get("/api/tenerife/scenario/{key}")
+def tf_scenario(key: str):
+    n_cat = len(_catalog()) if key == "sismicidad_actual" else 0
+    b = _tf_scenario_bytes(key, n_cat)
+    if b is None:
         raise HTTPException(404, "escenario desconocido")
-    return J(out)
+    return Response(content=b, media_type="application/json")
 
 
 # ------------------------------------------------------------------ Canarias live
@@ -246,12 +282,12 @@ def canarias_indicators(zone: str = "tenerife", days: int = 120):
                                  "erupciones y desgasificación fuerte, no la difusa previa (CO2, He).")))
 
 
-@app.get("/api/canarias/zones")
-def canarias_zones(at: str | None = None):
+@lru_cache(maxsize=32)
+def _canarias_zones_cached(t_bucket: int, n_cat: int) -> dict:
     from .. import deformation as D
     from ..calibration import context_line
     cat = _catalog()
-    t_at = dt.datetime.fromisoformat(at).timestamp() if at else time.time()
+    t_at = float(t_bucket)
     day = dt.datetime.fromtimestamp(t_at, dt.timezone.utc).date()
     try:
         cal = _calibration()
@@ -273,8 +309,15 @@ def canarias_zones(at: str | None = None):
                         mc=u.mc, rate_surprise=u.rate_surprise, history=context_line(cal, z.key, u.index),
                         deformation=_deform_summary(D.zone_deformation(z.key, day))))
     out.sort(key=lambda d: -(d["index"] or -1))
-    return J(dict(at=dt.datetime.fromtimestamp(t_at, dt.timezone.utc).isoformat(), zones=out, so2=D.so2_status(day),
-                  note="Índice de actividad anómala 0-10 frente a la línea base propia de cada zona. NO es probabilidad de erupción; las alertas oficiales son del PEVOLCA."))
+    return _clean(dict(at=dt.datetime.fromtimestamp(t_at, dt.timezone.utc).isoformat(), zones=out, so2=D.so2_status(day),
+                       note="Índice de actividad anómala 0-10 frente a la línea base propia de cada zona. NO es probabilidad de erupción; las alertas oficiales son del PEVOLCA."))
+
+
+@app.get("/api/canarias/zones")
+def canarias_zones(at: str | None = None):
+    cat = _catalog()
+    t_bucket = int(dt.datetime.fromisoformat(at).timestamp()) if at else int(time.time() // 60) * 60
+    return JSONResponse(_canarias_zones_cached(t_bucket, len(cat)))
 
 
 def _deform_summary(zd: dict) -> dict:
@@ -304,18 +347,16 @@ def canarias_refresh(request: Request):
 
 
 # ------------------------------------------------------------------ solunar
-@app.get("/api/solunar")
-def solunar(zone: str = "la_palma", start: str = "2011-01-01", end: str | None = None, min_mag: float | None = None):
-    if zone not in BY_KEY:
-        raise HTTPException(404, "zona desconocida")
+@lru_cache(maxsize=64)
+def _solunar_cached(zone: str, start: str, end_key: str, min_mag: float | None, n_cat: int) -> dict:
     cat = store.zone_catalog(_catalog(), zone)
     s = dt.datetime.fromisoformat(start).replace(tzinfo=dt.timezone.utc).timestamp()
-    e = dt.datetime.fromisoformat(end).replace(tzinfo=dt.timezone.utc).timestamp() if end else time.time()
+    e = dt.datetime.fromisoformat(end_key).replace(tzinfo=dt.timezone.utc).timestamp()
     w = cat.window(s, e)
     if min_mag is not None:
         w = w.select(np.nan_to_num(w.mag, nan=-9) >= min_mag)
     lat, lon = BY_KEY[zone].centroid
-    res = dict(zone=zone, n=len(w), start=start, end=end)
+    res = dict(zone=zone, n=len(w), start=start, end=end_key)
     if len(w) >= 20:
         year = 365.25 * DAY
         clock = TidalClock(lat, lon, w.t.min() - year, w.t.max() + year)
@@ -326,12 +367,24 @@ def solunar(zone: str = "la_palma", start: str = "2011-01-01", end: str | None =
             h, _ = np.histogram(arr[~np.isnan(arr)], bins=12, range=(0, 360))
             res[name] = dict(raw=schuster(arr), declustered=schuster(arr[keep]), hist12=h.tolist(),
                              shift_test=alignment_shift_test(w.t[keep], fn, period, n_perm=200))
+    return _clean(res)
+
+
+@app.get("/api/solunar")
+def solunar(zone: str = "la_palma", start: str = "2011-01-01", end: str | None = None, min_mag: float | None = None):
+    if zone not in BY_KEY:
+        raise HTTPException(404, "zona desconocida")
+    cat = _catalog()
+    end_key = end or dt.datetime.now(dt.timezone.utc).date().isoformat()
+    res = dict(_solunar_cached(zone, start, end_key, min_mag, len(cat)))
+    res["end"] = end
+    lat, lon = BY_KEY[zone].centroid
     now = time.time()
     res["now"] = dict(tidal_phase=float(tidal_phase([now], lat, lon)[0]), lunar_elongation=float(lunar_elongation(now)))
     res["note"] = ("Schuster: p<0,05 = fases no uniformes (no prueba causalidad); los enjambres inflan la significación. "
                    "La prueba robusta es 'shift_test': exceso de sismos en fase 0 (máximo de marea / mareas vivas) frente a "
                    "200 desplazamientos temporales del propio catálogo desagrupado (1 sismo/6 h).")
-    return J(res)
+    return JSONResponse(res)
 
 
 # ------------------------------------------------------------------ La Palma 2021
@@ -383,6 +436,12 @@ def lp_meta():
 
 @lru_cache(maxsize=256)
 def _lp_day(date: str):
+    cf = CACHE / "lp_days" / f"{date}.json"
+    if cf.exists():
+        try:
+            return json.loads(cf.read_text())
+        except Exception:
+            pass
     r = replay()
     d = dt.date.fromisoformat(date)
     now = dt.datetime(d.year, d.month, d.day, 23, 59, tzinfo=dt.timezone.utc)
@@ -399,8 +458,13 @@ def _lp_day(date: str):
                               horizon_h=72, west=r.grid.west, north=r.grid.north, step=r.grid.step,
                               rows=r.grid.shape[0], cols=r.grid.shape[1],
                               legend="Probabilidad de cubrimiento en las próximas 72 h · mancha oscura con borde naranja = último mapa de Copernicus ya entregado")
-        out["observed"] = r.observed_geojson(now)
-    return _clean(out)
+    res = _clean(out)
+    try:
+        cf.parent.mkdir(parents=True, exist_ok=True)
+        cf.write_text(json.dumps(res))
+    except Exception:
+        pass
+    return res
 
 
 def _lp_indicators(d: dt.date) -> dict:
@@ -460,13 +524,26 @@ def impact_replay():
 
 @lru_cache(maxsize=256)
 def _lp_impact(date: str):
+    cf = CACHE / "lp_impact" / f"{date}.json"
+    if cf.exists():
+        try:
+            return json.loads(cf.read_text())
+        except Exception:
+            pass
     d = dt.date.fromisoformat(date)
     now = dt.datetime(d.year, d.month, d.day, 23, 59, tzinfo=dt.timezone.utc)
     ir = impact_replay()
     if now < LAPALMA_2021_ONSET:
         sc = ir.scenario(now)
-        return _clean(dict(date=date, phase="pre-eruptive", scenario=sc))
-    return _clean(dict(date=date, **ir.eruptive(now)))
+        res = _clean(dict(date=date, phase="pre-eruptive", scenario=sc))
+    else:
+        res = _clean(dict(date=date, **ir.eruptive(now)))
+    try:
+        cf.parent.mkdir(parents=True, exist_ok=True)
+        cf.write_text(json.dumps(res))
+    except Exception:
+        pass
+    return res
 
 
 @app.get("/api/lapalma2021/impact/{date}")
@@ -683,7 +760,13 @@ def export_report(zone: str, month: str, fmt: str, request: Request):
     from .. import pdfexport as X
     if zone not in BY_KEY or zone == "atlantico" or fmt not in ("pdf", "csv"):
         raise HTTPException(404, "no existe")
-    r = _report(zone, month, dt.date.today().isoformat())
+    try:
+        from ..reports import month_bounds
+        month_bounds(month)
+    except Exception:
+        raise HTTPException(400, "mes inválido (AAAA-MM)")
+    today = dt.datetime.now(dt.timezone.utc).date().isoformat()
+    r = _report(zone, month, today, len(store.load_events()))
     if fmt == "pdf":
         return _file(X.report_pdf(r), "application/pdf", f"volscan_informe_{zone}_{month}.pdf")
     return _file(X.report_csv(r), "text/csv; charset=utf-8", f"volscan_informe_{zone}_{month}.csv")
@@ -692,6 +775,12 @@ def export_report(zone: str, month: str, fmt: str, request: Request):
 @app.get("/api/export/impact/lapalma2021/{date}.{fmt}")
 def export_lp_impact(date: str, fmt: str, request: Request):
     need(request, "tecnico")
+    if fmt not in ("pdf", "csv"):
+        raise HTTPException(404, "no existe")
+    try:
+        dt.date.fromisoformat(date)
+    except ValueError:
+        raise HTTPException(400, "fecha inválida")
     from .. import pdfexport as X
     imp = _lp_impact(date)
     if imp.get("phase") != "eruptive":
@@ -699,13 +788,26 @@ def export_lp_impact(date: str, fmt: str, request: Request):
     fac, iso = imp.get("facilities", []), imp.get("isolation", [])
     if fmt == "csv":
         return _file(X.impact_csv(fac, iso), "text/csv; charset=utf-8", f"volscan_impacto_lapalma2021_{date}.csv")
-    c = imp.get("constrained") or {}
-    b, r_, w = c.get("buildings") or {}, c.get("road_km") or {}, imp.get("watch") or {}
-    kpis = [("Edificios nuevos en 72 h", str(b.get("central", "—")), f"{b.get('low', '—')}–{b.get('high', '—')}"),
-            ("Vías nuevas en 72 h (km)", str(r_.get("central", "—")), f"{r_.get('low', '—')}–{r_.get('high', '—')}"),
+    c = imp.get("constrained")
+    w = imp.get("watch") or {}
+    if c:
+        b, r_ = c.get("buildings") or {}, c.get("road_km") or {}
+        b_val, b_rng = str(b.get("central", "—")), f"{b.get('low', '—')}–{b.get('high', '—')}"
+        r_val, r_rng = str(r_.get("central", "—")), f"{r_.get('low', '—')}–{r_.get('high', '—')}"
+        map_val, map_note = f"hace {c.get('map_age_h', '—')} h", f"se supone entregado {imp.get('map_delay_h')} h tras la imagen"
+    else:
+        b, r_ = imp.get("buildings") or {}, imp.get("road_km") or {}
+        bp, rp = b.get("p10_p90") or ["—", "—"], r_.get("p10_p90") or ["—", "—"]
+        b_val = str(round(b["expected"])) if "expected" in b else "—"
+        b_rng = f"P10–P90 {round(bp[0])}–{round(bp[1])}" if isinstance(bp[0], (int, float)) else "—"
+        r_val = str(round(r_["expected"], 1)) if "expected" in r_ else "—"
+        r_rng = f"P10–P90 {rp[0]}–{rp[1]}"
+        map_val, map_note = "aún no entregado", "pronóstico solo con el conjunto inicial desde la boca"
+    kpis = [("Edificios nuevos en 72 h", b_val, b_rng),
+            ("Vías nuevas en 72 h (km)", r_val, r_rng),
             ("Edificios ya perdidos", str(imp["already_lost"]["buildings"]), f"{imp['already_lost']['road_km']} km de vías"),
             ("Lista de vigilancia", f"{w.get('high', '—')} alcanzables", f"{w.get('pocket', '—')} cercados por la colada"),
-            ("Último mapa de Copernicus", f"hace {c.get('map_age_h', '—')} h", f"se supone entregado {imp.get('map_delay_h')} h tras la imagen")]
+            ("Último mapa de Copernicus", map_val, map_note)]
     pdf = X.impact_pdf(f"La Palma 2021 · impacto previsto a 72 h · {date}", "Reconstrucción con los datos disponibles ese día (simulación, no alerta).",
                        kpis, fac, iso, [], imp.get("method", ""), "Copernicus EMS EMSR546, IGN, Copernicus DEM, OpenStreetMap (ODbL)")
     return _file(pdf, "application/pdf", f"volscan_impacto_lapalma2021_{date}.pdf")
@@ -714,6 +816,8 @@ def export_lp_impact(date: str, fmt: str, request: Request):
 @app.get("/api/export/impact/tenerife/{key}.{fmt}")
 def export_tf_impact(key: str, fmt: str, request: Request):
     need(request, "tecnico")
+    if fmt not in ("pdf", "csv"):
+        raise HTTPException(404, "no existe")
     from .. import pdfexport as X
     sc, _, _ = _tf(key)
     fac, iso = sc.get("facilities", []), sc.get("isolation", [])
@@ -764,6 +868,10 @@ class BriefReq(BaseModel):
 def lp_briefing(date: str, request: Request, req: BriefReq = BriefReq()):
     if req.regenerate:
         need(request, "tecnico")
+    try:
+        dt.date.fromisoformat(date)
+    except ValueError:
+        raise HTTPException(400, "fecha inválida")
     day = _lp_day(date)
     cfg = llm.LLMConfig.from_env()
     f = CACHE / "briefings" / f"lapalma2021_{date}_{cfg.provider}_{cfg.model.replace(':', '_').replace('/', '_')}.json"
@@ -794,7 +902,7 @@ def report_months():
 
 
 @lru_cache(maxsize=512)
-def _report(zone: str, month: str, today: str):
+def _report(zone: str, month: str, today: str, n_events: int = 0):
     from ..reports import monthly_report
     cat = store.zone_catalog(_catalog(), zone)
     ev = [e for e, k in zip(store.load_events(), store.event_zone_keys()) if k == zone]
@@ -811,7 +919,20 @@ def report_monthly(zone: str = "tenerife", month: str | None = None):
         month_bounds(month)
     except Exception:
         raise HTTPException(400, "mes inválido (AAAA-MM)")
-    return JSONResponse(_report(zone, month, dt.date.today().isoformat()))
+    today = dt.datetime.now(dt.timezone.utc).date().isoformat()
+    return JSONResponse(_report(zone, month, today, len(store.load_events())))
+
+
+@app.get("/api/reports/catastrophe/lapalma2021")
+def report_catastrophe_lapalma():
+    f = CACHE / "catastrophe_lapalma2021.json"
+    if f.exists():
+        return JSONResponse(json.loads(f.read_text()))
+    from ..reports import catastrophe_report_lapalma2021
+    res = _clean(catastrophe_report_lapalma2021(impact_replay()))
+    f.parent.mkdir(parents=True, exist_ok=True)
+    f.write_text(json.dumps(res, ensure_ascii=False))
+    return JSONResponse(res)
 
 
 class RewriteReq(BaseModel):
@@ -823,7 +944,15 @@ class RewriteReq(BaseModel):
 def report_rewrite(req: RewriteReq, request: Request):
     need(request, "tecnico")
     """The language model rewrites the summary in an institutional register WITHOUT adding facts (the figures go in as data)."""
-    rep = _report(req.zone, req.month, dt.date.today().isoformat())
+    if req.zone not in BY_KEY or req.zone == "atlantico":
+        raise HTTPException(404, "zona desconocida")
+    try:
+        from ..reports import month_bounds
+        month_bounds(req.month)
+    except Exception:
+        raise HTTPException(400, "mes inválido (AAAA-MM)")
+    today = dt.datetime.now(dt.timezone.utc).date().isoformat()
+    rep = _report(req.zone, req.month, today, len(store.load_events()))
     cfg = llm.LLMConfig.from_env()
     facts = {k: rep.get(k) for k in ("title", "partial", "stats", "prev", "baseline", "rate_ratio", "b", "unrest_end", "top_events", "felt",
                                      "tides", "deformation", "so2")}
@@ -838,33 +967,77 @@ def report_rewrite(req: RewriteReq, request: Request):
         return JSONResponse(dict(text=None, ai=False, error=str(e), model=cfg.public()))
 
 
-# ------------------------------------------------------------------ chat (RAG)
+# ------------------------------------------------------------------ hexagonal AI: Meta SAM 3.1 + Muse Spark / Llama Agent
+@app.get("/api/ai/architecture")
+@app.get("/api/architecture")
+def ai_architecture():
+    from ..application import get_container
+    return J(get_container().manifest())
+
+
+class SwitchAdapterReq(BaseModel):
+    preset: str = "meta_muse"       # "meta_muse" | "meta_llama4" | "meta_llama3_70b" | "ollama_local" | "auto"
+    model: str | None = None
+    base: str | None = None
+    api_key: str | None = None
+
+
+@app.post("/api/ai/adapter")
+def switch_ai_adapter(req: SwitchAdapterReq, request: Request):
+    need(request, "tecnico")
+    from ..application import META_MODEL_PRESETS, get_container
+    if req.preset not in META_MODEL_PRESETS and req.preset not in ("auto", "meta", "llama", "ollama", "local"):
+        raise HTTPException(400, f"preset desconocido: {req.preset}")
+    c = get_container()
+    st = c.switch_llm_adapter(req.preset, model=req.model, base=req.base, api_key=req.api_key)
+    _llm_status["value"] = st
+    _llm_status["at"] = time.time()
+    return J(dict(ok=True, llm=st, architecture=c.manifest()))
+
+
+@app.get("/api/lapalma2021/sam3/{date}")
+def lp_sam3_assimilation(date: str):
+    try:
+        dt.date.fromisoformat(date)
+    except ValueError:
+        raise HTTPException(400, "fecha inválida")
+    from ..ai.vision_service import sam3_scene_for_date
+    from ..application import get_container
+    return J(sam3_scene_for_date(date, lp=replay(), port=get_container().segmentation))
+
+
+@app.get("/api/lapalma2021/sam3-validation")
+def lp_sam3_validation():
+    from ..ai.vision_service import sam3_validation_benchmark
+    return J(sam3_validation_benchmark(impact_replay()))
+
+
 class ChatReq(BaseModel):
     question: str
-    context: str | None = None      # "canarias" | "lapalma2021:YYYY-MM-DD"
+    context: str | None = None      # "canarias" | "tenerife" | "lapalma2021:YYYY-MM-DD"
 
 
 @app.post("/api/chat")
+@app.post("/api/ai/agent")
 def chat(req: ChatReq, request: Request):
     need(request, "tecnico")
     if not req.question.strip():
         raise HTTPException(400, "pregunta vacía")
-    idx = rag.get_index(store.load_events(), replay().obs if _replay["obj"] else None)
-    hits = idx.search(req.question, k=6)
-    live = None
     if req.context and req.context.startswith("lapalma2021:"):
-        day = _lp_day(req.context.split(":", 1)[1])
-        live = {k: day[k] for k in ("date", "seismic", "lava")}
-    elif req.context == "canarias":
-        z = json.loads(canarias_zones().body)
-        live = dict(at=z["at"], zonas=[{k: q[k] for k in ("name", "index", "n7", "n30", "max_mag30", "depth_median30")}
-                                       for q in z["zones"]])
-    cfg = llm.LLMConfig.from_env()
-    try:
-        answer = llm.chat(rag.build_prompt(req.question, hits, live), cfg)
-        return JSONResponse(dict(answer=answer, ai=True, model=cfg.public(), citations=rag.cite(hits)))
-    except llm.LLMUnavailable as e:
-        return JSONResponse(dict(answer=None, ai=False, error=str(e), model=cfg.public(), citations=rag.cite(hits)))
+        date_str = req.context.split(":", 1)[1]
+        try:
+            dt.date.fromisoformat(date_str)
+        except ValueError:
+            raise HTTPException(400, "fecha inválida")
+    from ..application import get_container
+    agent = get_container().agent()
+    res = agent.run(
+        req.question,
+        context=req.context,
+        events=store.load_events(),
+        lava_obs=replay().obs if _replay["obj"] else None,
+    )
+    return J(res)
 
 
 # ------------------------------------------------------------------ web app

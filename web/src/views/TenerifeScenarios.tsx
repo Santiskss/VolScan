@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { api, fmt, type Terrain, type TfScenario } from '../api'
-import Atlas3D, { type Label, type SurfacePoint } from '../three/Atlas3D'
+import Atlas3D, { preloadImage, type Label, type SurfacePoint } from '../three/Atlas3D'
 import Exports from './Exports'
 
 const r0 = (v: number | null | undefined) => (v == null ? '—' : Math.round(v).toLocaleString('es-ES'))
@@ -22,11 +22,23 @@ export default function TenerifeScenarios() {
   const [showAssets, setShowAssets] = useState(true)
   const [focus, setFocus] = useState<{ x: number; y: number; distKm: number } | null>(null)
 
-  useEffect(() => { api.terrain('tenerife').then(setTerrain); api.tfScenarios().then((d) => { setList(d.scenarios); setNote(d.note) }) }, [])
+  useEffect(() => {
+    api.terrain('tenerife').then((t) => { preloadImage(t.texture); setTerrain(t) })
+    api.tfScenarios().then((d) => {
+      setList(d.scenarios)
+      setNote(d.note)
+      d.scenarios.forEach((s) => {
+        if (s.key !== key) api.tfScenario(s.key).then((v) => preloadImage(v.overlay?.png)).catch(() => {})
+      })
+    })
+  }, [])
   useEffect(() => {
     let alive = true
     setLoading(true); setErr(null)
-    api.tfScenario(key).then((d) => { if (alive) { setSc(d); const v = d.vents?.[0]?.xy; if (v) setFocus({ x: v[0], y: v[1] + 4000, distKm: 30 }) } })
+    api.tfScenario(key).then((d) => {
+      preloadImage(d.overlay?.png)
+      if (alive) { setSc(d); const v = d.vents?.[0]?.xy; if (v) setFocus({ x: v[0], y: v[1] + 4000, distKm: 30 }) }
+    })
       .catch((e) => alive && setErr(String(e))).finally(() => alive && setLoading(false))
     return () => { alive = false }
   }, [key])
