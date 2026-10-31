@@ -176,7 +176,7 @@ class MetaSAM3Adapter(LavaSegmentationPort):
         if self.endpoint:
             return "remote_api"
         if self.checkpoint and os.path.exists(self.checkpoint):
-            return "local_weights"
+            return "local_weights_unimplemented"
         return "physics_prompt_seeded"
 
     def status(self) -> dict[str, Any]:
@@ -185,16 +185,18 @@ class MetaSAM3Adapter(LavaSegmentationPort):
             port="LavaSegmentationPort",
             adapter="MetaSAM3Adapter",
             family="Meta SAM 3.1",
-            model=self.model,
+            model=self.model if mode == "remote_api" else "deterministic-geodesic",
             mode=mode,
-            ready=True,
+            ready=mode == "remote_api",
+            inference_verified=False,
+            checkpoint_implemented=False,
             endpoint=self.endpoint if mode == "remote_api" else None,
             note=(
-                "Inferencia remota SAM 3.1 activa"
+                "Endpoint remoto configurado; inferencia pendiente de respuesta válida"
                 if mode == "remote_api"
-                else "Pesos locales SAM 3.1 cargados"
-                if mode == "local_weights"
-                else "Extracción de prompts SAM 3.1 (boca + frentes SWIR + caja) con segmentación geodésica determinista"
+                else "Fichero de pesos presente, predictor local sin implementar; se ejecuta algoritmo determinista"
+                if mode == "local_weights_unimplemented"
+                else "Segmentación geodésica determinista; no se ejecutan pesos SAM"
             ),
         )
 
@@ -242,7 +244,7 @@ class MetaSAM3Adapter(LavaSegmentationPort):
             data = resp.json()
             mask_arr = np.asarray(data["mask"], dtype=bool).ravel()
             conf_arr = np.asarray(data.get("confidence", mask_arr.astype(float)), dtype=float).ravel()
-            if mask_arr.size == g.elev.size:
+            if mask_arr.size == g.elev.size and conf_arr.size == g.elev.size and np.isfinite(conf_arr).all() and ((conf_arr >= 0) & (conf_arr <= 1)).all():
                 return mask_arr, conf_arr
         except Exception:
             return None
@@ -263,6 +265,7 @@ class MetaSAM3Adapter(LavaSegmentationPort):
                 mode = "physics_prompt_seeded"
 
         if mask_flat is None or conf_flat is None:
+            mode = "physics_prompt_seeded"
             mask_flat, conf_flat = _prompt_seeded_segmentation(scene, points, box_xy)
 
         g = scene.grid
@@ -281,7 +284,7 @@ class MetaSAM3Adapter(LavaSegmentationPort):
             prompt_points=points,
             prompt_box_xy=box_xy,
             adapter="MetaSAM3Adapter",
-            model=self.model,
+            model=self.model if mode == "remote_api" else "deterministic-geodesic",
             mode=mode,
             latency_ms=dt_ms,
         )

@@ -925,7 +925,7 @@ def report_monthly(zone: str = "tenerife", month: str | None = None):
 
 @app.get("/api/reports/catastrophe/lapalma2021")
 def report_catastrophe_lapalma():
-    f = CACHE / "catastrophe_lapalma2021.json"
+    f = CACHE / "catastrophe_lapalma2021_evidence_v2.json"
     if f.exists():
         return JSONResponse(json.loads(f.read_text()))
     from ..reports import catastrophe_report_lapalma2021

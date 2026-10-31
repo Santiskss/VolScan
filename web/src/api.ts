@@ -209,7 +209,7 @@ export type CatastropheReport = {
   summary_kpis: {
     eruption_days: number; real_area_ha: number; real_buildings_destroyed: number; real_quakes_total: number
     volscan_days_within_p10_p90: number; volscan_eval_days: number; volscan_bias_pct: number | null
-    sam3_mean_iou: number; sam3_lead_gain_h: number
+    sam3_mean_iou: number | null; sam3_lead_gain_h: number | null
   }
   provenance: { layer: string; kind: 'REAL' | 'ESTIMADO'; source: string; usage: string }[]
   rheology_phases: {
@@ -233,7 +233,7 @@ export type CatastropheReport = {
 
 export type Sam3Day = {
   date: string; phase: 'pre-eruptive' | 'eruptive'; available: boolean; note?: string
-  observation_index?: number; observed_at?: string; cems_already_delivered_at_now?: boolean; lead_time_advantage_h?: number
+  observation_index?: number; observed_at?: string; cems_already_delivered_at_now?: boolean; lead_time_advantage_h?: number | null
   segmentation?: { adapter: string; model: string; mode: string; latency_ms: number; area_ha: number; reach_m: number; n_prompt_points: number }
   comparison_vs_cems?: { cems_area_ha: number; sam3_area_ha: number; cems_reach_m: number; sam3_reach_m: number; iou: number; precision: number; recall: number; f1: number }
   assimilated_forecast?: { n_passes_assimilated: number; ess: number; sea_p_ever: number; sea_eta_h: (number | null)[] }
@@ -242,7 +242,7 @@ export type Sam3Day = {
 }
 export type Sam3Validation = {
   adapter: NonNullable<Status['vision']>; n_scenes: number; note: string
-  summary: { mean_iou: number; median_iou: number; min_iou: number; max_iou: number; mean_precision: number; mean_recall: number; mean_f1: number; mean_latency_ms: number; cems_delivery_delay_h: number; sam3_delivery_delay_h: number; lead_time_gain_h: number }
+  summary: { mean_iou: number; median_iou: number; min_iou: number; max_iou: number; mean_precision: number; mean_recall: number; mean_f1: number; mean_latency_ms: number; cems_delivery_delay_h: number; sam3_delivery_delay_h: number; lead_time_gain_h: number | null }
   scenes: { k: number; observed_at: string; date: string; cems_area_ha: number; sam3_area_ha: number; cems_reach_m: number; sam3_reach_m: number; latency_ms: number; n_prompts: number; iou: number; precision: number; recall: number; f1: number }[]
 }
 export type AgentResponse = {

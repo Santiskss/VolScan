@@ -107,3 +107,7 @@ Reproduce the data: `pip install -e ".[data]"`, then `python scripts/fetch_lapal
 ## License
 
 Code: Apache-2.0 (see `LICENSE`). Data: see `data/PROVENANCE.md`.
+
+## Revisión de evidencia · 31 de octubre de 2026
+
+La pestaña de segmentación contiene una **demostración sintética**: construye radiancia/temperatura desde las máscaras CEMS que usa como referencia. Su IoU no constituye validación externa de SAM ni prueba un adelanto operativo. Los 15 minutos de entrega son un supuesto, no una medición. El predictor local de pesos está sin implementar y el modo determinista se identifica por su nombre real. Las métricas históricas de impacto pertenecen a una evaluación distinta y conservan sus denominadores y límites. No se ha hecho la integración con otros productos.

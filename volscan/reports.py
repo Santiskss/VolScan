@@ -241,10 +241,10 @@ def catastrophe_report_lapalma2021(ir) -> dict:
             usage="Repondera los 600 recorridos con el alcance y dirección observados; calibra el P10–P90 con errores pasados.",
         ),
         dict(
-            layer="Segmentación térmica satelital inmediata (SWIR/TIRS)",
+            layer="Experimento térmico sintético derivado de la referencia CEMS",
             kind="ESTIMADO",
-            source="Adaptador hexagonal Meta SAM 3.1 (`MetaSAM3Adapter`)",
-            usage="Extrae el perímetro activo en 9 ms tras la pasada satelital (+23,75 h antes del mapa humano de Copernicus).",
+            source="Segmentación geodésica determinista; proveedor SAM pendiente de verificación",
+            usage="Escena generada desde la propia máscara CEMS. No demuestra rendimiento externo ni adelanto operativo.",
         ),
     ]
 
@@ -388,7 +388,7 @@ def catastrophe_report_lapalma2021(ir) -> dict:
                 if inside
                 else f"Fuera de P10–P90 (real {obs_72} vs rango {p10}–{p90})"
                 if obs_72 is not None
-                else f"SAM 3.1 segmenta {sam_area} ha (IoU {sam_iou}) 24 h antes del primer mapa CEMS"
+                else f"Experimento sintético: {sam_area} ha (IoU circular {sam_iou}); sin adelanto operativo demostrado"
             )
             timeline.append(dict(
                 date=d_str,
@@ -485,8 +485,8 @@ def catastrophe_report_lapalma2021(ir) -> dict:
             volscan_days_within_p10_p90=val_sum["within_p10_p90_72h"],
             volscan_eval_days=val_sum["days"],
             volscan_bias_pct=val_sum["bias_pct"],
-            sam3_mean_iou=0.952,
-            sam3_lead_gain_h=23.75,
+            sam3_mean_iou=None,
+            sam3_lead_gain_h=None,
         ),
         provenance=provenance,
         rheology_phases=rheology_phases,

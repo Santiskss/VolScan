@@ -123,9 +123,9 @@ export default function Reports() {
                   <div className="s">{Math.round((100 * catRep.summary_kpis.volscan_days_within_p10_p90) / catRep.summary_kpis.volscan_eval_days)} % de días dentro del rango P10–P90 (sesgo {fmt.num(catRep.summary_kpis.volscan_bias_pct)} %)</div>
                 </div>
                 <div className="kpi">
-                  <div className="k"><ProvenanceTag kind="ESTIMADO" /> Asimilación Meta SAM 3.1</div>
-                  <div className="v">{fmt.num(catRep.summary_kpis.sam3_mean_iou, 3)}<small> IoU</small></div>
-                  <div className="s">+{fmt.num(catRep.summary_kpis.sam3_lead_gain_h, 1)} h de antelación frente a los mapas humanos de Copernicus</div>
+                  <div className="k"><ProvenanceTag kind="ESTIMADO" /> Experimento sintético</div>
+                  <div className="v">Sin validación externa</div>
+                  <div className="s">Sin adelanto operativo demostrado; escenas generadas desde CEMS</div>
                 </div>
                 <div className="kpi">
                   <div className="k"><ProvenanceTag kind="REAL" /> Apertura y Marea Lunar</div>

@@ -159,14 +159,17 @@ def test_sam3_day1_assimilation_and_63_scene_benchmark():
     day20 = sam3_scene_for_date("2021-09-20")
     assert day20["available"] is True
     assert day20["cems_already_delivered_at_now"] is False
-    assert day20["lead_time_advantage_h"] == 23.75
+    assert day20["lead_time_advantage_h"] is None
+    assert day20["evidence"]["independent_validation"] is False
+    assert day20["evidence"]["input_kind"] == "synthetic_from_cems_reference"
     assert day20["comparison_vs_cems"]["iou"] >= 0.80
     assert day20["assimilated_forecast"]["n_passes_assimilated"] == 1
 
     bench = sam3_validation_benchmark()
     assert bench["n_scenes"] == 63
     assert bench["summary"]["mean_iou"] >= 0.85
-    assert bench["summary"]["lead_time_gain_h"] == 23.75
+    assert bench["summary"]["lead_time_gain_h"] is None
+    assert bench["evidence"]["operational"] is False
 
 
 def test_api_hexagonal_endpoints():

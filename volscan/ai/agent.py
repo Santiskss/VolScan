@@ -278,7 +278,7 @@ def build_domain_tools(seg_port: LavaSegmentationPort | None = None) -> list[Too
         ),
         ToolDefinition(
             name="run_sam3_satellite_assimilation",
-            description="Ejecuta el adaptador Meta SAM 3.1 (LavaSegmentationPort) sobre la imagen térmica satelital SWIR/TIRS en La Palma 2021, asimila la máscara en los 600 recorridos y la compara con Copernicus EMS (usa date='benchmark' para las 22 escenas).",
+            description="Experimento sintético: escenas térmicas generadas desde la propia referencia CEMS. No es validación satelital externa ni demuestra adelanto operativo. Usa benchmark para la prueba sintética.",
             parameters={
                 "type": "object",
                 "properties": {
@@ -358,9 +358,9 @@ def _synthesize_offline(question: str, records: list[ToolExecutionRecord], hits)
             if out.get("mode") == "benchmark_63_scenes" or "summary" in out:
                 s = out["summary"]
                 parts.append(
-                    f"Segmentación satelital con Meta SAM 3.1 (63 cartografías EMSR546 en La Palma 2021): "
+                    f"Prueba sintética circular derivada de CEMS, sin validación externa: "
                     f"IoU medio {s['mean_iou']} (mediana {s['median_iou']}, precisión {s['mean_precision']}, exhaustividad {s['mean_recall']}), "
-                    f"latencia media {s['mean_latency_ms']} ms por escena y ganancia de antelación operativa de +{s['lead_time_gain_h']} h frente a las 24 h de fotointerpretación manual."
+                    f"latencia computacional media {s['mean_latency_ms']} ms por escena; sin adelanto operativo demostrado."
                 )
             elif out.get("available"):
                 c = out["comparison_vs_cems"]
@@ -368,8 +368,8 @@ def _synthesize_offline(question: str, records: list[ToolExecutionRecord], hits)
                 eta = af["sea_eta_h"]
                 eta_str = f"P50 {eta[1]} h (P10–P90 {eta[0]}–{eta[2]} h)" if eta and eta[1] is not None else "sin llegada prevista en el horizonte"
                 parts.append(
-                    f"Asimilación satelital Meta SAM 3.1 ({out['date']}): superficie segmentada {c['sam3_area_ha']} ha frente a {c['cems_area_ha']} ha de Copernicus EMS "
-                    f"(IoU {c['iou']}, alcance {c['sam3_reach_m']} m vs {c['cems_reach_m']} m, +{out['lead_time_advantage_h']} h de antelación). "
+                    f"Experimento sintético circular ({out['date']}): superficie segmentada {c['sam3_area_ha']} ha frente a {c['cems_area_ha']} ha de Copernicus EMS "
+                    f"(IoU sintético {c['iou']}, alcance {c['sam3_reach_m']} m vs {c['cems_reach_m']} m; sin adelanto operativo demostrado). "
                     f"Tras reponderar los 600 recorridos con la máscara SAM 3.1 (ESS {af['ess']}), la probabilidad de llegada al mar es {round(100 * af['sea_p_ever'])} % ({eta_str})."
                 )
         elif rec.name == "get_lapalma_2021_forecast":

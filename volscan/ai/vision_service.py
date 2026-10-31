@@ -142,8 +142,7 @@ def sam3_scene_for_date(date_str: str, lp=None, port: LavaSegmentationPort | Non
     """Run SAM 3.1 segmentation on the latest satellite pass acquired by the end of `date_str` (0.25 h latency)
     and assimilate it into the 600-member lava ensemble.
     """
-    if date_str in _SAM3_DATE_CACHE:
-        return _SAM3_DATE_CACHE[date_str]
+    # Adapters may change between requests: do not reuse a date-only result across configurations.
     from ..replay import default_replay
     lp = lp or default_replay()
     port = port or default_segmentation_port()
@@ -173,12 +172,14 @@ def sam3_scene_for_date(date_str: str, lp=None, port: LavaSegmentationPort | Non
         )
 
     k_last = ks_sam[-1]
-    seg, metrics = _cached_sam3_pass(k_last)
+    seg = port.segment(build_thermal_scene_for_obs(lp, k_last))
+    metrics = evaluate_mask_iou(seg.mask_flat, lp.mask(k_last))
 
     # Reweight the 600-member ensemble using SAM 3.1 masks instead of waiting 24 h for CEMS human vectors
     total_ll = np.zeros(lp.fc.n_paths)
     for k in ks_sam:
-        total_ll = total_ll + _cached_sam3_ll(k)
+        sk = seg if k == k_last else port.segment(build_thermal_scene_for_obs(lp, k))
+        total_ll = total_ll + A.log_likelihood(lp.fc, lp.dist, sk.mask_flat, lp.hours(lp.obs[k].observed_at))
     w_sam = A.weights_from_loglik(total_ll)
     fc_sam = lp.fc.reweighted(w_sam)
     t_now = lp.hours(now)
@@ -205,7 +206,9 @@ def sam3_scene_for_date(date_str: str, lp=None, port: LavaSegmentationPort | Non
         observation_index=k_last,
         observed_at=lp.obs[k_last].observed_at.isoformat(),
         cems_already_delivered_at_now=cems_delivered,
-        lead_time_advantage_h=lead_advantage_h,
+        lead_time_advantage_h=None,
+        hypothetical_lead_time_h=lead_advantage_h,
+        evidence=dict(input_kind="synthetic_from_cems_reference", independent_validation=False, operational=False, note="La escena se genera desde la máscara CEMS usada como referencia; hay circularidad. IoU es una prueba del algoritmo con datos sintéticos, no validación satelital. El retraso de 15 minutos es hipotético."),
         segmentation=seg.public_meta(),
         comparison_vs_cems=dict(
             cems_area_ha=cems_area_ha,
@@ -220,6 +223,7 @@ def sam3_scene_for_date(date_str: str, lp=None, port: LavaSegmentationPort | Non
             sea_p_ever=round(p_sea, 3),
             sea_eta_h=[None if np.isnan(v) else round(v - t_now, 1) for v in q_sea],
         ),
+        note="Experimento sintético generado desde CEMS; sin adelanto operativo demostrado.",
         overlay=dict(
             png=overlay_png,
             west=g.west,
@@ -228,7 +232,7 @@ def sam3_scene_for_date(date_str: str, lp=None, port: LavaSegmentationPort | Non
             rows=g.shape[0],
             cols=g.shape[1],
             horizon_h=72,
-            legend="Máscara segmentada con Meta SAM 3.1 + pronóstico asimilado a 72 h",
+            legend="Experimento sintético: máscara geodésica desde referencia CEMS; horizonte hipotético 72 h",
         ),
         adapter=port.status(),
     )
@@ -239,7 +243,7 @@ def sam3_scene_for_date(date_str: str, lp=None, port: LavaSegmentationPort | Non
 def sam3_validation_benchmark(ir=None) -> dict[str, Any]:
     """Compare Meta SAM 3.1 segmentation across all 22 EMSR546 scenes and measure downstream 72 h forecast skill."""
     from ..replay import CACHE, default_replay
-    cache_file = CACHE / "sam3_validation_lapalma2021.json"
+    cache_file = CACHE / "synthetic_segmentation_lapalma2021_v2.json"
     if cache_file.exists():
         try:
             return json.loads(cache_file.read_text())
@@ -274,6 +278,7 @@ def sam3_validation_benchmark(ir=None) -> dict[str, Any]:
 
     out = dict(
         adapter=port.status(),
+        evidence=dict(input_kind="synthetic_from_cems_reference", independent_validation=False, operational=False),
         n_scenes=len(scenes),
         summary=dict(
             mean_iou=round(float(np.mean(ious)), 3),
@@ -286,13 +291,15 @@ def sam3_validation_benchmark(ir=None) -> dict[str, Any]:
             mean_latency_ms=round(float(np.mean(latencies)), 1),
             cems_delivery_delay_h=24.0,
             sam3_delivery_delay_h=0.25,
-            lead_time_gain_h=23.75,
+            lead_time_gain_h=None,
+            hypothetical_lead_time_h=23.75,
         ),
         scenes=scenes,
         note=(
-            f"Comparativa sobre las {len(scenes)} cartografías satelitales de Copernicus EMS (EMSR546) en La Palma 2021. "
-            "Meta SAM 3.1 recibe como prompts espaciales la boca eruptiva, los máximos radiométricos SWIR/TIRS del frente "
-            "y el núcleo de la máscara previa (para conservar la corteza enfriada e ignorar el penacho cerca del cráter)."
+            f"Prueba sintética sobre {len(scenes)} máscaras CEMS. Las escenas térmicas se generan desde la misma referencia usada para evaluar. "
+            "Por esa circularidad, IoU/precisión/recall no miden rendimiento sobre imágenes satelitales independientes. "
+            "No se ha demostrado adelanto operativo; los 15 minutos son un supuesto."
+
         ),
     )
     cache_file.parent.mkdir(parents=True, exist_ok=True)

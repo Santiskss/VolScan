@@ -175,7 +175,7 @@ export default function AtlasLaPalma() {
           )}
           <div className="legend-strip">
             {showQuakes && <div className="item">Sismos IGN bajo la isla · <b style={{ color: '#e23d14' }}>●</b> 24 h <b style={{ color: '#f08a35' }}>●</b> 7 d <b style={{ color: '#8f8577' }}>●</b> anteriores · tamaño = magnitud</div>}
-            {showLava && eruptive && <div className="item">Probabilidad de colada (72 h)<span className="grad" />· mancha oscura con borde naranja = {useSam3Overlay ? 'máscara Meta SAM 3.1' : 'colada observada CEMS'}</div>}
+            {showLava && eruptive && <div className="item">Probabilidad de colada (72 h)<span className="grad" />· mancha oscura con borde naranja = {useSam3Overlay ? 'máscara sintética' : 'colada observada CEMS'}</div>}
             <div className="item">Reconstrucción con datos reales · usa solo lo disponible ese día</div>
           </div>
           <div className="controls-row">
@@ -242,10 +242,10 @@ export default function AtlasLaPalma() {
 
         {eruptive && (
           <section className="incident">
-            <h3>Asimilación satelital · Meta SAM 3.1</h3>
+            <h3>Experimento sintético de segmentación</h3><p className="note">Las escenas térmicas se generan desde la propia referencia CEMS. Su coincidencia no valida segmentación satelital ni adelanto operativo. La inferencia real requiere un proveedor verificado.</p>
             {!sam3 && (
               <button className="btn olive" disabled={sam3Loading || !date} onClick={loadSam3}>
-                {sam3Loading ? 'Segmentando SWIR/TIRS…' : 'Segmentar pasada térmica (SAM 3.1)'}
+                {sam3Loading ? 'Calculando experimento…' : 'Ejecutar demostración sintética'}
               </button>
             )}
             {sam3 && !sam3.available && <div className="note">{sam3.note}</div>}
@@ -259,7 +259,7 @@ export default function AtlasLaPalma() {
                   <span className="k">Alcance frente</span>
                   <span>{fmt.int(sam3.comparison_vs_cems.sam3_reach_m)} m vs {fmt.int(sam3.comparison_vs_cems.cems_reach_m)} m</span>
                   <span className="k">Antelación a CEMS</span>
-                  <span><b>+{fmt.num(sam3.lead_time_advantage_h)} h</b> ({sam3.cems_already_delivered_at_now ? 'CEMS ya entregado' : 'CEMS aún NO entregado ese día'})</span>
+                  <span>Sin adelanto operativo demostrado; entrada generada desde CEMS.</span>
                   <span className="k">Mar (asimilado SAM 3.1)</span>
                   <span>{fmt.pct(sam3.assimilated_forecast.sea_p_ever)} (ESS {fmt.num(sam3.assimilated_forecast.ess)})</span>
                 </div>

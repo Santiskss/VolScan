@@ -84,23 +84,23 @@ export default function Validation() {
 
       {samVal && (
         <div style={{ marginTop: 28 }}>
-          <h3>Segmentación térmica satelital · Meta SAM 3.1 frente a Copernicus EMS ({samVal.n_scenes} escenas EMSR546)</h3>
+          <h3>Experimento de segmentación con escenas sintéticas derivadas de CEMS ({samVal.n_scenes} escenas EMSR546)</h3>
           <p className="note">{samVal.note}</p>
           <div className="kpis kpis-page" style={{ marginTop: 10 }}>
             <div className="kpi">
               <div className="k">IoU medio (Jaccard)</div>
               <div className="v">{fmt.num(samVal.summary.mean_iou, 3)}</div>
-              <div className="s">mediana {fmt.num(samVal.summary.median_iou, 3)} en {samVal.n_scenes} pasadas satelitales</div>
+              <div className="s">mediana {fmt.num(samVal.summary.median_iou, 3)} en {samVal.n_scenes} máscaras de referencia (prueba circular)</div>
             </div>
             <div className="kpi">
               <div className="k">Precisión / Recall</div>
               <div className="v">{pc(samVal.summary.mean_precision)}<small> / {pc(samVal.summary.mean_recall)}</small></div>
-              <div className="s">F1 medio {fmt.num(samVal.summary.mean_f1, 3)} frente a delineación humana CEMS</div>
+              <div className="s">F1 medio {fmt.num(samVal.summary.mean_f1, 3)} sobre la referencia usada para construir la entrada</div>
             </div>
             <div className="kpi">
               <div className="k">Ganancia de antelación</div>
-              <div className="v">+{fmt.num(samVal.summary.lead_time_gain_h, 1)}<small> h</small></div>
-              <div className="s">0,25 h recepción+SAM 3.1 frente a {fmt.num(samVal.summary.cems_delivery_delay_h, 0)} h fotointerpretación CEMS</div>
+              <div className="v">Sin demostrar</div>
+              <div className="s">No hay escenas observadas independientes ni latencia operativa medida</div>
             </div>
             <div className="kpi">
               <div className="k">Latencia por escena</div>
