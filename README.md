@@ -50,7 +50,7 @@ part of this submission. Public datasets are listed with their licences in
 | Volcanic zones as island shapes, not overlapping boxes (`scripts/build_zones.py`) | ✅ |
 | Live catalogue health + EMSC fallback when the IGN page fails | ✅ |
 | Solunar: tidal / lunar phase per quake, Schuster + robust shift-null test | ✅ |
-| RAG over curated sources + data-derived summaries, local LLM (Ollama) → Meta Muse | ✅ |
+| RAG over curated sources + data-derived summaries, Meta Muse Glimmer 30B running locally (open weights) | ✅ |
 | Volcano Atlas web app (3D terrain, quakes at depth, lava probability, impact, validation, reports) | ✅ |
 | SAM 3.1 lava/plume segmentation (satellite, webcams) | next |
 | Muse Spark agent with tools | next |
@@ -87,9 +87,19 @@ uvicorn volscan.api.app:app --port 8200
 pytest -q
 ```
 
-AI: by default a local model through Ollama (`ollama pull qwen3:8b`, `ollama pull nomic-embed-text`).
-With credits for the Meta Model API, set `META_API_KEY` in `.env` (see `.env.example`). Without a model,
-everything else still works, and the AI panels say so explicitly.
+AI: by default **Meta Muse Glimmer 30B**, Meta's open-weights model (Apache-2.0), running on your own
+machine through Ollama. Nothing leaves the room, which is what an emergency operations centre needs.
+
+```bash
+ollama pull hf.co/meta-models/Muse-Glimmer-30B-GGUF:Q4_K_M   # ~18 GB with the vision projector
+ollama pull nomic-embed-text                                  # embeddings for the RAG
+```
+
+On a 24 GB Mac, close heavy apps first, or use the smaller quant
+`hf.co/unsloth/Muse-Glimmer-30B-GGUF:UD-IQ3_M` (~14 GB) in `.env`. `VOLSCAN_REASONING_STRENGTH`
+(`low` by default) trades depth for speed. With credits for the Meta Model API, set `META_API_KEY` in `.env`
+to use Muse Spark instead (see `.env.example`). Without a model, everything else still works, and the AI
+panels say so explicitly.
 
 Reproduce the data: `pip install -e ".[data]"`, then `python scripts/fetch_lapalma_2021.py`,
 `python scripts/fetch_terrain_canarias.py`, `python scripts/fetch_exposure_lapalma.py`,

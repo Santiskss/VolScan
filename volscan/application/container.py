@@ -12,6 +12,7 @@ from ..adapters.interop import (
     Sha256JsonlAuditAdapter,
 )
 from ..adapters.meta_ai import (
+    MetaGlimmerLocalAdapter,
     MetaLlamaAdapter,
     MetaMuseSparkAdapter,
     MetaSAM3Adapter,
@@ -20,7 +21,7 @@ from ..adapters.meta_ai import (
 )
 from ..adapters.telemetry import IgnEmscSeismicAdapter, NasaOmpsSo2Adapter, NglGnssAdapter
 from ..ai.agent import VolScanAgent
-from ..ai.llm import LLMConfig, _load_dotenv
+from ..ai.llm import GLIMMER_DEFAULT_MODEL, LLMConfig, _load_dotenv
 from ..ports import (
     AuditTrailPort,
     EmbeddingPort,
@@ -36,6 +37,13 @@ from ..ports import (
 )
 
 META_MODEL_PRESETS = {
+    "meta_glimmer_local": {
+        "adapter": "MetaGlimmerLocalAdapter",
+        "provider": "meta-local",
+        "model": GLIMMER_DEFAULT_MODEL,
+        "base": "http://localhost:11434/v1",
+        "description": "Meta Muse Glimmer 30B en local (pesos abiertos, texto + imagen + tool-calling, sin conexión)",
+    },
     "meta_muse": {
         "adapter": "MetaMuseSparkAdapter",
         "provider": "meta",
@@ -71,6 +79,8 @@ def resolve_llm_adapter(preset: str | None = None, model: str | None = None, bas
     """Resolve the active LanguageModelPort / EmbeddingPort / MultimodalVisionLanguagePort adapter."""
     _load_dotenv()
     choice = (preset or os.environ.get("VOLSCAN_LLM_ADAPTER") or "auto").strip().lower()
+    if choice in ("meta_glimmer_local", "glimmer", "meta_local"):
+        return MetaGlimmerLocalAdapter(model=model, base=base)
     if choice in ("meta_muse", "muse", "meta"):
         return MetaMuseSparkAdapter(api_key=api_key, model=model, base=base)
     if choice in ("meta_llama", "meta_llama4", "meta_llama3_70b", "llama"):

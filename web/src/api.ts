@@ -276,3 +276,11 @@ export const fmt = {
   date: (iso: string) => new Date(iso).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC' }),
   dateTime: (iso: string) => new Date(iso).toLocaleString('es-ES', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit', timeZone: 'UTC' }) + ' UTC',
 }
+
+/** Human label for the model that answered: Meta API, Meta open weights on this machine, or another local model. */
+export function modelLabel(provider?: string, model?: string): string {
+  const m = model || '—'
+  if (provider === 'meta') return `Meta · ${m}`
+  if (provider === 'meta-local' || /glimmer/i.test(m)) return 'Meta Muse Glimmer · local'
+  return `Local · ${m}`
+}

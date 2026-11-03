@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { api, authEvents, fmt, setToken, STATIC, type AuthUser, type Status } from './api'
+import { api, authEvents, fmt, modelLabel, setToken, STATIC, type AuthUser, type Status } from './api'
 import AuditLog from './views/AuditLog'
 import Login from './views/Login'
 import AtlasLaPalma from './views/AtlasLaPalma'
@@ -68,7 +68,7 @@ export default function App() {
         {tabs.map(([k, label]) => <button key={k} className={`tab ${tab === k ? 'active' : ''}`} onClick={() => setTab(k)}>{label}</button>)}
         <span className="spacer" />
         {status?.vision && <span className="chip" title={status.vision.note}><span className={`dot ${status.vision.ready ? 'ok' : 'warn'}`} />Visión: {status.vision.mode === 'remote_api' ? 'endpoint configurado' : 'algoritmo determinista · sin pesos SAM'}</span>}
-        <span className="chip"><span className={`dot ${llm?.ok ? 'ok' : 'warn'}`} />{STATIC ? 'IA: solo en versión local' : <>IA: {llm ? (llm.provider === 'meta' ? 'Meta · ' : 'Local · ') + llm.model : '—'}{llm && !llm.ok ? ' (modo determinista)' : ''}</>}</span>
+        <span className="chip"><span className={`dot ${llm?.ok ? 'ok' : 'warn'}`} />{STATIC ? 'IA: solo en versión local' : <>IA: {llm ? modelLabel(llm.provider, llm.model) : '—'}{llm && !llm.ok ? ' (modo determinista)' : ''}</>}</span>
         <span className="chip" title={status?.catalog.health?.message ?? ''}><span className={`dot ${!STATIC && status?.catalog.health && !status.catalog.health.ok ? 'warn' : 'ok'}`} />IGN: {status ? `${fmt.int(status.catalog.n_events)} sismos` : '—'}{!STATIC && status?.catalog.health && !status.catalog.health.ok ? ` · ${status.catalog.health.level}` : ''}</span>
         {STATIC && status && <span className="chip"><span className="dot warn" />Instantánea · {fmt.dateTime(status.now)}</span>}
         {auth?.enabled && auth.user && <span className="chip"><span className="dot ok" />{auth.user.name} · {auth.user.role}<button className="linklike" onClick={() => { api.logout().finally(() => { setToken(null); setAuth({ enabled: true, user: null }) }) }}>Salir</button></span>}

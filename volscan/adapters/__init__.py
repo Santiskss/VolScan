@@ -8,6 +8,7 @@ from .interop import (
     Sha256JsonlAuditAdapter,
 )
 from .meta_ai import (
+    MetaGlimmerLocalAdapter,
     MetaLlamaAdapter,
     MetaMuseSparkAdapter,
     MetaSAM3Adapter,
@@ -18,6 +19,7 @@ from .telemetry import IgnEmscSeismicAdapter, NasaOmpsSo2Adapter, NglGnssAdapter
 
 __all__ = [
     "IgnEmscSeismicAdapter",
+    "MetaGlimmerLocalAdapter",
     "MetaLlamaAdapter",
     "MetaMuseSparkAdapter",
     "MetaSAM3Adapter",

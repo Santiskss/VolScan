@@ -23,8 +23,13 @@ if [ ! -f web/dist/index.html ] || [ "${REBUILD:-0}" = "1" ] || [ -n "$(find web
   command -v npm >/dev/null 2>&1 || { echo "✖ Necesitas Node.js 18+ (brew install node)"; exit 1; }
   (cd web && npm ci --no-audit --no-fund && npm run build)
 fi
+MODEL=${VOLSCAN_LLM_MODEL:-$(grep -E '^VOLSCAN_LLM_MODEL=' .env 2>/dev/null | cut -d= -f2-)}
+MODEL=${MODEL:-hf.co/meta-models/Muse-Glimmer-30B-GGUF:Q4_K_M}
 if command -v ollama >/dev/null 2>&1; then
-  echo "▶ IA local: Ollama detectado. Modelo: ${VOLSCAN_LLM_MODEL:-qwen3:8b} (cámbialo en .env)"
+  echo "▶ IA local: Ollama detectado. Modelo: $MODEL (cámbialo en .env)"
+  if ! ollama list 2>/dev/null | awk '{print $1}' | grep -qiF "$MODEL"; then
+    echo "  ⚠ El modelo no está descargado. Ejecuta una vez:  ollama pull $MODEL"
+  fi
 else
   echo "⚠ Ollama no está instalado: VolScan funciona igual, pero los partes y el asistente usarán solo recuperación."
 fi

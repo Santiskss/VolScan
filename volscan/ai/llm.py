@@ -1,13 +1,15 @@
 """Hexagonal Adapters for LanguageModelPort & EmbeddingPort (Meta Muse Spark / Llama / Ollama).
 
-Today: Ollama local model on the operator's Mac (http://localhost:11434/v1) or
-Meta Model API (Muse Spark / Llama 4) on the same OpenAI-compatible contract.
+Default: Meta Muse Glimmer 30B (open weights, Apache-2.0) running locally through
+Ollama on the operator's Mac (http://localhost:11434/v1). The Meta Model API
+(Muse Spark) uses the same OpenAI-compatible contract.
 Switching between local air-gapped execution and Meta's hosted API requires only
 environment variables (or `.env`):
 
   VOLSCAN_LLM_ADAPTER  optional: "meta" | "ollama" | "auto" (default "auto")
   VOLSCAN_LLM_BASE     default http://localhost:11434/v1
-  VOLSCAN_LLM_MODEL    default qwen3:8b (or llama3.2:latest / muse-spark-1.3)
+  VOLSCAN_LLM_MODEL    default Muse Glimmer GGUF (see GLIMMER_DEFAULT_MODEL), or muse-spark-1.3
+  VOLSCAN_REASONING_STRENGTH  Glimmer reasoning depth: low | medium | high | xhigh (default low)
   VOLSCAN_LLM_KEY      (Ollama ignores it; for Meta use META_API_KEY)
   META_API_KEY         if present and VOLSCAN_LLM_BASE isn't set, Meta is used:
                        base https://api.meta.ai/v1, model muse-spark-1.3
@@ -30,6 +32,43 @@ from .ports import EmbeddingPort, LanguageModelPort, ModelTurn, ToolCall, ToolDe
 
 class LLMUnavailable(RuntimeError):
     pass
+
+
+# Meta Muse Glimmer 30B, official GGUF (Q4_K_M ~16.8 GB + 1.4 GB vision projector).
+# On a 24 GB Mac it fits if you close heavy apps; smaller: hf.co/unsloth/Muse-Glimmer-30B-GGUF:UD-IQ3_M
+GLIMMER_DEFAULT_MODEL = "hf.co/meta-models/Muse-Glimmer-30B-GGUF:Q4_K_M"
+_REASONING_LEVELS = ("low", "medium", "high", "xhigh")
+
+
+def is_glimmer(model: str | None) -> bool:
+    return "glimmer" in (model or "").lower()
+
+
+def provider_for(base: str, model: str) -> str:
+    """"meta" = Meta Model API · "meta-local" = Meta open weights on our machine · "local" = other local model."""
+    if "meta.ai" in base:
+        return "meta"
+    if is_glimmer(model):
+        return "meta-local"
+    return "local"
+
+
+def with_reasoning_strength(messages: list[dict[str, Any]], model: str) -> list[dict[str, Any]]:
+    """Glimmer reads its reasoning depth from the system prompt ("Reasoning strength: <level>").
+    Lower = faster on a laptop. Other models get the messages untouched."""
+    if not is_glimmer(model):
+        return messages
+    level = os.environ.get("VOLSCAN_REASONING_STRENGTH", "low").strip().lower()
+    if level not in _REASONING_LEVELS:
+        level = "low"
+    tag = f"Reasoning strength: {level}"
+    msgs = [dict(m) for m in messages]
+    if msgs and msgs[0].get("role") == "system" and isinstance(msgs[0].get("content"), str):
+        if not msgs[0]["content"].startswith("Reasoning strength:"):
+            msgs[0]["content"] = f"{tag}\n\n{msgs[0]['content']}"
+    else:
+        msgs.insert(0, dict(role="system", content=tag))
+    return msgs
 
 
 def _load_dotenv():
@@ -59,10 +98,14 @@ class LLMConfig:
             model = os.environ.get("VOLSCAN_LLM_MODEL", "muse-spark-1.3")
             return cls(base, model, meta_key or os.environ.get("VOLSCAN_LLM_KEY"), "meta", "MetaMuseSparkAdapter")
         base = os.environ.get("VOLSCAN_LLM_BASE", "http://localhost:11434/v1").rstrip("/")
-        model = os.environ.get("VOLSCAN_LLM_MODEL", "qwen3:8b")
-        is_meta = "meta.ai" in base or "llama" in base or model.startswith("muse-") or model.lower().startswith("llama")
-        provider = "meta" if "meta.ai" in base else "local"
-        adapter = "MetaMuseSparkAdapter" if is_meta and provider == "meta" else "OllamaLocalAdapter"
+        model = os.environ.get("VOLSCAN_LLM_MODEL") or GLIMMER_DEFAULT_MODEL
+        provider = provider_for(base, model)
+        if provider == "meta":
+            adapter = "MetaMuseSparkAdapter"
+        elif provider == "meta-local":
+            adapter = "MetaGlimmerLocalAdapter"
+        else:
+            adapter = "OllamaLocalAdapter"
         return cls(base, model, os.environ.get("VOLSCAN_LLM_KEY") or meta_key, provider, adapter)
 
     def public(self) -> dict[str, Any]:
@@ -70,7 +113,8 @@ class LLMConfig:
             provider=self.provider,
             model=self.model,
             adapter=self.adapter_name,
-            base=self.base if self.provider == "local" else "Meta Model API",
+            base=self.base if self.provider in ("local", "meta-local") else "Meta Model API",
+            open_weights=self.provider == "meta-local",
         )
 
 
@@ -88,7 +132,8 @@ class OpenAICompatibleAdapter(LanguageModelPort, EmbeddingPort):
 
     def __init__(self, cfg: LLMConfig | None = None, timeout: float = 120.0):
         self.cfg = cfg or LLMConfig.from_env()
-        self.timeout = timeout
+        # a 30B model on a laptop needs more than two minutes for a long briefing
+        self.timeout = max(timeout, float(os.environ.get("VOLSCAN_LLM_TIMEOUT", "300"))) if is_glimmer(self.cfg.model) else timeout
 
     def _headers(self) -> dict[str, str]:
         h = {"Content-Type": "application/json"}
@@ -108,7 +153,7 @@ class OpenAICompatibleAdapter(LanguageModelPort, EmbeddingPort):
         t0 = time.perf_counter()
         body: dict[str, Any] = dict(
             model=self.cfg.model,
-            messages=messages,
+            messages=with_reasoning_strength(messages, self.cfg.model),
             temperature=temperature,
             max_tokens=max_tokens,
             stream=False,

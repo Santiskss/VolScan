@@ -976,7 +976,7 @@ def ai_architecture():
 
 
 class SwitchAdapterReq(BaseModel):
-    preset: str = "meta_muse"       # "meta_muse" | "meta_llama4" | "meta_llama3_70b" | "ollama_local" | "auto"
+    preset: str = "meta_glimmer_local"  # "meta_glimmer_local" | "meta_muse" | "meta_llama4" | "meta_llama3_70b" | "ollama_local" | "auto"
     model: str | None = None
     base: str | None = None
     api_key: str | None = None
@@ -986,7 +986,7 @@ class SwitchAdapterReq(BaseModel):
 def switch_ai_adapter(req: SwitchAdapterReq, request: Request):
     need(request, "tecnico")
     from ..application import META_MODEL_PRESETS, get_container
-    if req.preset not in META_MODEL_PRESETS and req.preset not in ("auto", "meta", "llama", "ollama", "local"):
+    if req.preset not in META_MODEL_PRESETS and req.preset not in ("auto", "meta", "llama", "ollama", "local", "glimmer", "meta_local"):
         raise HTTPException(400, f"preset desconocido: {req.preset}")
     c = get_container()
     st = c.switch_llm_adapter(req.preset, model=req.model, base=req.base, api_key=req.api_key)

@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { api, fmt, type AgentResponse, type Citation, type DayState, type ImpactDay, type Meta, type Quake, type Sam3Day, type Terrain } from '../api'
+import { api, fmt, modelLabel, type AgentResponse, type Citation, type DayState, type ImpactDay, type Meta, type Quake, type Sam3Day, type Terrain } from '../api'
 import ImpactPanel from './ImpactPanel'
 import { LevelChip, So2Bars } from './Indicators'
 import Atlas3D, { preloadImage, type Label, type QuakePoint, type SurfacePoint } from '../three/Atlas3D'
@@ -278,7 +278,7 @@ export default function AtlasLaPalma() {
           {brief && <>
             <div className={`brief ${brief.ai ? '' : 'na'}`}>{brief.text}</div>
             <div className="brief-meta">
-              <span>{brief.ai ? `${brief.model.provider === 'meta' ? 'Meta' : 'Local'} · ${brief.model.model}` : 'Síntesis determinista sin LLM'}</span>
+              <span>{brief.ai ? modelLabel(brief.model.provider, brief.model.model) : 'Síntesis determinista sin LLM'}</span>
               {brief.ai && <button className="btn" style={{ padding: '2px 8px' }} onClick={() => loadBrief(true)}>Rehacer</button>}
             </div>
             {brief.citations.length > 0 && <div className="note" style={{ marginTop: 6 }}>Fuentes: {brief.citations.map((c) => `[${c.n}] ${c.doc}`).join(' · ')}</div>}
@@ -314,7 +314,7 @@ export default function AtlasLaPalma() {
               )}
               <div className={`brief ${agentRes.ai ? '' : 'na'}`}>{agentRes.answer}</div>
               <div className="brief-meta">
-                <span>{agentRes.ai ? `${agentRes.model.provider === 'meta' ? 'Meta' : 'Local'} · ${agentRes.model.model}` : 'Motor determinista + RAG'}</span>
+                <span>{agentRes.ai ? modelLabel(agentRes.model.provider, agentRes.model.model) : 'Motor determinista + RAG'}</span>
               </div>
             </div>
           )}
