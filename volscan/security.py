@@ -14,6 +14,10 @@ users from the command line:
     python -m volscan.security add-user ana tecnico      # asks for the password
     python -m volscan.security verify-audit
 
+In production, put the content of config/users.json in the VOLSCAN_USERS_JSON
+secret. With VOLSCAN_AUTH=on and VOLSCAN_PUBLIC_DEMO=on, anonymous visitors
+browse as "visitante" (tecnico) and the team logs in for admin.
+
 Passwords are stored as PBKDF2-SHA256 (310,000 iterations, per-user salt) in
 config/users.json, which is not in git. Sessions are random tokens held in
 memory for 12 hours.
@@ -67,6 +71,9 @@ def _hash(password: str, salt: bytes) -> str:
 
 
 def load_users(path: Path | None = None) -> dict:
+    # Production (containers without a disk): the same users.json content in a secret env var
+    if path is None and os.environ.get("VOLSCAN_USERS_JSON"):
+        return {u["name"]: u for u in json.loads(os.environ["VOLSCAN_USERS_JSON"])["users"]}
     path = path or USERS
     if not path.exists():
         return {}
@@ -91,7 +98,6 @@ def add_user(name: str, role: str, password: str, path: Path | None = None):
 
 
 def check_password(name: str, password: str, path: Path | None = None) -> dict | None:
-    path = path or USERS
     u = load_users(path).get(name)
     if not u:
         _hash(password, b"\0" * 16)          # same cost whether or not the user exists
@@ -127,13 +133,14 @@ def public_demo() -> bool:
 def user_for(token: str | None) -> dict | None:
     if not auth_enabled():
         return dict(name="visitante" if public_demo() else "local", role="tecnico" if public_demo() else "admin")
+    visitor = dict(name="visitante", role="tecnico") if public_demo() else None
     if not token:
-        return None
+        return visitor
     with _lock:
         s = _sessions.get(token)
         if not s or s["expires"] < time.time():
             _sessions.pop(token, None)
-            return None
+            return visitor
         return dict(name=s["name"], role=s["role"])
 
 

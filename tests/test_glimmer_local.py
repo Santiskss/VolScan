@@ -98,3 +98,25 @@ def test_public_demo_locks_model_and_admin(monkeypatch):
     assert c.get("/api/auth/config").json()["user"] == {"name": "visitante", "role": "tecnico"}
     r = c.post("/api/ai/adapter", json={"preset": "meta_muse", "base": "http://example.invalid"})
     assert r.status_code == 403
+
+
+def test_production_users_from_env_with_public_visitors(monkeypatch, tmp_path):
+    import json as _json
+
+    from fastapi.testclient import TestClient
+
+    from volscan import security as sec
+    from volscan.api.app import app
+    f = tmp_path / "u.json"
+    sec.add_user("equipo", "admin", "una-clave-larga-123", path=f)
+    monkeypatch.setenv("VOLSCAN_USERS_JSON", f.read_text())
+    monkeypatch.setenv("VOLSCAN_AUTH", "on")
+    monkeypatch.setenv("VOLSCAN_PUBLIC_DEMO", "on")
+    c = TestClient(app)
+    assert c.get("/api/auth/config").json()["user"]["name"] == "visitante"
+    r = c.post("/api/login", json={"name": "equipo", "password": "una-clave-larga-123"})
+    assert r.status_code == 200
+    tok = r.json()["token"]
+    me = c.get("/api/auth/config", headers={"Authorization": f"Bearer {tok}"}).json()["user"]
+    assert me == {"name": "equipo", "role": "admin"}
+    assert c.post("/api/login", json={"name": "equipo", "password": "mala-clave-000"}).status_code in (401, 403)

@@ -71,7 +71,9 @@ export default function App() {
         <span className="chip"><span className={`dot ${llm?.ok ? 'ok' : 'warn'}`} />{STATIC ? 'IA: solo en versión local' : <>IA: {llm ? modelLabel(llm.provider, llm.model) : '—'}{llm && !llm.ok ? ' (modo determinista)' : ''}</>}</span>
         <span className="chip" title={status?.catalog.health?.message ?? ''}><span className={`dot ${!STATIC && status?.catalog.health && !status.catalog.health.ok ? 'warn' : 'ok'}`} />IGN: {status ? `${fmt.int(status.catalog.n_events)} sismos` : '—'}{!STATIC && status?.catalog.health && !status.catalog.health.ok ? ` · ${status.catalog.health.level}` : ''}</span>
         {STATIC && status && <span className="chip"><span className="dot warn" />Instantánea · {fmt.dateTime(status.now)}</span>}
-        {auth?.enabled && auth.user && <span className="chip"><span className="dot ok" />{auth.user.name} · {auth.user.role}<button className="linklike" onClick={() => { api.logout().finally(() => { setToken(null); setAuth({ enabled: true, user: null }) }) }}>Salir</button></span>}
+        {auth?.enabled && auth.user && (auth.user.name === 'visitante'
+          ? <span className="chip"><span className="dot ok" />Demo pública<button className="linklike" onClick={() => setAuth({ enabled: true, user: null })}>Entrar</button></span>
+          : <span className="chip"><span className="dot ok" />{auth.user.name} · {auth.user.role}<button className="linklike" onClick={() => { api.logout().finally(() => { setToken(null); setAuth({ enabled: true, user: null }) }) }}>Salir</button></span>)}
       </div>
       <div className="header">
         <Logo />

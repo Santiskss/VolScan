@@ -15,6 +15,11 @@ que necesitan vuestra cuenta.
 Modo demo pública (`VOLSCAN_PUBLIC_DEMO=on`, por defecto en la imagen): cualquiera entra sin cuenta con rol
 `tecnico` (agente, informes, exportaciones), pero no puede administrar usuarios ni cambiar el modelo o su URL.
 
+Usuario del equipo: con `VOLSCAN_AUTH=on` además, los visitantes siguen entrando como "Demo pública" y el
+equipo pulsa **Entrar** para iniciar sesión como admin. El usuario `tephra` (admin) ya está creado: la
+contraseña y la línea `VOLSCAN_USERS_JSON=…` lista para pegar están en `config/PRODUCCION-credenciales.txt`
+(fuera de git). Para crear otro: `python -m volscan.security add-user NOMBRE admin` y copiad `config/users.json`.
+
 ## Opción A · Todo en Modal (recomendada, ~20 min)
 
 Modal da 30 $/mes gratis al crear la cuenta; si os llegan los 100 $ del hackathon, mejor.
@@ -31,7 +36,9 @@ modal deploy deploy/modal_glimmer.py                    # imprime la URL …--vo
 modal secret create volscan-app \
   VOLSCAN_LLM_BASE=https://<workspace>--volscan-glimmer-serve.modal.run/v1 \
   VOLSCAN_LLM_MODEL=hf.co/meta-models/Muse-Glimmer-30B-GGUF:Q4_K_M \
-  VOLSCAN_LLM_KEY=$KEY
+  VOLSCAN_LLM_KEY=$KEY \
+  VOLSCAN_AUTH=on \
+  VOLSCAN_USERS_JSON='<la línea de config/PRODUCCION-credenciales.txt>'
 modal deploy deploy/modal_app.py                        # imprime la URL pública de VolScan
 ```
 
@@ -40,6 +47,19 @@ Primera petición al modelo: descarga ~18 GB al volumen (5-10 min, solo una vez)
 haced una pregunta.
 
 Coste orientativo: la web en CPU, céntimos al día; la L40S solo cuenta mientras está encendida (~2 $/h).
+
+## Grabar el vídeo sin freír el Mac
+
+Con el modelo en Modal, el Mac no carga los 30B: VolScan local usa la GPU de Modal. En `.env`:
+
+```
+VOLSCAN_LLM_BASE=https://<workspace>--volscan-glimmer-serve.modal.run/v1
+VOLSCAN_LLM_MODEL=hf.co/meta-models/Muse-Glimmer-30B-GGUF:Q4_K_M
+VOLSCAN_LLM_KEY=<LLAMA_API_KEY>
+```
+
+Sigue siendo Muse Glimmer (pesos abiertos de Meta) y cuenta igual para el premio de open weights: las bases
+aceptan "your own hardware or partner-provided inference". O grabad directamente sobre la URL pública.
 
 ## Opción B · Docker en cualquier sitio (Render, Railway, Fly.io, VPS)
 
