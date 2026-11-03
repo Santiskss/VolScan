@@ -1,8 +1,8 @@
 # Puesta en producción de VolScan
 
 Objetivo: una URL pública para los jueces del Meta Global AI Developer Hackathon, con la IA respondiendo
-con **Meta Muse Glimmer 30B** (pesos abiertos). Todo lo de abajo está probado salvo los dos `modal deploy`,
-que necesitan vuestra cuenta.
+con **Meta Muse Glimmer 30B** (pesos abiertos). Probado: tests, build de la web, servidor en modo demo pública y que los dos
+scripts de Modal son válidos con `modal` 1.6.3. Sin probar: los `modal deploy` reales (necesitan vuestra cuenta).
 
 ## Qué hay
 
@@ -10,7 +10,7 @@ que necesitan vuestra cuenta.
 |---|---|---|
 | Imagen de producción | `Dockerfile` | Compila la web (Vite) y sirve API + UI con uvicorn en el puerto `$PORT` (8200). Arranca en modo demo pública. |
 | Modelo en GPU | `deploy/modal_glimmer.py` | Glimmer 30B con llama.cpp en una A10 de Modal, API compatible OpenAI, protegida con clave. Se apaga tras 10 min sin uso. |
-| Web en Modal | `deploy/modal_app.py` | La misma imagen Docker desplegada en Modal; se apaga a los 5 min sin visitas y arranca sola. |
+| Web en Modal | `deploy/modal_app.py` | API + UI en Modal (imagen propia de Modal, la web va precompilada); se apaga a los 5 min sin visitas y arranca sola. |
 
 Modo demo pública (`VOLSCAN_PUBLIC_DEMO=on`, por defecto en la imagen): cualquiera entra sin cuenta con rol
 `tecnico` (agente, informes, exportaciones), pero no puede administrar usuarios ni cambiar el modelo o su URL.
@@ -39,6 +39,7 @@ modal secret create volscan-app \
   VOLSCAN_LLM_KEY=$KEY \
   VOLSCAN_AUTH=on \
   VOLSCAN_USERS_JSON='<la línea de config/PRODUCCION-credenciales.txt>'
+(cd web && npm ci && npm run build)                     # compila la interfaz
 modal deploy deploy/modal_app.py                        # imprime la URL pública de VolScan
 ```
 

@@ -1,21 +1,40 @@
-"""VolScan web app (API + UI) on Modal, built from the repository Dockerfile.
+"""VolScan web app (API + UI) on Modal.
 
-    modal deploy deploy/modal_app.py      # from the repository root
+From the repository root:
 
-Model: create the secret once, pointing to the Glimmer endpoint (deploy/modal_glimmer.py)
-or to the Meta Model API:
+    (cd web && npm ci && npm run build)       # the UI is shipped pre-built
+    modal deploy deploy/modal_app.py           # prints the public URL
+
+The model is configured once in the "volscan-app" secret (see DEPLOY.md):
     modal secret create volscan-app \
         VOLSCAN_LLM_BASE=https://<workspace>--volscan-glimmer-serve.modal.run/v1 \
         VOLSCAN_LLM_MODEL=hf.co/meta-models/Muse-Glimmer-30B-GGUF:Q4_K_M \
-        VOLSCAN_LLM_KEY=<LLAMA_API_KEY>
-(Meta API instead: META_API_KEY=... and no VOLSCAN_LLM_BASE.)
+        VOLSCAN_LLM_KEY=<LLAMA_API_KEY> VOLSCAN_AUTH=on VOLSCAN_USERS_JSON='...'
+
+Built without the Dockerfile on purpose: Modal ignores USER and does not implement
+HEALTHCHECK/EXPOSE, so a plain Modal image is the safer path here.
 """
 from pathlib import Path
 
 import modal
 
 ROOT = Path(__file__).resolve().parents[1]
-image = modal.Image.from_dockerfile(ROOT / "Dockerfile", context_dir=ROOT)
+if not (ROOT / "web" / "dist" / "index.html").exists():
+    raise SystemExit("Falta web/dist: ejecuta antes  (cd web && npm ci && npm run build)")
+
+_ignore = ["**/__pycache__", "**/*.pyc", ".DS_Store"]
+image = (
+    modal.Image.debian_slim(python_version="3.12")
+    .pip_install("numpy>=1.24", "scipy>=1.10", "requests>=2.28", "pillow>=9", "reportlab>=4",
+                 "fastapi>=0.110", "uvicorn>=0.27")
+    .env({"PYTHONPATH": "/app", "VOLSCAN_PUBLIC_DEMO": "on"})
+    .add_local_file(ROOT / "pyproject.toml", "/app/pyproject.toml", copy=True)
+    .add_local_dir(ROOT / "data", "/app/data", copy=True, ignore=_ignore)
+    .add_local_dir(ROOT / "knowledge", "/app/knowledge", copy=True, ignore=_ignore)
+    .add_local_dir(ROOT / "web" / "dist", "/app/web/dist", copy=True, ignore=_ignore)
+    .add_local_dir(ROOT / "volscan", "/app/volscan", copy=True, ignore=_ignore)
+    .run_commands("mkdir -p /app/out /app/config")
+)
 app = modal.App("volscan")
 
 
