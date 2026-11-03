@@ -32,13 +32,13 @@ app = modal.App("volscan-glimmer")
 
 @app.function(
     image=image,
-    gpu="L40S",                      # 48 GB: weights + vision + 32k context with room to spare
+    gpu="A10",                       # 24 GB: weights (17 GB) + vision (1.4 GB) + 16k context; ~1.10 $/h
     volumes={"/cache": cache},
     secrets=[modal.Secret.from_name("volscan-glimmer")],
     scaledown_window=600,
     timeout=60 * 60,
 )
-@modal.concurrent(max_inputs=4)
+@modal.concurrent(max_inputs=2)
 @modal.web_server(port=PORT, startup_timeout=20 * 60)
 def serve():
     import os
@@ -49,7 +49,7 @@ def serve():
         "--jinja",                    # required by Glimmer's chat template (tool calling)
         "--host", "0.0.0.0", "--port", str(PORT),
         "-ngl", "999",                # everything on the GPU
-        "-c", "32768",
-        "--parallel", "4",
+        "-c", "16384",
+        "--parallel", "2",
         "--api-key", os.environ["LLAMA_API_KEY"],
     ])

@@ -21,10 +21,10 @@ app = modal.App("volscan")
 
 @app.function(
     image=image,
-    cpu=2.0,
-    memory=4096,
+    cpu=1.0,
+    memory=3072,
     secrets=[modal.Secret.from_name("volscan-app")],
-    min_containers=1,                # no cold start for judges
+    scaledown_window=300,            # scales to zero after 5 idle min: you only pay while someone uses it
     timeout=60 * 10,
 )
 @modal.concurrent(max_inputs=50)

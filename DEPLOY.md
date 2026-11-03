@@ -9,8 +9,8 @@ que necesitan vuestra cuenta.
 | Pieza | Archivo | Qué hace |
 |---|---|---|
 | Imagen de producción | `Dockerfile` | Compila la web (Vite) y sirve API + UI con uvicorn en el puerto `$PORT` (8200). Arranca en modo demo pública. |
-| Modelo en GPU | `deploy/modal_glimmer.py` | Glimmer 30B con llama.cpp en una L40S de Modal, API compatible OpenAI, protegida con clave. Se apaga tras 10 min sin uso. |
-| Web en Modal | `deploy/modal_app.py` | La misma imagen Docker desplegada en Modal, siempre encendida. |
+| Modelo en GPU | `deploy/modal_glimmer.py` | Glimmer 30B con llama.cpp en una A10 de Modal, API compatible OpenAI, protegida con clave. Se apaga tras 10 min sin uso. |
+| Web en Modal | `deploy/modal_app.py` | La misma imagen Docker desplegada en Modal; se apaga a los 5 min sin visitas y arranca sola. |
 
 Modo demo pública (`VOLSCAN_PUBLIC_DEMO=on`, por defecto en la imagen): cualquiera entra sin cuenta con rol
 `tecnico` (agente, informes, exportaciones), pero no puede administrar usuarios ni cambiar el modelo o su URL.
@@ -46,7 +46,7 @@ Primera petición al modelo: descarga ~18 GB al volumen (5-10 min, solo una vez)
 1-3 min tras 10 min sin uso. Calentadlo antes de grabar y antes de que juzguen (5-8 nov): abrid el asistente y
 haced una pregunta.
 
-Coste orientativo: la web en CPU, céntimos al día; la L40S solo cuenta mientras está encendida (~2 $/h).
+Coste orientativo (Modal cobra por segundo, 30 $/mes gratis en el plan Starter): la web ~0,06 $/h solo mientras alguien la usa; la GPU A10 ~1,10 $/h solo mientras está encendida (se apaga a los 10 min sin uso). Una sesión de grabación de 2 h + una semana de jueces probando: ~5-15 $. Poned un límite de gasto en la configuración de Modal.
 
 ## Grabar el vídeo sin freír el Mac
 
