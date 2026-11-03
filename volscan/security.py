@@ -116,9 +116,17 @@ def logout(token: str):
         _sessions.pop(token, None)
 
 
+def public_demo() -> bool:
+    """Public web deployment without accounts: visitors can use everything a technician can,
+    but cannot administer users or repoint the AI to another server."""
+    from .ai.llm import _load_dotenv
+    _load_dotenv()
+    return os.environ.get("VOLSCAN_PUBLIC_DEMO", "off").strip().lower() in ("on", "1", "true", "yes")
+
+
 def user_for(token: str | None) -> dict | None:
     if not auth_enabled():
-        return dict(name="local", role="admin")
+        return dict(name="visitante" if public_demo() else "local", role="tecnico" if public_demo() else "admin")
     if not token:
         return None
     with _lock:

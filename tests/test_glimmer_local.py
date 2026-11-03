@@ -86,3 +86,15 @@ def test_glimmer_request_body(monkeypatch):
     assert sent["timeout"] >= 300
     assert turn.content == "Parte listo." and turn.tool_calls[0].arguments == {"zone": "tenerife"}
     assert turn.provider == "meta-local"
+
+
+def test_public_demo_locks_model_and_admin(monkeypatch):
+    from fastapi.testclient import TestClient
+
+    from volscan.api.app import app
+    monkeypatch.setenv("VOLSCAN_AUTH", "off")
+    monkeypatch.setenv("VOLSCAN_PUBLIC_DEMO", "on")
+    c = TestClient(app)
+    assert c.get("/api/auth/config").json()["user"] == {"name": "visitante", "role": "tecnico"}
+    r = c.post("/api/ai/adapter", json={"preset": "meta_muse", "base": "http://example.invalid"})
+    assert r.status_code == 403

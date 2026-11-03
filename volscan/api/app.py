@@ -985,6 +985,8 @@ class SwitchAdapterReq(BaseModel):
 @app.post("/api/ai/adapter")
 def switch_ai_adapter(req: SwitchAdapterReq, request: Request):
     need(request, "tecnico")
+    if sec.public_demo():
+        raise HTTPException(403, "en la demo pública el modelo de IA es fijo")
     from ..application import META_MODEL_PRESETS, get_container
     if req.preset not in META_MODEL_PRESETS and req.preset not in ("auto", "meta", "llama", "ollama", "local", "glimmer", "meta_local"):
         raise HTTPException(400, f"preset desconocido: {req.preset}")

@@ -281,6 +281,6 @@ export const fmt = {
 export function modelLabel(provider?: string, model?: string): string {
   const m = model || '—'
   if (provider === 'meta') return `Meta · ${m}`
-  if (provider === 'meta-local' || /glimmer/i.test(m)) return 'Meta Muse Glimmer · local'
+  if (provider === 'meta-local' || /glimmer/i.test(m)) return 'Meta Muse Glimmer (open weights)'
   return `Local · ${m}`
 }
