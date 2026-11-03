@@ -10,10 +10,11 @@ echo "▶ Instalando el cliente de Modal…"
 $PY -m pip install -q --upgrade modal
 MODAL="$PY -m modal"
 
-if ! $MODAL profile current >/dev/null 2>&1; then
-  echo "▶ Inicia sesión en Modal (se abre el navegador)…"
-  $MODAL setup
+if [ -z "${MODAL_TOKEN_ID:-}" ] && ! grep -qs "token_id" ~/.modal.toml; then
+  echo "▶ Inicia sesión en Modal: se abre el navegador, pulsa Authorize…"
+  $MODAL token new
 fi
+$MODAL token info >/dev/null 2>&1 || { echo "✖ Modal sigue sin sesión. Ejecuta: $MODAL token new  y vuelve a lanzar este script"; exit 1; }
 
 mkdir -p config
 if [ -f config/glimmer.key ]; then KEY=$(cat config/glimmer.key); else KEY=$(openssl rand -hex 24); echo "$KEY" > config/glimmer.key; chmod 600 config/glimmer.key; fi
