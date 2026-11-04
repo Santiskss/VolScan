@@ -15,3 +15,5 @@ data/canarias/emsc_backup.csv
 config/
 
 .runtime/
+Deploy VolScan.command
+video/
