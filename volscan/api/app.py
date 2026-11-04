@@ -253,7 +253,7 @@ def _tf_scenario_bytes(key: str, n_cat: int) -> bytes | None:
         out = scenario(key, _catalog())
     if out is None:
         return None
-    return json.dumps(_clean(out)).encode("utf-8")
+    return json.dumps(_en(_clean(out))).encode("utf-8")
 
 
 @app.get("/api/tenerife/scenario/{key}")
@@ -261,7 +261,7 @@ def tf_scenario(key: str):
     n_cat = len(_catalog()) if key == "sismicidad_actual" else 0
     b = _tf_scenario_bytes(key, n_cat)
     if b is None:
-        raise HTTPException(404, "escenario desconocido")
+        raise HTTPException(404, "unknown scenario")
     return Response(content=b, media_type="application/json")
 
 
@@ -345,7 +345,7 @@ def _canarias_zones_cached(t_bucket: int, n_cat: int) -> dict:
 def canarias_zones(at: str | None = None):
     cat = _catalog()
     t_bucket = int(dt.datetime.fromisoformat(at).timestamp()) if at else int(time.time() // 60) * 60
-    return JSONResponse(_canarias_zones_cached(t_bucket, len(cat)))
+    return JSONResponse(_en(_canarias_zones_cached(t_bucket, len(cat))))
 
 
 def _deform_summary(zd: dict) -> dict:
@@ -412,7 +412,7 @@ def solunar(zone: str = "la_palma", start: str = "2011-01-01", end: str | None =
     res["note"] = ("Schuster: p<0.05 = non-uniform phases (does not prove causation); swarms inflate significance. "
                    "The robust test is 'shift_test': excess of earthquakes at phase 0 (tidal maximum / spring tides) against "
                    "200 time shifts of the declustered catalogue itself (1 quake/6 h).")
-    return JSONResponse(res)
+    return JSONResponse(_en(res))
 
 
 # ------------------------------------------------------------------ La Palma 2021
@@ -516,7 +516,7 @@ def lp_day(date: str):
         dt.date.fromisoformat(date)
     except ValueError:
         raise HTTPException(400, "invalid date")
-    return JSONResponse(_lp_day(date))
+    return JSONResponse(_en(_lp_day(date)))
 
 
 @lru_cache(maxsize=2)
@@ -580,19 +580,19 @@ def lp_impact(date: str):
         dt.date.fromisoformat(date)
     except ValueError:
         raise HTTPException(400, "invalid date")
-    return JSONResponse(_lp_impact(date))
+    return JSONResponse(_en(_lp_impact(date)))
 
 
 @app.get("/api/lapalma2021/validation")
 def lp_validation():
     f = CACHE / "validation_lapalma2021.json"
     if f.exists():
-        return JSONResponse(json.loads(f.read_text()))
+        return JSONResponse(_en(json.loads(f.read_text())))
     from ..replay import validation_payload
     res = _clean(validation_payload(impact_replay()))
     f.parent.mkdir(parents=True, exist_ok=True)
     f.write_text(json.dumps(res))
-    return JSONResponse(res)
+    return JSONResponse(_en(res))
 
 
 # ------------------------------------------------------------------ interoperability: CAP 1.2 and OGC API Features
@@ -904,7 +904,7 @@ def lp_briefing(date: str, request: Request, req: BriefReq = BriefReq()):
     cfg = llm.LLMConfig.from_env()
     f = CACHE / "briefings" / f"lapalma2021_{date}_{cfg.provider}_{cfg.model.replace(':', '_').replace('/', '_')}.json"
     if f.exists() and not req.regenerate:
-        return JSONResponse(json.loads(f.read_text()))
+        return JSONResponse(_en(json.loads(f.read_text())))
     idx = rag.get_index(store.load_events(), replay().obs)
     hits = idx.search(f"La Palma 2021 eruption Tajogaite {date} earthquakes lava flow erupción sismos colada", k=5)
     live = {k: day[k] for k in ("date", "seismic", "lava")}
@@ -919,7 +919,7 @@ def lp_briefing(date: str, request: Request, req: BriefReq = BriefReq()):
         f.write_text(json.dumps(res, ensure_ascii=False))
     except llm.LLMUnavailable as e:
         res = dict(date=date, text=_fallback_brief(day), model=cfg.public(), ai=False, error=str(e), citations=[])
-    return JSONResponse(res)
+    return JSONResponse(_en(res))
 
 
 # ------------------------------------------------------------------ monthly reports
@@ -948,19 +948,19 @@ def report_monthly(zone: str = "tenerife", month: str | None = None):
     except Exception:
         raise HTTPException(400, "invalid month (YYYY-MM)")
     today = dt.datetime.now(dt.timezone.utc).date().isoformat()
-    return JSONResponse(_report(zone, month, today, len(store.load_events())))
+    return JSONResponse(_en(_report(zone, month, today, len(store.load_events()))))
 
 
 @app.get("/api/reports/catastrophe/lapalma2021")
 def report_catastrophe_lapalma():
     f = CACHE / "catastrophe_lapalma2021_evidence_v2.json"
     if f.exists():
-        return JSONResponse(json.loads(f.read_text()))
+        return JSONResponse(_en(json.loads(f.read_text())))
     from ..reports import catastrophe_report_lapalma2021
     res = _clean(catastrophe_report_lapalma2021(impact_replay()))
     f.parent.mkdir(parents=True, exist_ok=True)
     f.write_text(json.dumps(res, ensure_ascii=False))
-    return JSONResponse(res)
+    return JSONResponse(_en(res))
 
 
 class RewriteReq(BaseModel):
