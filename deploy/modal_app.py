@@ -19,7 +19,8 @@ from pathlib import Path
 import modal
 
 ROOT = Path(__file__).resolve().parents[1]
-if not (ROOT / "web" / "dist" / "index.html").exists():
+# Only on the deploying machine: inside the container this file runs again from /root
+if modal.is_local() and not (ROOT / "web" / "dist" / "index.html").exists():
     raise SystemExit("Falta web/dist: ejecuta antes  (cd web && npm ci && npm run build)")
 
 _ignore = ["**/__pycache__", "**/*.pyc", ".DS_Store"]
