@@ -1,0 +1,13 @@
+.git
+.venv
+.runtime
+.pytest_cache
+**/__pycache__
+*.egg-info
+.env
+out
+web/node_modules
+web/dist
+web/tsconfig.tsbuildinfo
+tests
+data/canarias/emsc_backup.csv

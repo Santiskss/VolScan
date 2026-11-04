@@ -3,6 +3,29 @@
 **A volcanic hazard twin for the Canary Islands that corrects itself with what it sees.**
 Built by TephraLabs for the Meta Global AI Developer Hackathon 2026 (Startup track).
 
+- **Live demo:** https://santiagoconcep19--volscan-web.us-east.modal.run (public, no account needed)
+- **Demo video (3 min):** _link added on submission_
+- **Meta model:** Muse Glimmer 30B (open weights) drives the operations agent, served on our own GPU
+
+## How VolScan uses Meta's models
+
+**Muse Glimmer 30B** is the brain of the operations agent. An emergency technician asks a question in plain
+English (“What would happen if an eruption started on Tenerife's north-west rift? Prepare the alert for the
+emergency services.”). Glimmer decides which of VolScan's tools to call (lava-flow scenario, impact on buildings,
+roads and water supply, a CAP 1.2 alert for the 112 system, live seismicity), reads their outputs and writes a
+cited briefing that separates historical data, simulation and live data, and always leaves official alerts to PEVOLCA.
+
+Why open weights: an emergency operations room cannot depend on a third-party API or send its data out. Glimmer runs
+on hardware we control: a Modal GPU for the public demo (`deploy/modal_glimmer.py`, llama.cpp, OpenAI-compatible) or
+a laptop with Ollama for offline use. The same code switches to Muse Spark on the Meta Model API by setting
+`META_API_KEY`, through a hexagonal port (`volscan/ports`, `volscan/adapters/meta_ai.py`).
+
+```
+question ─► Muse Glimmer 30B ─► tool calls ─► VolScan engines (lava ensemble · impact · CAP · IGN/GNSS/SO2)
+                 ▲                                  │
+                 └──────── tool outputs + RAG ◄─────┘ ─► cited English briefing (+ CAP XML)
+```
+
 VolScan doesn't promise to predict *when* a volcano will erupt. Nobody can do
 that reliably, and in Spain the official alert levels come from PEVOLCA. What
 VolScan does:
@@ -38,14 +61,31 @@ part of this submission. Public datasets are listed with their licences in
 | Assimilation of observed extents (`volscan.assimilation`) | ✅ |
 | La Palma 2021 day-by-day replay, using only what was known each day (`volscan.replay`) | ✅ |
 | IGN earthquake catalogue for the whole archipelago, 2010 → today, live refresh | ✅ |
-| Seismic unrest analytics per volcanic zone (rate, depth, b-value, energy) | ✅ |
+| Seismic unrest index per zone, above a common Mc, with its 2011–2026 track record (`volscan.calibration`) | ✅ |
+| Deformation: 28 public GNSS stations (NGL), anomaly vs 3-year trend (`volscan.deformation`) | ✅ |
+| Gas: satellite SO2 over the archipelago (NASA OMPS via GIBS) (`volscan.sources.gibs_so2`) | ✅ |
+| Impact with a clock: buildings, roads, services, isolated neighbourhoods (`volscan.impact`) | ✅ |
+| Day-by-day validation against Copernicus, with map delivery delay and calibrated ranges | ✅ |
+| Tenerife: prepared impact scenarios per volcanic system + one from current seismicity (`volscan.tenerife`) | ✅ |
+| Monthly reports per zone: seismicity, deformation, gas | ✅ |
+| Exports: PDF and CSV (reports, impact sheets), CAP 1.2 messages for 112 systems, GeoJSON via OGC API Features (`/ogc`) | ✅ |
+| Users and roles (lector / tecnico / admin), tamper-evident audit trail (`volscan.security`) | ✅ |
+| Volcanic zones as island shapes, not overlapping boxes (`scripts/build_zones.py`) | ✅ |
+| Live catalogue health + EMSC fallback when the IGN page fails | ✅ |
 | Solunar: tidal / lunar phase per quake, Schuster + robust shift-null test | ✅ |
-| RAG over curated sources + data-derived summaries, local LLM (Ollama) → Meta Muse | ✅ |
-| Volcano Atlas web app (3D terrain, quakes at depth, lava probability, AI briefing) | ✅ |
-| SAM 3.1 lava/plume segmentation (satellite, webcams) | next |
-| Muse Spark agent with tools | next |
+| RAG over curated sources + data-derived summaries, Meta Muse Glimmer 30B running locally (open weights) | ✅ |
+| Volcano Atlas web app (3D terrain, quakes at depth, lava probability, impact, validation, reports) | ✅ |
+| Operations agent on Meta Muse Glimmer 30B with tool calling, self-hosted (`volscan.ai.agent`) | ✅ |
+| Public deployment on Modal (web + Glimmer GPU), English UI | ✅ |
+| SAM 3.1 lava/plume segmentation on real satellite imagery | next (current tab is a labelled synthetic demo) |
 
-### First results (honest)
+### Results (honest)
+- **Impact, 2021 validation** (83 daily 72 h forecasts, maps assumed known 24 h after acquisition): the real number of newly reached buildings fell inside the P10–P90 on **67/83 days** (81 %, for a nominal 80 %); total bias **−11 %**. The range is calibrated with past errors and its upper end covers lateral infill of the ground hemmed in by the flow. The worst burst (25–28 Oct, ~10 buildings/ha) stays out of range. A watch list of buildings reachable *or hemmed in by the flow* held **54 %** of the buildings lost in the following 72 h.
+- **Unrest index, 2011–2026**: index ≥ 4 happened in **15 episodes** archipelago-wide; **both eruptions** were preceded (El Hierro 80 days, La Palma 6 days). The rest were real unrest without eruption. It is a base rate, not a probability.
+- **Deformation**: El Hierro 2011, station FRON anomalous from 20 Aug (7 weeks before the eruption). La Palma 2021: public stations see the co-eruptive deflation (MAZO −44 mm), not the near-vent pre-eruptive uplift (those IGN stations are not public).
+- **SO2**: 0 before 19 Sep 2021, tens of kt during the eruption; quiet maximum over 2024–2026: 0.13 kt.
+
+### First results (v0.1)
 - **20 Sep 2021, day 1** (with only the first Copernicus map): VolScan gave a **67 % probability that the lava would reach Todoque** (destroyed on 21 Sep) and **36 % that it would reach the sea**.
 - **27 Sep 2021**: estimated sea arrival P50 = **+26 h**, with P10–P90 between +1 h and +78 h. It actually reached the sea **+22 h** later (28 Sep, 22:02 UTC).
 - While the front stalled (22–26 Sep), the ETA widened. VolScan flags "front stalled · area growing", but it doesn't model effusion pulses.
@@ -71,13 +111,37 @@ uvicorn volscan.api.app:app --port 8200
 pytest -q
 ```
 
-AI: by default a local model through Ollama (`ollama pull qwen3:8b`, `ollama pull nomic-embed-text`).
-With credits for the Meta Model API, set `META_API_KEY` in `.env` (see `.env.example`). Without a model,
-everything else still works, and the AI panels say so explicitly.
+AI: by default **Meta Muse Glimmer 30B**, Meta's open-weights model (Apache-2.0), running on your own
+machine through Ollama. Nothing leaves the room, which is what an emergency operations centre needs.
+
+```bash
+ollama pull hf.co/meta-models/Muse-Glimmer-30B-GGUF:Q4_K_M   # ~18 GB with the vision projector
+ollama pull nomic-embed-text                                  # embeddings for the RAG
+```
+
+On a 24 GB Mac, close heavy apps first, or use the smaller quant
+`hf.co/unsloth/Muse-Glimmer-30B-GGUF:UD-IQ3_M` (~14 GB) in `.env`. `VOLSCAN_REASONING_STRENGTH`
+(`low` by default) trades depth for speed. With credits for the Meta Model API, set `META_API_KEY` in `.env`
+to use Muse Spark instead (see `.env.example`). Without a model, everything else still works, and the AI
+panels say so explicitly.
 
 Reproduce the data: `pip install -e ".[data]"`, then `python scripts/fetch_lapalma_2021.py`,
-`python scripts/fetch_terrain_canarias.py`, and `python -c "import datetime as d; from volscan.sources.ign_catalog import sync_monthly as s; s('data/canarias/ign', d.date(2010,1,1), d.date.today())"`.
+`python scripts/fetch_terrain_canarias.py`, `python scripts/fetch_exposure_lapalma.py`,
+`python scripts/fetch_exposure_tenerife.py`, `python scripts/fetch_gnss_so2.py`, `python scripts/validate_lapalma.py`, and `python -c "import datetime as d; from volscan.sources.ign_catalog import sync_monthly as s; s('data/canarias/ign', d.date(2010,1,1), d.date.today())"`.
+
+## Interoperability and access
+
+- **OGC API Features** at `http://localhost:8200/ogc` (add it in QGIS as a WFS / OGC API - Features connection): zones,
+  GNSS stations, last-30-day quakes, La Palma 2021 lava probability and buildings at risk (`?fecha=`), Tenerife scenarios (`?escenario=`).
+- **CAP 1.2** at `/api/cap/lapalma2021/{fecha}.xml` and `/api/cap/tenerife/{escenario}.xml`: status `Exercise`,
+  scope `Restricted`, one area per probability band. VolScan never issues real alerts.
+- **Access control**: `VOLSCAN_AUTH=on` in `.env` and `python -m volscan.security add-user NAME lector|tecnico|admin`.
+  Every call is logged in `out/audit/audit.jsonl` with a hash chain (`python -m volscan.security verify-audit`).
 
 ## License
 
 Code: Apache-2.0 (see `LICENSE`). Data: see `data/PROVENANCE.md`.
+
+## Evidence review · 31 October 2026
+
+The segmentation tab contains a **synthetic demonstration**: it builds radiance/temperature from the CEMS masks it then uses as the reference. Its IoU is not external validation of SAM and does not prove any operational lead time. The 15-minute delivery is an assumption, not a measurement. The local weights predictor is not implemented, and the deterministic mode is labelled by its real name. Historical impact metrics come from a separate evaluation and keep their denominators and limits. No integration with other products has been done.

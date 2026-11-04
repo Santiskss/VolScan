@@ -76,6 +76,16 @@ def test_zones():
     assert zone_of(28.27, -16.64).key == "tenerife"
     assert zone_of(29.00, -13.75).key == "lanzarote_fuerteventura"   # Timanfaya
     assert zone_of(31.0, -10.0).key == "atlantico"
+    assert zone_of(27.62, -17.99).key == "el_hierro"            # Tagoro, submarine, 2 km off La Restinga
+    assert zone_of(28.10, -15.95).key == "enmedio"
+    assert zone_of(28.27, -16.20).key == "tenerife"             # sea between the boxes of v0.1 still belongs to Tenerife
+
+
+def test_zones_do_not_overlap_and_vectorise():
+    import numpy as np
+    from volscan.zones import zone_keys
+    k = zone_keys(np.array([28.61, 27.95, 30.5]), np.array([-17.87, -15.6, -20.0]))
+    assert list(k) == ["la_palma", "gran_canaria", "atlantico"]
 
 
 IGN_PAGE = """<p>562 terremotos. </p><table><tr><th>Evento</th></tr>

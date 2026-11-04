@@ -34,6 +34,11 @@ FIELDS = ["evid", "time_utc", "lat", "lon", "depth_km", "mag", "mag_type", "int_
 _ROW = re.compile(r"<tr[^>]*>(.*?)</tr>", re.S)
 _CELL = re.compile(r"<td[^>]*>(.*?)</td>", re.S)
 _TOTAL = re.compile(r"([\d.]+) terremotos")
+_NO_RESULTS = "No se han encontrado registros"
+
+
+class IgnFormatChanged(RuntimeError):
+    """The IGN page answered, but neither with results nor with its "no results" message: the format changed."""
 
 
 @dataclass(frozen=True)
@@ -105,7 +110,11 @@ def fetch_range(start: dt.date, end: dt.date, box=CANARIAS_BOX, pause_s: float =
     total = parse_total(first)
     events = parse_rows(first)
     if total is None:
+        if not events and _NO_RESULTS not in first:
+            raise IgnFormatChanged("la página del IGN no trae ni resultados ni el aviso de «sin resultados»")
         return events                       # "no results" page has no total
+    if total > 0 and not events:
+        raise IgnFormatChanged(f"el IGN anuncia {total} terremotos pero no se pudo leer ninguna fila")
     page = 1
     while len(events) < total:
         time.sleep(pause_s)

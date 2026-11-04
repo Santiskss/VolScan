@@ -130,7 +130,7 @@ def load_curated() -> list[Chunk]:
     return out
 
 
-MONTHS = "ene feb mar abr may jun jul ago sep oct nov dic".split()
+MONTHS = "Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec".split()
 
 
 def build_data_docs(events, lava_obs=None) -> list[Chunk]:
@@ -146,17 +146,17 @@ def build_data_docs(events, lava_obs=None) -> list[Chunk]:
         big = max(evs, key=lambda e: e.mag if e.mag is not None else -9)
         felt = [e for e in evs if e.int_max]
         zname = BY_KEY[zk].name
-        txt = (f"Sismicidad en {zname} en {MONTHS[m - 1]} de {y} según el catálogo del IGN: {len(evs)} terremotos localizados. "
-               + (f"Magnitud máxima {max(mags):.1f} ({big.mag_type}) el {big.time_utc:%d-%m-%Y %H:%M} UTC en {big.location}, "
-                  f"a {big.depth_km if big.depth_km is not None else '—'} km. " if mags else "")
-               + (f"Profundidad mediana {deps[len(deps) // 2]:.1f} km (entre {deps[0]:.0f} y {deps[-1]:.0f} km). " if deps else "")
-               + (f"{len(felt)} sentidos (intensidad máxima {max(e.int_max for e in felt)}). " if felt else "Ninguno con intensidad registrada. "))
-        chunks.append(Chunk(f"Catálogo IGN · {zname}", f"{MONTHS[m - 1]} {y}", txt, "data"))
+        txt = (f"Seismicity in {zname} in {MONTHS[m - 1]} {y} according to the IGN catalogue: {len(evs)} earthquakes located. "
+               + (f"Maximum magnitude {max(mags):.1f} ({big.mag_type}) on {big.time_utc:%d-%m-%Y %H:%M} UTC at {big.location}, "
+                  f"at {big.depth_km if big.depth_km is not None else '—'} km depth. " if mags else "")
+               + (f"Median depth {deps[len(deps) // 2]:.1f} km (between {deps[0]:.0f} and {deps[-1]:.0f} km). " if deps else "")
+               + (f"{len(felt)} felt (maximum intensity {max(e.int_max for e in felt)}). " if felt else "None with recorded intensity. "))
+        chunks.append(Chunk(f"IGN catalogue · {zname}", f"{MONTHS[m - 1]} {y}", txt, "data"))
     if lava_obs:
         rows = [f"{o.observed_at:%d-%m-%Y %H:%M} UTC: {o.area_ha_reported:.0f} ha" for o in lava_obs if o.area_ha_reported]
         for k in range(0, len(rows), 16):
-            chunks.append(Chunk("Copernicus EMS EMSR546 · coladas La Palma 2021", f"observaciones {k + 1}-{min(k + 16, len(rows))}",
-                                "Superficie cartografiada de las coladas de Tajogaite (Copernicus EMS, fotointerpretación): "
+            chunks.append(Chunk("Copernicus EMS EMSR546 · La Palma 2021 lava flows", f"observations {k + 1}-{min(k + 16, len(rows))}",
+                                "Mapped area of the Tajogaite lava flows (Copernicus EMS, photo-interpretation): "
                                 + "; ".join(rows[k:k + 16]) + ".", "data"))
     return chunks
 
@@ -174,22 +174,22 @@ def get_index(events=None, lava_obs=None, rebuild: bool = False) -> Index:
     return _INDEX
 
 
-SYSTEM = """Eres el analista de VolScan (TephraLabs), un sistema de apoyo a la decisión sobre riesgo volcánico en Canarias.
-Reglas:
-- Responde en español, claro y breve, para técnicos de emergencias.
-- Usa SOLO la información del CONTEXTO y los DATOS EN VIVO que se te dan. Si algo no está, di que no consta.
-- Cita las fuentes entre corchetes con el número del fragmento, p. ej. [2].
-- VolScan NO emite niveles de alerta ni probabilidades de erupción: las alertas son del PEVOLCA. Nunca afirmes que habrá o no habrá una erupción.
-- Distingue siempre histórico, simulación/pronóstico y dato en directo. Las cifras con su incertidumbre."""
+SYSTEM = """You are the analyst of VolScan (TephraLabs), a decision-support system for volcanic risk in the Canary Islands.
+Rules:
+- Answer in English, clearly and briefly, for emergency technicians. Use plain text, no markdown symbols such as ** or #.
+- Use ONLY the information in the CONTEXT and the LIVE DATA you are given (some of it may be in Spanish; translate it). If something is not there, say it is not available.
+- Cite sources in square brackets with the fragment number, e.g. [2].
+- VolScan does NOT issue alert levels or eruption probabilities: alerts belong to PEVOLCA. Never state that there will or will not be an eruption.
+- Always distinguish historical data, simulation/forecast and live data. Give figures with their uncertainty."""
 
 
 def build_prompt(question: str, hits, live: dict | None = None) -> list[dict]:
     ctx = "\n\n".join(f"[{i + 1}] {c.doc} — {c.section}\n{c.text}" for i, (c, _) in enumerate(hits))
-    user = f"CONTEXTO:\n{ctx}\n\n"
+    user = f"CONTEXT:\n{ctx}\n\n"
     if live:
         import json
-        user += f"DATOS EN VIVO (calculados por VolScan ahora):\n{json.dumps(live, ensure_ascii=False, default=str)[:4000]}\n\n"
-    user += f"PREGUNTA: {question}"
+        user += f"LIVE DATA (computed by VolScan now):\n{json.dumps(live, ensure_ascii=False, default=str)[:4000]}\n\n"
+    user += f"QUESTION: {question}"
     return [dict(role="system", content=SYSTEM), dict(role="user", content=user)]
 
 

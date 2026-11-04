@@ -61,12 +61,12 @@ def relief_rgb(z: np.ndarray, step: float, zmax: float | None = None, sea=SEA) -
 def png_data_url(arr: np.ndarray, mode: str) -> str:
     from PIL import Image
     buf = io.BytesIO()
-    Image.fromarray(arr, mode).save(buf, format="PNG", optimize=True)
+    Image.fromarray(arr, mode).save(buf, format="PNG", compress_level=1)
     return "data:image/png;base64," + base64.b64encode(buf.getvalue()).decode()
 
 
 def lava_overlay_rgba(prob: np.ndarray, observed: np.ndarray | None) -> np.ndarray:
-    """Probability in warm tones plus the outline of the observed flow (dark ink, like the CEMS atlas)."""
+    """Probability in warm tones over the observed flow (dark fill, orange outline, same language as the Fire Atlas)."""
     p = np.clip(prob, 0, 1)
     r = 150 + 105 * np.sqrt(p)
     g = 40 + 170 * p ** 1.6
@@ -76,9 +76,9 @@ def lava_overlay_rgba(prob: np.ndarray, observed: np.ndarray | None) -> np.ndarr
     if observed is not None:
         m = observed.astype(bool)
         fill = m & (p <= 0.01)
-        rgba[fill] = [70, 46, 36, 150]
+        rgba[fill] = [52, 36, 29, 225]
         edge = m & ~(np.roll(m, 1, 0) & np.roll(m, -1, 0) & np.roll(m, 1, 1) & np.roll(m, -1, 1))
-        rgba[edge] = [40, 26, 20, 255]
+        rgba[edge] = [228, 86, 30, 255]
     return np.clip(rgba, 0, 255).astype(np.uint8)
 
 
