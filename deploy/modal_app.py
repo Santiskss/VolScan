@@ -27,7 +27,8 @@ image = (
     modal.Image.debian_slim(python_version="3.12")
     .pip_install("numpy>=1.24", "scipy>=1.10", "requests>=2.28", "pillow>=9", "reportlab>=4",
                  "fastapi>=0.110", "uvicorn>=0.27")
-    .env({"PYTHONPATH": "/app", "VOLSCAN_PUBLIC_DEMO": "on"})
+    # VOLSCAN_LLM_PING=off: the status bar must not wake the GPU every minute
+    .env({"PYTHONPATH": "/app", "VOLSCAN_PUBLIC_DEMO": "on", "VOLSCAN_LLM_PING": "off"})
     .add_local_file(ROOT / "pyproject.toml", "/app/pyproject.toml", copy=True)
     .add_local_dir(ROOT / "data", "/app/data", copy=True, ignore=_ignore)
     .add_local_dir(ROOT / "knowledge", "/app/knowledge", copy=True, ignore=_ignore)

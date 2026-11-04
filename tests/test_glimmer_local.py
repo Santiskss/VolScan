@@ -120,3 +120,14 @@ def test_production_users_from_env_with_public_visitors(monkeypatch, tmp_path):
     me = c.get("/api/auth/config", headers={"Authorization": f"Bearer {tok}"}).json()["user"]
     assert me == {"name": "equipo", "role": "admin"}
     assert c.post("/api/login", json={"name": "equipo", "password": "mala-clave-000"}).status_code in (401, 403)
+
+
+def test_on_demand_model_is_not_pinged(monkeypatch):
+    _clear(monkeypatch)
+    monkeypatch.setenv("VOLSCAN_LLM_PING", "off")
+    import requests
+    def boom(*a, **k):
+        raise AssertionError("must not call the model")
+    monkeypatch.setattr(requests, "get", boom)
+    st = MetaGlimmerLocalAdapter(base="https://example.modal.run/v1").status()
+    assert st["ok"] is True and st["on_demand"] is True

@@ -238,6 +238,11 @@ class OpenAICompatibleAdapter(LanguageModelPort, EmbeddingPort):
     def status(self) -> dict[str, Any]:
         import requests
 
+        # Model served on demand (GPU that scales to zero): pinging it every minute from the status
+        # bar would keep the GPU awake and billing. Report it as available; real errors still show
+        # up in the answer itself.
+        if os.environ.get("VOLSCAN_LLM_PING", "on").strip().lower() in ("off", "0", "false", "no"):
+            return dict(ok=True, on_demand=True, models=[self.cfg.model], port="LanguageModelPort", **self.cfg.public())
         try:
             h = {"Authorization": f"Bearer {self.cfg.key}"} if self.cfg.key else {}
             r = requests.get(f"{self.cfg.base}/models", headers=h, timeout=5)
