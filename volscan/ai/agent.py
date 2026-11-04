@@ -12,6 +12,7 @@ from __future__ import annotations
 
 import datetime as dt
 import json
+import os
 import re
 import time
 from typing import Any
@@ -477,7 +478,7 @@ class VolScanAgent:
         messages = rag.build_prompt(question, hits, live=tool_summary_for_prompt)
 
         try:
-            turn = self.llm_port.complete(messages, tools=self.tools, temperature=0.2, max_tokens=700)
+            turn = self.llm_port.complete(messages, tools=self.tools, temperature=0.2, max_tokens=int(os.environ.get("VOLSCAN_AGENT_MAX_TOKENS", "1600")))
             # If the model requested additional tool calls not yet in `records`, execute them and complete synthesis
             if turn.tool_calls:
                 extra_records = self._execute_calls(turn.tool_calls)
@@ -485,7 +486,7 @@ class VolScanAgent:
                     records.extend(extra_records)
                     combined = {r.name: dict(arguments=r.arguments, result=r.output) for r in records}
                     messages = rag.build_prompt(question, hits, live=combined)
-                    turn = self.llm_port.complete(messages, tools=None, temperature=0.2, max_tokens=700)
+                    turn = self.llm_port.complete(messages, tools=None, temperature=0.2, max_tokens=int(os.environ.get("VOLSCAN_AGENT_MAX_TOKENS", "1600")))
 
             answer = turn.content or _synthesize_offline(question, records, hits)
             return dict(
