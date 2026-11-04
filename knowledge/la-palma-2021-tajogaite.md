@@ -1,39 +1,39 @@
-# Erupción de Tajogaite (Cumbre Vieja, La Palma), 2021
+# Tajogaite eruption (Cumbre Vieja, La Palma), 2021
 
-Fuentes: Wikipedia, «2021 Cumbre Vieja volcanic eruption» (consultada el 26-10-2026); INGV, proyecto GET-IT, «The 2021 eruption in La Palma»; Copernicus EMS, activación EMSR546; Catálogo de terremotos del IGN.
+Sources: Wikipedia, “2021 Cumbre Vieja volcanic eruption” (accessed 26-10-2026); INGV, GET-IT project, “The 2021 eruption in La Palma”; Copernicus EMS, activation EMSR546; IGN earthquake catalogue.
 
-## Precursores sísmicos
-- **11 sep 2021**: empieza un enjambre sísmico bajo Cumbre Vieja. Según la prensa y Wikipedia, en una semana se registraron más de 22.000 eventos (incluidos los no localizados). Los terremotos localizados se fueron haciendo **más superficiales** con los días.
-- **13 sep 2021**: el PEVOLCA declara el semáforo **amarillo** en cuatro municipios (El Paso, Los Llanos de Aridane, Mazo y Fuencaliente), con unas 35.000 personas.
-- Las magnitudes del enjambre previo llegaron a ~3,5–3,8 mbLg.
+## Seismic precursors
+- **11 Sep 2021**: a seismic swarm begins under Cumbre Vieja. According to the press and Wikipedia, more than 22,000 events were recorded in a week (including unlocated ones). Located earthquakes became **shallower** day by day.
+- **13 Sep 2021**: PEVOLCA declares a **yellow** light in four municipalities (El Paso, Los Llanos de Aridane, Mazo and Fuencaliente), home to about 35,000 people.
+- Magnitudes in the precursor swarm reached ~3.5–3.8 mbLg.
 
-## Inicio y desarrollo
-- **Inicio**: 19 sep 2021, 15:10–15:12 hora canaria (14:10–14:12 UTC), en Cabeza de Vaca (El Paso).
-- **20 sep**: destruido el colegio de Los Campitos y unas 200 viviendas.
-- **21 sep**: la colada llega a **Todoque**.
-- **25 sep**: colapso parcial del cono principal y nueva boca al oeste.
-- **26 sep**: destruida la iglesia de Todoque. Los frentes avanzan entre 100 y 200 m/h.
-- **28 sep, ~23:02 hora canaria (22:02 UTC)**: la primera colada **llega al mar** en Los Guirres / Playa Nueva (Tazacorte) y forma una fajana (delta lávico): ~20 ha el 30 sep y ~38 ha el 7 oct.
-- **1 oct**: tercera boca; la colada corta la carretera LP-2.
-- **4 oct**: colapso del cono principal, que aumenta el caudal.
-- **9–11 oct**: colapsos del flanco norte y nuevas lenguas. El 10 oct la lava destruye lo que quedaba de Todoque y entra en el polígono del Callejón de la Gata.
-- **14 oct**: la colada norte entra en **La Laguna**.
-- **10 nov y 15 nov**: segunda y tercera llegada al mar.
-- **25 nov y 28 nov**: nuevas fisuras al sur y al noreste del cono.
-- **13 dic 2021**: cesa la actividad (85 días, la erupción histórica más larga de la isla).
-- **25 dic 2021**: el PEVOLCA da por terminada la erupción.
+## Onset and development
+- **Onset**: 19 Sep 2021, 15:10–15:12 Canary time (14:10–14:12 UTC), at Cabeza de Vaca (El Paso).
+- **20 Sep**: the Los Campitos school and about 200 homes are destroyed.
+- **21 Sep**: the lava reaches **Todoque**.
+- **25 Sep**: partial collapse of the main cone and a new vent to the west.
+- **26 Sep**: the Todoque church is destroyed. Fronts advance 100–200 m/h.
+- **28 Sep, ~23:02 Canary time (22:02 UTC)**: the first flow **reaches the sea** at Los Guirres / Playa Nueva (Tazacorte) and builds a lava delta: ~20 ha on 30 Sep and ~38 ha on 7 Oct.
+- **1 Oct**: third vent; the flow cuts the LP-2 road.
+- **4 Oct**: the main cone collapses, increasing the effusion rate.
+- **9–11 Oct**: collapses of the northern flank and new lava tongues. On 10 Oct the lava destroys what was left of Todoque and enters the Callejón de la Gata industrial estate.
+- **14 Oct**: the northern flow enters **La Laguna**.
+- **10 Nov and 15 Nov**: second and third sea entries.
+- **25 Nov and 28 Nov**: new fissures south and north-east of the cone.
+- **13 Dec 2021**: activity stops (85 days, the longest historical eruption on the island).
+- **25 Dec 2021**: PEVOLCA declares the eruption over.
 
-## Sismicidad durante la erupción
-Hubo sismos profundos (~30–40 km) bajo Mazo, de hasta mbLg 4,9–5,0 (24 oct, 30 oct, 31 oct), e intermedios (~10–15 km). El catálogo del IGN que integra VolScan permite calcularlo día a día.
+## Seismicity during the eruption
+There were deep earthquakes (~30–40 km) under Mazo, up to mbLg 4.9–5.0 (24 Oct, 30 Oct, 31 Oct), and intermediate ones (~10–15 km). The IGN catalogue in VolScan lets this be computed day by day.
 
-## Balance (cifras publicadas; varían según la fuente y la fecha)
-- **Superficie de coladas**: ~1.219–1.241 ha. La última cartografía de Copernicus EMS (17 dic 2021) da 1.241 ha.
-- **Volumen**: más de 0,2 km³ de magma (INGV).
-- **SO2 emitido**: ~1,8 Tg (INGV).
-- **Personas evacuadas**: ~7.000.
-- **Edificaciones**: más de 3.000 destruidas o afectadas (Wikipedia). Las cifras del Catastro difieren según el criterio.
-- **Infraestructura**: 73 km de vías destruidos y 370 ha de cultivos perdidas (INGV).
-- **Coste**: más de 1.200 M€ (INGV). 843 M€ según una estimación de diciembre de 2021.
+## Toll (published figures; they vary by source and date)
+- **Lava flow area**: ~1,219–1,241 ha. The last Copernicus EMS map (17 Dec 2021) gives 1,241 ha.
+- **Volume**: more than 0.2 km³ of magma (INGV).
+- **SO2 emitted**: ~1.8 Tg (INGV).
+- **People evacuated**: ~7,000.
+- **Buildings**: more than 3,000 destroyed or damaged (Wikipedia). Cadastre figures differ depending on the criterion.
+- **Infrastructure**: 73 km of roads destroyed and 370 ha of crops lost (INGV).
+- **Cost**: more than €1.2 billion (INGV); €843 million according to a December 2021 estimate.
 
-## Lo que VolScan reproduce
-VolScan usa el relieve **previo** a la erupción (Copernicus GLO-30), las 63 cartografías de colada de Copernicus EMS (del 20 sep al 17 dic) y el catálogo del IGN para un replay día a día **con solo la información disponible cada día**.
+## What VolScan reproduces
+VolScan uses the **pre-eruption** terrain (Copernicus GLO-30), the 63 Copernicus EMS lava maps (20 Sep to 17 Dec) and the IGN catalogue for a day-by-day replay **using only the information available each day**.

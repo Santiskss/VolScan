@@ -48,15 +48,15 @@ HORIZON_H = 24 * 30
 HUBS = ("Puerto de la Cruz", "Los Cristianos", "Güímar", "La Orotava", "Adeje")
 
 SCENARIOS = [
-    dict(key="dorsal_noroeste", name="Dorsal noroeste", history="Garachico 1706 (Arenas Negras) · Chinyero 1909",
+    dict(key="dorsal_noroeste", name="North-west rift", history="Garachico 1706 (Arenas Negras) · Chinyero 1909",
          vents=[(-16.7645, 28.3161, "Arenas Negras (1706)"), (-16.7571, 28.2949, "Chinyero (1909)"),
                 (-16.7916, 28.2937, "Montaña Bilma")], sigma_m=700.0),
-    dict(key="pico_viejo", name="Flanco oeste de Pico Viejo", history="Narices del Teide / Chahorra 1798",
+    dict(key="pico_viejo", name="Pico Viejo west flank", history="Narices del Teide / Chahorra 1798",
          vents=[(-16.6768, 28.2548, "Montaña Chahorra (1798)"), (-16.7000, 28.2657, "Montaña Reventada")], sigma_m=700.0),
-    dict(key="teide_norte", name="Flanco norte del Teide", history="Sin erupción histórica; drena hacia Icod y La Orotava",
-         vents=[(-16.6064, 28.3063, "Montaña Negra (norte del Teide)"), (-16.6423, 28.2900, "Ladera norte del Teide")],
+    dict(key="teide_norte", name="Teide north flank", history="No historical eruption; drains towards Icod and La Orotava",
+         vents=[(-16.6064, 28.3063, "Montaña Negra (north of Teide)"), (-16.6423, 28.2900, "Teide north slope")],
          sigma_m=800.0),
-    dict(key="dorsal_noreste", name="Dorsal noreste", history="Sietefuentes, Fasnia y Arafo 1704–1705",
+    dict(key="dorsal_noreste", name="North-east rift", history="Sietefuentes, Fasnia and Arafo 1704–1705",
          vents=[(-16.5132, 28.2845, "Volcanes de Fasnia (1705)"), (-16.4621, 28.3402, "Volcán de Arafo (1705)"),
                 (-16.5295, 28.2707, "Montaña Negra o del Volcán")], sigma_m=700.0),
 ]
@@ -137,8 +137,8 @@ def run(spec: dict, vents_xy: list, seed: int = 21) -> dict:
         places=places[:20], isolation=iso[:15], buildings_at_risk_xy=pts[:6000], n_buildings_exposed=int((bp >= 0.05).sum()),
         overlay=dict(png=png_data_url(lava_overlay_rgba(p2, None), "RGBA"), west=g.west, north=g.north, step=g.step * 2,
                      rows=p2.shape[0], cols=p2.shape[1], horizon_h=None,
-                     legend=f"Escenario {spec['name']}: probabilidad de que la colada alcance cada punto (30 días)"),
-        exposure_note="Edificios: OpenStreetMap a 27 oct 2026 (~100.000 contornos; la cobertura varía por municipio, es una cota inferior).",
+                     legend=f"{spec['name']} scenario: probability that lava reaches each point (30 days)"),
+        exposure_note="Buildings: OpenStreetMap as of 27 Oct 2026 (~100,000 footprints; coverage varies by municipality, so this is a lower bound).",
         generated_at=dt.datetime.now(dt.timezone.utc).isoformat(),
     )
     CACHE.mkdir(parents=True, exist_ok=True)
@@ -155,18 +155,18 @@ def scenario(key: str, cat=None, at_ts: float | None = None) -> dict | None:
         at_ts = at_ts or float(cat.t.max())
         vents, info = seismic_vents(cat, at_ts)
         if len(vents) < 5:
-            return dict(key=key, name="Sismicidad de los últimos 90 días", unavailable=True,
-                        note="Pocos sismos localizados en los últimos 90 días para situar bocas.")
+            return dict(key=key, name="Seismicity of the last 90 days", unavailable=True,
+                        note="Too few earthquakes located in the last 90 days to place vents.")
         rng = np.random.default_rng(0)
         if len(vents) > 300:
             vents = [vents[k] for k in sorted(rng.choice(len(vents), 300, replace=False))]
-        spec = dict(key=key, name="Sismicidad de los últimos 90 días",
-                    history=f"Bocas sobre el 30 % más somero de {info['n_events']} sismos (≤ {info['depth_cut_km']} km)",
+        spec = dict(key=key, name="Seismicity of the last 90 days",
+                    history=f"Vents over the shallowest 30 % of {info['n_events']} earthquakes (≤ {info['depth_cut_km']} km)",
                     sigma_m=1500.0)
         out = run(spec, vents)
         out["seismic"] = info
-        out["note"] = ("Hipótesis, no pronóstico: la sismicidad de Tenerife está a 6–20 km bajo Las Cañadas y no marca dónde "
-                       "abriría una boca. Sirve para ver qué quedaría expuesto si abriera sobre ella.")
+        out["note"] = ("A hypothesis, not a forecast: Tenerife's seismicity is 6–20 km below Las Cañadas and does not mark where "
+                       "a vent would open. It shows what would be exposed if one opened above it.")
         return out
     spec = next((s for s in SCENARIOS if s["key"] == key), None)
     if spec is None:
@@ -182,7 +182,7 @@ def scenario(key: str, cat=None, at_ts: float | None = None) -> dict | None:
 
 def catalogue() -> list[dict]:
     return [dict(key=s["key"], name=s["name"], history=s["history"]) for s in SCENARIOS] + \
-        [dict(key=SEISMIC_KEY, name="Sismicidad de los últimos 90 días", history="Hipótesis a partir del catálogo IGN")]
+        [dict(key=SEISMIC_KEY, name="Seismicity of the last 90 days", history="Hypothesis from the IGN catalogue")]
 
 
 def probability_raster(sc: dict) -> np.ndarray | None:

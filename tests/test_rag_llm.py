@@ -30,14 +30,14 @@ def test_data_docs_from_events():
           IgnEvent("b", t, 28.6, -17.85, 5.0, 3.1, "mbLg", "III", "EL PASO.ILP")]
     docs = build_data_docs(ev)
     assert len(docs) == 1 and "La Palma" in docs[0].doc
-    assert "2 terremotos" in docs[0].text and "3.1" in docs[0].text and "intensidad máxima III" in docs[0].text
+    assert "2 earthquakes" in docs[0].text and "3.1" in docs[0].text and "maximum intensity III" in docs[0].text
 
 
 def test_prompt_contains_numbered_context_and_rules():
     idx = Index([Chunk("Doc", "S", "contenido de prueba volcán")])
     msgs = build_prompt("volcán", idx.search("volcán"), live={"x": 1})
     assert msgs[0]["role"] == "system" and "PEVOLCA" in msgs[0]["content"]
-    assert "[1] Doc — S" in msgs[1]["content"] and "DATOS EN VIVO" in msgs[1]["content"]
+    assert "[1] Doc — S" in msgs[1]["content"] and "LIVE DATA" in msgs[1]["content"]
 
 
 def test_llm_unavailable_is_an_explicit_error(monkeypatch):

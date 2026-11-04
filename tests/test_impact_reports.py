@@ -53,20 +53,20 @@ def test_monthly_report_figures_and_narrative():
     assert r["stats"]["n"] == 200 and not r["partial"]
     assert len(r["daily"]) == 31 and sum(r["daily"]) == 200
     assert r["felt"] == 1
-    assert "200 terremotos localizados" in r["summary"] and "1 fue sentido" in r["summary"]
+    assert "recorded 200 earthquakes" in r["summary"] and "1 was felt" in r["summary"]
     assert "PEVOLCA" in r["summary"]
 
 
 def test_partial_month_says_so():
     cat, ev = synth()
     r = monthly_report(cat, ev, "tenerife", "2026-07", now=dt.datetime(2026, 7, 15, tzinfo=dt.timezone.utc))
-    assert r["partial"] and "en lo que va de mes" in r["summary"]
+    assert r["partial"] and "so far this month" in r["summary"]
 
 
 def test_narrative_never_divides_by_missing_baseline():
     r = dict(zone=dict(name="X"), partial=False, stats=dict(n=0, max_mag=None, depth_median=None, shallow_lt5=0, n_m3=0),
              prev=dict(depth_median=None), rate_ratio=None, felt=0, unrest_end=dict(index=None), tides=None)
-    assert narrative(r).startswith("X registró 0 terremotos localizados")
+    assert narrative(r).startswith("X recorded 0 earthquakes")
 
 
 def test_validation_summary_counts_range_bias_and_watch():

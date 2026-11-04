@@ -180,15 +180,15 @@ class OpenAICompatibleAdapter(LanguageModelPort, EmbeddingPort):
                     timeout=self.timeout,
                 )
         except Exception as e:
-            raise LLMUnavailable(f"{self.cfg.provider} no responde en {self.cfg.base}: {type(e).__name__}") from e
+            raise LLMUnavailable(f"{self.cfg.provider} not responding at {self.cfg.base}: {type(e).__name__}") from e
 
         if r.status_code != 200:
-            raise LLMUnavailable(f"{self.cfg.provider} devolvió HTTP {r.status_code}: {r.text[:200]}")
+            raise LLMUnavailable(f"{self.cfg.provider} returned HTTP {r.status_code}: {r.text[:200]}")
 
         try:
             msg = r.json()["choices"][0]["message"]
         except Exception as e:
-            raise LLMUnavailable(f"respuesta inesperada de {self.cfg.provider}") from e
+            raise LLMUnavailable(f"unexpected response from {self.cfg.provider}") from e
 
         content = _clean_text(msg.get("content") or "")
         parsed_calls: list[ToolCall] = []

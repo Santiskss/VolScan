@@ -10,18 +10,18 @@ export default function Login({ onDone }: { onDone: (u: AuthUser) => void }) {
     e.preventDefault()
     setBusy(true); setErr(null)
     api.login(name, password).then((r) => { setToken(r.token); onDone(r.user) })
-      .catch(() => setErr('Usuario o contraseña incorrectos')).finally(() => setBusy(false))
+      .catch(() => setErr('Wrong user name or password')).finally(() => setBusy(false))
   }
   return (
     <div className="login-wrap">
       <form className="card login" onSubmit={submit}>
-        <div className="kicker">VolScan · acceso</div>
-        <h2>Inicia sesión</h2>
-        <label>Usuario<input autoComplete="username" value={name} onChange={(e) => setName(e.target.value)} /></label>
-        <label>Contraseña<input type="password" autoComplete="current-password" value={password} onChange={(e) => setPassword(e.target.value)} /></label>
+        <div className="kicker">VolScan · access</div>
+        <h2>Sign in</h2>
+        <label>User<input autoComplete="username" value={name} onChange={(e) => setName(e.target.value)} /></label>
+        <label>Password<input type="password" autoComplete="current-password" value={password} onChange={(e) => setPassword(e.target.value)} /></label>
         {err && <div className="note warn-text">{err}</div>}
-        <button className="btn primary" disabled={busy || !name || !password}>{busy ? 'Entrando…' : 'Entrar'}</button>
-        <p className="note">Cada acceso y cada acción quedan en el registro de auditoría.</p>
+        <button className="btn primary" disabled={busy || !name || !password}>{busy ? 'Signing in…' : 'Sign in'}</button>
+        <p className="note">Every sign-in and every action is written to the audit log.</p>
       </form>
     </div>
   )

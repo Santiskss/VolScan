@@ -15,15 +15,15 @@ function Rose({ hist, label }: { hist: number[]; label: string }) {
       <circle cx={c} cy={c} r={R} fill="none" stroke="var(--line)" />
       <circle cx={c} cy={c} r={R / 2} fill="none" stroke="var(--line)" strokeDasharray="2 3" />
       {wedges.map((d, i) => <path key={i} d={d} fill="var(--accent)" opacity={0.75} />)}
-      <text x={c} y={10} textAnchor="middle" fontSize="10" fill="var(--muted)">0° · máximo</text>
-      <text x={c} y={c * 2 + 2} textAnchor="middle" fontSize="10" fill="var(--muted)">180° · mínimo</text>
+      <text x={c} y={10} textAnchor="middle" fontSize="10" fill="var(--muted)">0° · maximum</text>
+      <text x={c} y={c * 2 + 2} textAnchor="middle" fontSize="10" fill="var(--muted)">180° · minimum</text>
     </svg>
   )
 }
 
 function Verdict({ p }: { p: number | null }) {
   if (p == null || Number.isNaN(p)) return <span className="sig no">n/d</span>
-  return p < 0.05 ? <span className="sig yes">p = {p.toFixed(3).replace('.', ',')}</span> : <span className="sig no">p = {p.toFixed(2).replace('.', ',')}</span>
+  return p < 0.05 ? <span className="sig yes">p = {p.toFixed(3)}</span> : <span className="sig no">p = {p.toFixed(2)}</span>
 }
 
 export default function Solunar() {
@@ -32,40 +32,40 @@ export default function Solunar() {
   const [loading, setLoading] = useState(false)
   useEffect(() => { setLoading(true); setData(null); api.solunar(zone).then(setData).finally(() => setLoading(false)) }, [zone])
   const moon = data?.now?.lunar_elongation as number | undefined
-  const moonName = moon == null ? '—' : moon < 22 || moon > 338 ? 'Luna nueva' : moon < 158 ? 'Creciente' : moon < 202 ? 'Luna llena' : 'Menguante'
+  const moonName = moon == null ? '—' : moon < 22 || moon > 338 ? 'New moon' : moon < 158 ? 'Waxing' : moon < 202 ? 'Full moon' : 'Waning'
   return (
     <div className="page">
-      <h2>Mareas, Luna y sismos</h2>
-      <p className="lead">Las mareas terrestres deforman la corteza decenas de centímetros al día. VolScan calcula, para cada sismo del IGN desde 2011, en qué punto de la marea (ciclo de ~12,4 h) y de la Luna (mareas vivas y muertas) ocurrió. Así se mide si hay correlación, sin darla por hecha. Los enjambres hacen que los tests clásicos den «positivo» falso, así que el veredicto se basa en una prueba robusta: catálogo desagrupado y 200 desplazamientos temporales del propio catálogo.</p>
+      <h2>Tides, Moon and earthquakes</h2>
+      <p className="lead">Earth tides deform the crust by tens of centimetres a day. For every IGN earthquake since 2011, VolScan computes where in the tide (~12.4 h cycle) and the lunar cycle (spring and neap tides) it happened. That measures whether there is a correlation instead of assuming one. Swarms make classic tests give false positives, so the verdict rests on a robust test: a declustered catalogue and 200 time shifts of the catalogue itself.</p>
       <div style={{ display: 'flex', gap: 10, alignItems: 'center', marginBottom: 16 }}>
         <select value={zone} onChange={(e) => setZone(e.target.value)}>{ZONES.map(([k, n]) => <option key={k} value={k}>{n}</option>)}</select>
-        {loading && <span className="loading">Calculando fases para todo el catálogo…</span>}
-        {data && <span className="note">{fmt.int(data.n)} sismos analizados · ahora: marea en fase {fmt.int(data.now.tidal_phase)}°, {moonName} ({fmt.int(moon)}°)</span>}
+        {loading && <span className="loading">Computing phases for the whole catalogue…</span>}
+        {data && <span className="note">{fmt.int(data.n)} earthquakes analysed · now: tide at phase {fmt.int(data.now.tidal_phase)}°, {moonName} ({fmt.int(moon)}°)</span>}
       </div>
       {data && (
         <div className="cards">
           {(['semidiurnal', 'fortnightly'] as const).map((k) => data[k] && (
             <div className="card" key={k}>
-              <h3>{k === 'semidiurnal' ? 'Marea semidiurna (12,4 h)' : 'Mareas vivas y muertas (14,8 d)'}</h3>
+              <h3>{k === 'semidiurnal' ? 'Semidiurnal tide (12.4 h)' : 'Spring and neap tides (14.8 d)'}</h3>
               <div style={{ display: 'grid', gridTemplateColumns: '190px 1fr', gap: 12, alignItems: 'center' }}>
                 <Rose hist={data[k].hist12} label={k} />
                 <div className="stat">
-                  <span className="k">Schuster, todos los sismos</span><Verdict p={data[k].raw.p} />
-                  <span className="k">Schuster, desagrupado (n={data[k].declustered.n})</span><Verdict p={data[k].declustered.p} />
-                  <span className="k"><b>Prueba robusta</b> (exceso en fase 0)</span><Verdict p={data[k].shift_test.p_shift} />
-                  <span className="k">Alineación C</span><span>{fmt.num(data[k].shift_test.c, 3)}</span>
+                  <span className="k">Schuster, all earthquakes</span><Verdict p={data[k].raw.p} />
+                  <span className="k">Schuster, declustered (n={data[k].declustered.n})</span><Verdict p={data[k].declustered.p} />
+                  <span className="k"><b>Robust test</b> (excess at phase 0)</span><Verdict p={data[k].shift_test.p_shift} />
+                  <span className="k">Alignment C</span><span>{fmt.num(data[k].shift_test.c, 3)}</span>
                 </div>
               </div>
               <p className="note">{data[k].shift_test.p_shift < 0.05
-                ? 'La prueba robusta detecta un exceso de sismos cerca del máximo. Es una correlación que hay que vigilar, no una causa.'
+                ? 'The robust test finds an excess of earthquakes near the maximum. It is a correlation to watch, not a cause.'
                 : data[k].raw.p < 0.05
-                  ? 'El test clásico sale significativo, pero desaparece al controlar los enjambres: correlación aparente, no real.'
-                  : 'Sin modulación detectable con los datos actuales.'}</p>
+                  ? 'The classic test is significant, but it vanishes once swarms are controlled for: an apparent correlation, not a real one.'
+                  : 'No detectable modulation with current data.'}</p>
             </div>
           ))}
         </div>
       )}
-      <p className="note" style={{ marginTop: 16 }}>Efemérides de baja precisión (Astronomical Almanac): ~0,3° para la Luna, validadas con fases publicadas. Potencial de marea de grado 2 en el centroide de cada zona. El historial crece cada día con el catálogo del IGN.</p>
+      <p className="note" style={{ marginTop: 16 }}>Low-precision ephemerides (Astronomical Almanac): ~0.3° for the Moon, checked against published phases. Degree-2 tidal potential at each zone’s centroid. The record grows every day with the IGN catalogue.</p>
     </div>
   )
 }

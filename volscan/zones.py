@@ -41,17 +41,17 @@ class Zone:
 
 
 _INFO = [
-    ("el_hierro", "El Hierro", "incluye Tagoro (erupción submarina 2011-2012)"),
+    ("el_hierro", "El Hierro", "includes Tagoro (submarine eruption 2011-2012)"),
     ("la_palma", "La Palma", "Cumbre Vieja: San Juan 1949, Teneguía 1971, Tajogaite 2021"),
-    ("la_gomera", "La Gomera", "sin erupciones holocenas"),
-    ("tenerife", "Tenerife", "Teide–Pico Viejo y dorsales; Chinyero 1909"),
-    ("enmedio", "Canal Tenerife–Gran Canaria", "zona submarina del volcán de Enmedio"),
+    ("la_gomera", "La Gomera", "no Holocene eruptions"),
+    ("tenerife", "Tenerife", "Teide–Pico Viejo and rifts; Chinyero 1909"),
+    ("enmedio", "Tenerife–Gran Canaria channel", "submarine area of the Enmedio volcano"),
     ("gran_canaria", "Gran Canaria", ""),
-    ("lanzarote_fuerteventura", "Lanzarote y Fuerteventura", "Timanfaya 1730-36, Tao 1824"),
+    ("lanzarote_fuerteventura", "Lanzarote and Fuerteventura", "Timanfaya 1730-36, Tao 1824"),
 ]
 _BBOX = json.loads((DATA / "zones_bbox.json").read_text())
 ZONES = [Zone(k, n, *_BBOX[k], note=t) for k, n, t in _INFO]
-OTHER = Zone("atlantico", "Atlántico (fuera de zonas)", -90, 90, -180, 180)
+OTHER = Zone("atlantico", "Atlantic (outside zones)", -90, 90, -180, 180)
 BY_KEY = {z.key: z for z in ZONES + [OTHER]}
 
 

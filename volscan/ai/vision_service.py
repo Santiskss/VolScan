@@ -154,7 +154,7 @@ def sam3_scene_for_date(date_str: str, lp=None, port: LavaSegmentationPort | Non
             phase="pre-eruptive",
             available=False,
             adapter=port.status(),
-            note="Antes de la apertura de la boca (19 sep 2021) no hay colada en superficie que segmentar.",
+            note="Before the vent opened (19 Sep 2021) there is no surface flow to segment.",
         )
 
     # Satellite passes acquired up to `now - 15 min` (automated downlink + SAM 3.1 inference)
@@ -168,7 +168,7 @@ def sam3_scene_for_date(date_str: str, lp=None, port: LavaSegmentationPort | Non
             phase="eruptive",
             available=False,
             adapter=port.status(),
-            note="Aún no hay pasada satelital SWIR/TIRS adquirida tras el inicio de la erupción.",
+            note="No SWIR/TIRS satellite pass acquired yet after the eruption began.",
         )
 
     k_last = ks_sam[-1]
@@ -208,7 +208,7 @@ def sam3_scene_for_date(date_str: str, lp=None, port: LavaSegmentationPort | Non
         cems_already_delivered_at_now=cems_delivered,
         lead_time_advantage_h=None,
         hypothetical_lead_time_h=lead_advantage_h,
-        evidence=dict(input_kind="synthetic_from_cems_reference", independent_validation=False, operational=False, note="La escena se genera desde la máscara CEMS usada como referencia; hay circularidad. IoU es una prueba del algoritmo con datos sintéticos, no validación satelital. El retraso de 15 minutos es hipotético."),
+        evidence=dict(input_kind="synthetic_from_cems_reference", independent_validation=False, operational=False, note="The scene is generated from the CEMS mask used as reference, so the test is circular. IoU tests the algorithm on synthetic data; it is not satellite validation. The 15-minute delay is hypothetical."),
         segmentation=seg.public_meta(),
         comparison_vs_cems=dict(
             cems_area_ha=cems_area_ha,
@@ -223,7 +223,7 @@ def sam3_scene_for_date(date_str: str, lp=None, port: LavaSegmentationPort | Non
             sea_p_ever=round(p_sea, 3),
             sea_eta_h=[None if np.isnan(v) else round(v - t_now, 1) for v in q_sea],
         ),
-        note="Experimento sintético generado desde CEMS; sin adelanto operativo demostrado.",
+        note="Synthetic experiment generated from CEMS; no operational lead time shown.",
         overlay=dict(
             png=overlay_png,
             west=g.west,
@@ -232,7 +232,7 @@ def sam3_scene_for_date(date_str: str, lp=None, port: LavaSegmentationPort | Non
             rows=g.shape[0],
             cols=g.shape[1],
             horizon_h=72,
-            legend="Experimento sintético: máscara geodésica desde referencia CEMS; horizonte hipotético 72 h",
+            legend="Synthetic experiment: geodesic mask from the CEMS reference; hypothetical 72 h horizon",
         ),
         adapter=port.status(),
     )
@@ -296,9 +296,9 @@ def sam3_validation_benchmark(ir=None) -> dict[str, Any]:
         ),
         scenes=scenes,
         note=(
-            f"Prueba sintética sobre {len(scenes)} máscaras CEMS. Las escenas térmicas se generan desde la misma referencia usada para evaluar. "
-            "Por esa circularidad, IoU/precisión/recall no miden rendimiento sobre imágenes satelitales independientes. "
-            "No se ha demostrado adelanto operativo; los 15 minutos son un supuesto."
+            f"Synthetic test on {len(scenes)} CEMS masks. The thermal scenes are generated from the same reference used to evaluate. "
+            "Because of that circularity, IoU/precision/recall do not measure performance on independent satellite images. "
+            "No operational lead time has been shown; the 15 minutes are an assumption."
 
         ),
     )

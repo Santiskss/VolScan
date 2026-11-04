@@ -9,22 +9,22 @@ import TenerifeScenarios from './views/TenerifeScenarios'
 import Validation from './views/Validation'
 
 const TABS = [
-  ['atlas', 'Atlas 3D · Caso Real 2021'],
-  ['canarias', 'Canarias en directo (IGN)'],
-  ['tenerife', 'Tenerife · Simulación'],
-  ['validacion', 'Validación (Real vs Estimado)'],
-  ['informes', 'Dossier de Crisis e Informes'],
-  ['registro', 'Registro ENS'],
+  ['atlas', '3D Atlas · Real Case 2021'],
+  ['canarias', 'Canary Islands Live (IGN)'],
+  ['tenerife', 'Tenerife · Simulation'],
+  ['validacion', 'Validation (Real vs Forecast)'],
+  ['informes', 'Crisis Dossier & Reports'],
+  ['registro', 'Audit Log (ENS)'],
 ] as const
 type Tab = (typeof TABS)[number][0]
 
 const HEADERS: Record<Tab, [string, string, string]> = {
-  atlas: ['La Palma 2021', 'Dato real (IGN + Copernicus EMS) + Pronóstico asimilado VolScan a 72 h', 'Caso real + Modelo'],
-  canarias: ['Canarias hoy', 'Telemetría real en directo (IGN sismos · NGL GNSS · NASA SO2) + Índice VolScan', '100 % Dato en directo'],
-  tenerife: ['Tenerife', 'Simulación condicional a 30 días sobre MDE real si abriera una boca', 'Simulación de planificación'],
-  validacion: ['Auditoría 2021', 'Comparación de los 83 pronósticos de VolScan frente a lo cartografiado por Copernicus', 'Acierto medido: 81 %'],
-  registro: ['VolScan', 'Trazabilidad criptográfica SHA-256 de acciones y exportaciones', 'Seguridad · ENS'],
-  informes: ['Informes y Crisis', 'Dossier de Catástrofe (Tajogaite 2021: reología, evolución, mareas) y boletines por isla', 'Dato real vs Estimado'],
+  atlas: ['La Palma 2021', 'Real data (IGN + Copernicus EMS) + VolScan 72 h assimilated forecast', 'Real case + Model'],
+  canarias: ['Canary Islands today', 'Real live telemetry (IGN earthquakes · NGL GNSS · NASA SO2) + VolScan index', '100 % live data'],
+  tenerife: ['Tenerife', '30-day conditional simulation on the real DEM if a vent opened', 'Planning simulation'],
+  validacion: ['2021 Audit', 'VolScan’s 83 forecasts compared with what Copernicus mapped', 'Measured hit rate: 81 %'],
+  registro: ['VolScan', 'SHA-256 cryptographic traceability of actions and exports', 'Security · ENS'],
+  informes: ['Reports & Crisis', 'Disaster dossier (Tajogaite 2021: rheology, evolution, tides) and island bulletins', 'Real data vs Forecast'],
 }
 
 function Logo() {
@@ -67,13 +67,13 @@ export default function App() {
       <div className="topbar">
         {tabs.map(([k, label]) => <button key={k} className={`tab ${tab === k ? 'active' : ''}`} onClick={() => setTab(k)}>{label}</button>)}
         <span className="spacer" />
-        {status?.vision && <span className="chip" title={status.vision.note}><span className={`dot ${status.vision.ready ? 'ok' : 'warn'}`} />Visión: {status.vision.mode === 'remote_api' ? 'endpoint configurado' : 'algoritmo determinista · sin pesos SAM'}</span>}
-        <span className="chip"><span className={`dot ${llm?.ok ? 'ok' : 'warn'}`} />{STATIC ? 'IA: solo en versión local' : <>IA: {llm ? modelLabel(llm.provider, llm.model) : '—'}{llm && !llm.ok ? ' (modo determinista)' : ''}</>}</span>
-        <span className="chip" title={status?.catalog.health?.message ?? ''}><span className={`dot ${!STATIC && status?.catalog.health && !status.catalog.health.ok ? 'warn' : 'ok'}`} />IGN: {status ? `${fmt.int(status.catalog.n_events)} sismos` : '—'}{!STATIC && status?.catalog.health && !status.catalog.health.ok ? ` · ${status.catalog.health.level}` : ''}</span>
-        {STATIC && status && <span className="chip"><span className="dot warn" />Instantánea · {fmt.dateTime(status.now)}</span>}
+        {status?.vision && <span className="chip" title={status.vision.note}><span className={`dot ${status.vision.ready ? 'ok' : 'warn'}`} />Vision: {status.vision.mode === 'remote_api' ? 'endpoint configured' : 'deterministic algorithm · no SAM weights'}</span>}
+        <span className="chip"><span className={`dot ${llm?.ok ? 'ok' : 'warn'}`} />{STATIC ? 'AI: local version only' : <>AI: {llm ? modelLabel(llm.provider, llm.model) : '—'}{llm && !llm.ok ? ' (deterministic mode)' : ''}</>}</span>
+        <span className="chip" title={status?.catalog.health?.message ?? ''}><span className={`dot ${!STATIC && status?.catalog.health && !status.catalog.health.ok ? 'warn' : 'ok'}`} />IGN: {status ? `${fmt.int(status.catalog.n_events)} earthquakes` : '—'}{!STATIC && status?.catalog.health && !status.catalog.health.ok ? ` · ${status.catalog.health.level}` : ''}</span>
+        {STATIC && status && <span className="chip"><span className="dot warn" />Snapshot · {fmt.dateTime(status.now)}</span>}
         {auth?.enabled && auth.user && (auth.user.name === 'visitante'
-          ? <span className="chip"><span className="dot ok" />Demo pública<button className="linklike" onClick={() => setAuth({ enabled: true, user: null })}>Entrar</button></span>
-          : <span className="chip"><span className="dot ok" />{auth.user.name} · {auth.user.role}<button className="linklike" onClick={() => { api.logout().finally(() => { setToken(null); setAuth({ enabled: true, user: null }) }) }}>Salir</button></span>)}
+          ? <span className="chip"><span className="dot ok" />Public demo<button className="linklike" onClick={() => setAuth({ enabled: true, user: null })}>Sign in</button></span>
+          : <span className="chip"><span className="dot ok" />{auth.user.name} · {auth.user.role}<button className="linklike" onClick={() => { api.logout().finally(() => { setToken(null); setAuth({ enabled: true, user: null }) }) }}>Sign out</button></span>)}
       </div>
       <div className="header">
         <Logo />

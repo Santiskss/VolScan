@@ -192,11 +192,11 @@ class MetaSAM3Adapter(LavaSegmentationPort):
             checkpoint_implemented=False,
             endpoint=self.endpoint if mode == "remote_api" else None,
             note=(
-                "Endpoint remoto configurado; inferencia pendiente de respuesta válida"
+                "Remote endpoint configured; inference awaiting a valid response"
                 if mode == "remote_api"
-                else "Fichero de pesos presente, predictor local sin implementar; se ejecuta algoritmo determinista"
+                else "Weights file present, local predictor not implemented; running the deterministic algorithm"
                 if mode == "local_weights_unimplemented"
-                else "Segmentación geodésica determinista; no se ejecutan pesos SAM"
+                else "Deterministic geodesic segmentation; no SAM weights are run"
             ),
         )
 

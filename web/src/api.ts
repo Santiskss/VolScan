@@ -117,7 +117,7 @@ export const authEvents = new EventTarget()
 function authHeaders(): Record<string, string> { const t = getToken(); return t ? { Authorization: `Bearer ${t}` } : {} }
 function onStatus(r: Response, url: string) {
   if (r.status === 401) authEvents.dispatchEvent(new Event('unauthorized'))
-  if (!r.ok) throw new Error(r.status === 403 ? 'tu rol no permite esta acción' : `${r.status} ${url}`)
+  if (!r.ok) throw new Error(r.status === 403 ? 'your role does not allow this action' : `${r.status} ${url}`)
 }
 
 const GET_CACHE = new Map<string, Promise<unknown>>()
@@ -159,10 +159,10 @@ async function post<T>(url: string, body: unknown): Promise<T> {
   if (STATIC) {
     if (url.includes('/briefing/')) return get<T>(url)
     if (url === '/api/chat') {
-      return { answer: null, ai: false, error: 'esta es una instantánea estática; el asistente con IA funciona en la versión local (VolScan.command)', model: { ok: false, provider: 'local', model: '—' }, citations: [] } as T
+      return { answer: null, ai: false, error: 'this is a static snapshot; the AI assistant runs in the local version (VolScan.command)', model: { ok: false, provider: 'local', model: '—' }, citations: [] } as T
     }
     if (url === '/api/canarias/refresh') return get<T>('/api/status').then((s: any) => s.catalog)
-    if (url === '/api/reports/rewrite') return { text: null, ai: false, error: 'la redacción con IA funciona en la versión local', model: { ok: false, provider: 'local', model: '—' } } as T
+    if (url === '/api/reports/rewrite') return { text: null, ai: false, error: 'AI drafting runs in the local version', model: { ok: false, provider: 'local', model: '—' } } as T
   }
   const r = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json', ...authHeaders() }, body: JSON.stringify(body) })
   onStatus(r, url)
@@ -270,11 +270,11 @@ export function decodeHeights(t: Terrain): Float32Array {
 
 export const fmt = {
   pct: (p: number | null | undefined) => (p == null ? '—' : `${Math.round(p * 100)} %`),
-  num: (v: number | null | undefined, d = 1) => (v == null ? '—' : v.toLocaleString('es-ES', { maximumFractionDigits: d, minimumFractionDigits: d })),
-  int: (v: number | null | undefined) => (v == null ? '—' : Math.round(v).toLocaleString('es-ES')),
+  num: (v: number | null | undefined, d = 1) => (v == null ? '—' : v.toLocaleString('en-GB', { maximumFractionDigits: d, minimumFractionDigits: d })),
+  int: (v: number | null | undefined) => (v == null ? '—' : Math.round(v).toLocaleString('en-GB')),
   hours: (h: number | null | undefined) => (h == null ? '—' : h < 48 ? `${Math.round(h)} h` : `${(h / 24).toFixed(1).replace('.', ',')} d`),
-  date: (iso: string) => new Date(iso).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC' }),
-  dateTime: (iso: string) => new Date(iso).toLocaleString('es-ES', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit', timeZone: 'UTC' }) + ' UTC',
+  date: (iso: string) => new Date(iso).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC' }),
+  dateTime: (iso: string) => new Date(iso).toLocaleString('en-GB', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit', timeZone: 'UTC' }) + ' UTC',
 }
 
 /** Human label for the model that answered: Meta API, Meta open weights on this machine, or another local model. */

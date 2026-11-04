@@ -41,8 +41,8 @@ def _n(v, d: int = 1) -> str:
     if v is None:
         return "—"
     if isinstance(v, (int,)) or (isinstance(v, float) and d == 0):
-        return f"{round(v):,}".replace(",", ".")
-    return f"{v:.{d}f}".replace(".", ",")
+        return f"{round(v):,}"
+    return f"{v:.{d}f}"
 
 
 def _table(rows, widths, header=True):
@@ -80,8 +80,8 @@ def _doc(story, title: str) -> bytes:
         c.saveState()
         c.setFont("Helvetica", 7)
         c.setFillColor(MUTED)
-        c.drawString(18 * mm, 10 * mm, "VolScan · TephraLabs · no es una alerta oficial: la valoración corresponde al PEVOLCA")
-        c.drawRightString(192 * mm, 10 * mm, f"pág. {doc.page}")
+        c.drawString(18 * mm, 10 * mm, "VolScan · TephraLabs · not an official alert: the assessment belongs to PEVOLCA")
+        c.drawRightString(192 * mm, 10 * mm, f"p. {doc.page}")
         c.restoreState()
 
     SimpleDocTemplate(buf, pagesize=A4, leftMargin=18 * mm, rightMargin=18 * mm, topMargin=16 * mm, bottomMargin=18 * mm,
@@ -92,39 +92,39 @@ def _doc(story, title: str) -> bytes:
 # ---------------------------------------------------------------- monthly report
 def report_pdf(r: dict) -> bytes:
     s = r["stats"]
-    story = [Paragraph("INFORME MENSUAL DE VIGILANCIA VOLCÁNICA · VOLSCAN", KICK),
-             Paragraph(_t(r["title"] + (" (mes en curso)" if r["partial"] else "")), H1),
-             Paragraph(_t(f"Generado el {r['generated_at'][:16].replace('T', ' ')} UTC · zona: {r['zone']['note'] or r['zone']['name']}"), SMALL),
-             Spacer(1, 6), Paragraph(_t(r["summary"]), BODY), Paragraph("Cifras del mes", H2),
-             _table([["Indicador", "Este mes", "Mes anterior"],
-                     ["Terremotos", _n(s["n"], 0), _n(r["prev"]["n"], 0)],
-                     ["Magnitud máxima", _n(s["max_mag"]), _n(r["prev"]["max_mag"])],
+    story = [Paragraph("MONTHLY VOLCANO MONITORING REPORT · VOLSCAN", KICK),
+             Paragraph(_t(r["title"] + (" (current month)" if r["partial"] else "")), H1),
+             Paragraph(_t(f"Generated {r['generated_at'][:16].replace('T', ' ')} UTC · zone: {r['zone']['note'] or r['zone']['name']}"), SMALL),
+             Spacer(1, 6), Paragraph(_t(r["summary"]), BODY), Paragraph("Figures for the month", H2),
+             _table([["Indicator", "This month", "Previous month"],
+                     ["Earthquakes", _n(s["n"], 0), _n(r["prev"]["n"], 0)],
+                     ["Maximum magnitude", _n(s["max_mag"]), _n(r["prev"]["max_mag"])],
                      ["M >= 3", _n(s["n_m3"], 0), _n(r["prev"]["n_m3"], 0)],
-                     ["Profundidad mediana (km)", _n(s["depth_median"]), _n(r["prev"]["depth_median"])],
-                     ["Sismos a menos de 5 km", _n(s["shallow_lt5"], 0), _n(r["prev"]["shallow_lt5"], 0)],
-                     ["Tasa frente a la media de 12 meses", f"x{_n(r['rate_ratio'])}", ""],
-                     ["Índice de actividad al cierre (0-10)", _n(r["unrest_end"]["index"]), ""],
-                     ["b-value", f"{_n(r['b']['b'], 2)} ± {_n(r['b']['sigma'], 2)}" if r.get("b") else "pocos datos", ""]],
+                     ["Median depth (km)", _n(s["depth_median"]), _n(r["prev"]["depth_median"])],
+                     ["Earthquakes shallower than 5 km", _n(s["shallow_lt5"], 0), _n(r["prev"]["shallow_lt5"], 0)],
+                     ["Rate vs 12-month mean", f"x{_n(r['rate_ratio'])}", ""],
+                     ["Unrest index at close (0-10)", _n(r["unrest_end"]["index"]), ""],
+                     ["b-value", f"{_n(r['b']['b'], 2)} ± {_n(r['b']['sigma'], 2)}" if r.get("b") else "too few data", ""]],
                     [80 * mm, 45 * mm, 45 * mm]),
-             Spacer(1, 6), _bars(r["daily"], label="Terremotos por día")]
+             Spacer(1, 6), _bars(r["daily"], label="Earthquakes per day")]
     dfm = r.get("deformation")
-    story.append(Paragraph("Deformación (GNSS)", H2))
+    story.append(Paragraph("Deformation (GNSS)", H2))
     if dfm:
-        story.append(_table([["Estación", "Vertical (mm)", "z horiz. / vert.", "Nivel", "Datos hasta"]] +
+        story.append(_table([["Station", "Vertical (mm)", "z horiz. / vert.", "Level", "Data up to"]] +
                             [[x["code"] + " · " + x["place"], _n(x.get("anom_u_mm")), f"{_n(x.get('z_h'))} / {_n(abs(x.get('z_u') or 0))}",
                               x["level"], x.get("evaluated_at") or x["last"]] for x in dfm["stations"]],
                             [52 * mm, 28 * mm, 32 * mm, 26 * mm, 32 * mm]))
     else:
-        story.append(Paragraph("Sin estaciones GNSS públicas con datos para este mes.", SMALL))
-    story.append(Paragraph("Gases (SO2 por satélite)", H2))
+        story.append(Paragraph("No public GNSS stations with data for this month.", SMALL))
+    story.append(Paragraph("Gas (satellite SO2)", H2))
     so2 = r.get("so2")
-    story.append(Paragraph(_t(f"{so2['days_detected']} de {so2['days']} días con SO2 >= {_n(so2['threshold_kt'], 0)} kt; máximo diario "
-                              f"{_n(so2['max_kt'], 2)} kt.") if so2 else "Sin datos de SO2 para este mes.", BODY))
-    story += [Paragraph("Terremotos más destacados", H2),
-              _table([["Fecha (UTC)", "M", "Prof. (km)", "Int.", "Lugar"]] +
+    story.append(Paragraph(_t(f"{so2['days_detected']} of {so2['days']} days with SO2 >= {_n(so2['threshold_kt'], 0)} kt; daily maximum "
+                              f"{_n(so2['max_kt'], 2)} kt.") if so2 else "No SO2 data for this month.", BODY))
+    story += [Paragraph("Most notable earthquakes", H2),
+              _table([["Date (UTC)", "M", "Depth (km)", "Int.", "Place"]] +
                      [[e["t"][:16].replace("T", " "), _n(e["mag"]), _n(e["depth"]), e["int_max"] or "—", e["place"]] for e in r["top_events"]],
                      [34 * mm, 14 * mm, 20 * mm, 14 * mm, 88 * mm]),
-              Spacer(1, 8), Paragraph(_t("Fuentes: " + " · ".join(r["sources"])), SMALL)]
+              Spacer(1, 8), Paragraph(_t("Sources: " + " · ".join(r["sources"])), SMALL)]
     return _doc(story, r["title"])
 
 
@@ -144,28 +144,28 @@ def report_csv(r: dict) -> bytes:
 # ---------------------------------------------------------------- impact sheet
 def impact_pdf(title: str, subtitle: str, kpis: list[tuple[str, str, str]], facilities: list[dict], isolation: list[dict],
                places: list[dict], method: str, sources: str) -> bytes:
-    story = [Paragraph("PARTE DE IMPACTO · VOLSCAN", KICK), Paragraph(_t(title), H1), Paragraph(_t(subtitle), SMALL), Spacer(1, 6),
+    story = [Paragraph("IMPACT REPORT · VOLSCAN", KICK), Paragraph(_t(title), H1), Paragraph(_t(subtitle), SMALL), Spacer(1, 6),
              _table([["Indicador", "Valor", "Rango / nota"]] + [list(k) for k in kpis], [62 * mm, 40 * mm, 68 * mm])]
     if places:
-        story += [Paragraph("Núcleos alcanzables", H2),
-                  _table([["Núcleo", "Probabilidad"]] + [[p["name"], f"{round(100 * p['p'])} %"] for p in places[:15]], [120 * mm, 50 * mm])]
+        story += [Paragraph("Reachable neighbourhoods", H2),
+                  _table([["Neighbourhood", "Probability"]] + [[p["name"], f"{round(100 * p['p'])} %"] for p in places[:15]], [120 * mm, 50 * mm])]
     if isolation:
-        story += [Paragraph("Barrios que podrían quedar aislados", H2),
-                  _table([["Núcleo", "Alcanzado", "Aislado"]] +
+        story += [Paragraph("Neighbourhoods that could be cut off", H2),
+                  _table([["Neighbourhood", "Reached", "Isolated"]] +
                          [[i["name"], f"{round(100 * i['p_reached'])} %", f"{round(100 * i['p_isolated'])} %"] for i in isolation[:15]],
                          [100 * mm, 35 * mm, 35 * mm])]
     if facilities:
-        story += [Paragraph("Servicios e infraestructuras", H2),
-                  _table([["Servicio", "Nombre", "P", "Llegada P50"]] +
-                         [[f["kind"], f["name"], "PERDIDO" if f.get("already_lost") else f"{round(100 * f['p'])} %",
+        story += [Paragraph("Services and infrastructure", H2),
+                  _table([["Service", "Name", "P", "Arrival P50"]] +
+                         [[f["kind"], f["name"], "LOST" if f.get("already_lost") else f"{round(100 * f['p'])} %",
                            "" if f.get("already_lost") or f["eta_h"][1] is None else _hours(f["eta_h"][1])] for f in facilities[:25]],
                          [40 * mm, 80 * mm, 22 * mm, 28 * mm])]
-    story += [Spacer(1, 8), Paragraph(_t("Método: " + method), SMALL), Paragraph(_t("Fuentes: " + sources), SMALL)]
+    story += [Spacer(1, 8), Paragraph(_t("Method: " + method), SMALL), Paragraph(_t("Sources: " + sources), SMALL)]
     return _doc(story, title)
 
 
 def _hours(h: float) -> str:
-    return f"{round(h)} h" if h < 48 else f"{h / 24:.1f} d".replace(".", ",")
+    return f"{round(h)} h" if h < 48 else f"{h / 24:.1f} d"
 
 
 def impact_csv(facilities: list[dict], isolation: list[dict]) -> bytes:

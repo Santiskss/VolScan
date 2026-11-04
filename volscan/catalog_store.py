@@ -90,19 +90,19 @@ def health(now: float | None = None) -> dict:
     n_backup = len(ev) - len(ign_ev)
     err = _state["refresh_error"]
     if err and "IgnFormatChanged" in err:
-        level, msg = "fuente cambiada", "La página del IGN ha cambiado de formato: VolScan no puede leerla."
+        level, msg = "fuente cambiada", "The IGN page changed format: VolScan cannot read it."
     elif err:
-        level, msg = "sin conexión con el IGN", "No se pudo descargar el catálogo del IGN."
+        level, msg = "sin conexión con el IGN", "The IGN catalogue could not be downloaded."
     elif dl_age is not None and dl_age > STALE_H:
-        level, msg = "retrasado", f"La última descarga del IGN es de hace {dl_age:.0f} h."
+        level, msg = "retrasado", f"The last IGN download was {dl_age:.0f} h ago."
     else:
-        level, msg = "al día", "Catálogo del IGN descargado recientemente."
+        level, msg = "al día", "IGN catalogue downloaded recently."
     if n_backup:
-        msg += f" Se muestran {n_backup} sismos de respaldo de EMSC desde el último dato del IGN."
+        msg += f" Showing {n_backup} EMSC backup earthquakes since the last IGN record."
     elif err and _state.get("backup_error"):
-        msg += " El respaldo de EMSC tampoco respondió."
+        msg += " The EMSC backup did not respond either."
     if ev_age is not None and ev_age > QUIET_H:
-        msg += f" El último sismo registrado es de hace {ev_age:.0f} h, algo poco habitual en Canarias."
+        msg += f" The last recorded earthquake was {ev_age:.0f} h ago, unusual for the Canaries."
     return dict(level=level, ok=level == "al día", message=msg, last_download_age_h=None if dl_age is None else round(dl_age, 1),
                 last_event_age_h=None if ev_age is None else round(ev_age, 1), backup_events=n_backup)
 

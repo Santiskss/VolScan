@@ -44,9 +44,9 @@ def _extract_tenerife_branch(text: str) -> str:
         return "pico_viejo"
     if "teide" in t or "blanco" in t:
         return "teide_norte"
-    if "noreste" in t or "fasnia" in t or "arafo" in t or "siete fuentes" in t or "güímar" in t or "guimar" in t:
+    if "noreste" in t or "north-east" in t or "northeast" in t or "fasnia" in t or "arafo" in t or "siete fuentes" in t or "güímar" in t or "guimar" in t:
         return "dorsal_noreste"
-    if "actual" in t or "sismicidad" in t or "enjambre" in t:
+    if "actual" in t or "sismicidad" in t or "enjambre" in t or "current seismicity" in t or "swarm" in t:
         return "sismicidad_actual"
     return "dorsal_noroeste"
 
@@ -102,7 +102,7 @@ def build_domain_tools(seg_port: LavaSegmentationPort | None = None) -> list[Too
             evaluated_at=dt.datetime.now(dt.timezone.utc).strftime("%Y-%m-%d %H:%M UTC"),
             so2=D.so2_status(today),
             zones=rows,
-            note="Datos en directo (IGN, NGL, NASA OMPS). El índice (0–10) no es una probabilidad de erupción; alertas oficiales: PEVOLCA.",
+            note="Live data (IGN, NGL, NASA OMPS). The index (0–10) is not an eruption probability; official alerts: PEVOLCA.",
         )
 
     def tool_lapalma_forecast(date: str = "2021-09-25") -> dict[str, Any]:
@@ -172,7 +172,7 @@ def build_domain_tools(seg_port: LavaSegmentationPort | None = None) -> list[Too
             top_places=sc.get("places", [])[:6],
             top_facilities=[dict(name=f["name"], kind=f["kind"], p=f["p"], eta_p50_h=f["eta_h"][1]) for f in sc.get("facilities", [])[:6]],
             isolation=[dict(name=i["name"], p_isolated=i["p_isolated"]) for i in sc.get("isolation", [])[:5]],
-            note="Escenario condicional de planificación (no pronóstico de erupción).",
+            note="Conditional planning scenario (not an eruption forecast).",
         )
 
     def tool_cap_alert(target: str = "lapalma2021", ref: str = "2021-09-25") -> dict[str, Any]:
@@ -185,18 +185,18 @@ def build_domain_tools(seg_port: LavaSegmentationPort | None = None) -> list[Too
         if target == "tenerife":
             sc = scenario(ref, store.load_catalog())
             if not sc or sc.get("unavailable"):
-                return dict(error="Escenario de Tenerife no disponible", target=target, ref=ref)
+                return dict(error="Tenerife scenario not available", target=target, ref=ref)
             p = probability_raster(sc)
             bands = probability_bands(tf_grid(), p) if p is not None else []
             b = sc["buildings"]
-            headline = f"Tenerife · escenario {sc['name']} · planificación"
+            headline = f"Tenerife · {sc['name']} scenario · planning"
             params = dict(horizonte_h=sc["horizon_h"], edificios_media=round(b["expected"]), vias_km_media=round(sc["road_km"]["expected"], 1))
             xml = cap.build(
                 kind="tenerife",
                 ref=ref,
                 sent=now_utc,
                 headline=headline,
-                description=f"Escenario {sc['name']}: {round(b['expected'])} edificios de media en 30 d.",
+                description=f"{sc['name']} scenario: {round(b['expected'])} buildings on average in 30 d.",
                 bands=bands,
                 isolated=sc.get("isolation", [])[:5],
                 parameters=params,
@@ -221,7 +221,7 @@ def build_domain_tools(seg_port: LavaSegmentationPort | None = None) -> list[Too
         imp = ir.eruptive(now)
         c = imp.get("constrained") or {}
         b = c.get("buildings") or imp.get("buildings") or {}
-        headline = f"La Palma 2021 · impacto previsto a 72 h ({ref}) · simulación"
+        headline = f"La Palma 2021 · expected 72 h impact ({ref}) · simulation"
         params = dict(
             horizonte_h=72,
             edificios_central=b.get("central", round(b["expected"]) if "expected" in b else None),
@@ -233,7 +233,7 @@ def build_domain_tools(seg_port: LavaSegmentationPort | None = None) -> list[Too
             ref=ref,
             sent=now,
             headline=headline,
-            description=f"Reconstrucción {ref}",
+            description=f"Reconstruction {ref}",
             bands=bands,
             isolated=imp.get("isolation", [])[:5],
             expires=now + dt.timedelta(hours=72),
@@ -253,13 +253,13 @@ def build_domain_tools(seg_port: LavaSegmentationPort | None = None) -> list[Too
     return [
         ToolDefinition(
             name="get_canarias_live_status",
-            description="Consulta el estado sísmico en directo (IGN), deformación GNSS (NGL) y SO2 satelital (NASA OMPS) por zona volcánica en Canarias.",
+            description="Gets live seismic status (IGN), GNSS deformation (NGL) and satellite SO2 (NASA OMPS) per volcanic zone in the Canary Islands.",
             parameters={
                 "type": "object",
                 "properties": {
                     "zone": {
                         "type": "string",
-                        "description": "Zona volcánica: 'all', 'tenerife', 'la_palma', 'el_hierro', 'gran_canaria', 'lanzarote', 'fuerteventura', 'la_gomera', 'enmedio'.",
+                        "description": "Volcanic zone: 'all', 'tenerife', 'la_palma', 'el_hierro', 'gran_canaria', 'lanzarote', 'fuerteventura', 'la_gomera', 'enmedio'.",
                     }
                 },
             },
@@ -267,11 +267,11 @@ def build_domain_tools(seg_port: LavaSegmentationPort | None = None) -> list[Too
         ),
         ToolDefinition(
             name="get_lapalma_2021_forecast",
-            description="Consulta la reconstrucción histórica y el pronóstico de impacto a 72 h (edificios, vías, llegada al mar, núcleos) en La Palma 2021 para una fecha AAAA-MM-DD.",
+            description="Gets the historical reconstruction and the 72 h impact forecast (buildings, roads, sea arrival, neighbourhoods) for La Palma 2021 on a YYYY-MM-DD date.",
             parameters={
                 "type": "object",
                 "properties": {
-                    "date": {"type": "string", "description": "Fecha UTC en formato AAAA-MM-DD (entre 2021-09-11 y 2021-12-25)."}
+                    "date": {"type": "string", "description": "UTC date as YYYY-MM-DD (between 2021-09-11 and 2021-12-25)."}
                 },
                 "required": ["date"],
             },
@@ -279,11 +279,11 @@ def build_domain_tools(seg_port: LavaSegmentationPort | None = None) -> list[Too
         ),
         ToolDefinition(
             name="run_sam3_satellite_assimilation",
-            description="Experimento sintético: escenas térmicas generadas desde la propia referencia CEMS. No es validación satelital externa ni demuestra adelanto operativo. Usa benchmark para la prueba sintética.",
+            description="Synthetic experiment: thermal scenes generated from the CEMS reference itself. Not external satellite validation and shows no operational lead time. Use benchmark for the synthetic test.",
             parameters={
                 "type": "object",
                 "properties": {
-                    "date": {"type": "string", "description": "Fecha AAAA-MM-DD o 'benchmark' para el resumen de las 22 escenas EMSR546."}
+                    "date": {"type": "string", "description": "Date YYYY-MM-DD or 'benchmark' for the summary of the 22 EMSR546 scenes."}
                 },
                 "required": ["date"],
             },
@@ -291,14 +291,14 @@ def build_domain_tools(seg_port: LavaSegmentationPort | None = None) -> list[Too
         ),
         ToolDefinition(
             name="simulate_tenerife_scenario",
-            description="Ejecuta o consulta un escenario condicional de impacto a 30 días en Tenerife (bocas históricas o sismicidad actual).",
+            description="Runs or gets a 30-day conditional impact scenario on Tenerife (historical vents or current seismicity).",
             parameters={
                 "type": "object",
                 "properties": {
                     "branch": {
                         "type": "string",
                         "enum": ["dorsal_noroeste", "pico_viejo", "teide_norte", "dorsal_noreste", "sismicidad_actual"],
-                        "description": "Rama del sistema volcánico de Tenerife.",
+                        "description": "Branch of Tenerife's volcanic system.",
                     }
                 },
                 "required": ["branch"],
@@ -307,12 +307,12 @@ def build_domain_tools(seg_port: LavaSegmentationPort | None = None) -> list[Too
         ),
         ToolDefinition(
             name="preview_cap_112_alert",
-            description="Genera y previsualiza el mensaje estándar de alerta OASIS CAP 1.2 XML para 112 Canarias / ES-Alert.",
+            description="Generates and previews the standard OASIS CAP 1.2 XML alert message for 112 Canarias / ES-Alert.",
             parameters={
                 "type": "object",
                 "properties": {
                     "target": {"type": "string", "enum": ["lapalma2021", "tenerife"]},
-                    "ref": {"type": "string", "description": "Fecha AAAA-MM-DD (para lapalma2021) o rama (para tenerife)."},
+                    "ref": {"type": "string", "description": "Date YYYY-MM-DD (for lapalma2021) or branch (for tenerife)."},
                 },
                 "required": ["target", "ref"],
             },
@@ -328,23 +328,23 @@ def infer_deterministic_tool_calls(question: str, context: str | None = None) ->
     ctx_date = context.split(":", 1)[1] if (context and context.startswith("lapalma2021:")) else "2021-09-25"
     date_str = _extract_date(question, default=ctx_date)
 
-    if any(w in q for w in ("sam", "sam 3", "sam3", "segmenta", "satélite térmica", "termica", "iou", "meta sam")):
-        arg = "benchmark" if any(w in q for w in ("22", "validación", "validacion", "media", "global", "benchmark")) and not re.search(r"2021-\d{2}-\d{2}", question) else date_str
+    if any(w in q for w in ("sam", "sam 3", "sam3", "segmenta", "satélite térmica", "termica", "thermal", "iou", "meta sam")):
+        arg = "benchmark" if any(w in q for w in ("22", "validación", "validacion", "validation", "media", "mean", "global", "benchmark")) and not re.search(r"2021-\d{2}-\d{2}", question) else date_str
         calls.append(ToolCall(id="det_sam3", name="run_sam3_satellite_assimilation", arguments={"date": arg}))
 
-    if any(w in q for w in ("cap", "112", "es-alert", "xml", "alerta estándar")):
-        if "tenerife" in q or "garachico" in q or "dorsal" in q or "teide" in q:
+    if any(w in q for w in ("cap", "112", "es-alert", "xml", "alerta estándar", "alert")):
+        if "tenerife" in q or "garachico" in q or "dorsal" in q or "rift" in q or "teide" in q:
             calls.append(ToolCall(id="det_cap", name="preview_cap_112_alert", arguments={"target": "tenerife", "ref": _extract_tenerife_branch(question)}))
         else:
             calls.append(ToolCall(id="det_cap", name="preview_cap_112_alert", arguments={"target": "lapalma2021", "ref": date_str}))
 
-    if any(w in q for w in ("tenerife", "garachico", "icod", "chinyero", "pico viejo", "dorsal", "siete fuentes", "fasnia", "arafo", "güímar", "guimar")):
+    if any(w in q for w in ("tenerife", "garachico", "icod", "chinyero", "pico viejo", "dorsal", "rift", "siete fuentes", "fasnia", "arafo", "güímar", "guimar")):
         calls.append(ToolCall(id="det_tf", name="simulate_tenerife_scenario", arguments={"branch": _extract_tenerife_branch(question)}))
 
-    if any(w in q for w in ("la palma", "tajogaite", "todoque", "colada", "edificios", "mar", "2021", "72 h", "72h")) or (context and context.startswith("lapalma2021:")):
+    if any(w in q for w in ("la palma", "tajogaite", "todoque", "colada", "edificios", "mar", "lava", "buildings", "sea", "2021", "72 h", "72h")) or (context and context.startswith("lapalma2021:")):
         calls.append(ToolCall(id="det_lp", name="get_lapalma_2021_forecast", arguments={"date": date_str}))
 
-    if any(w in q for w in ("hoy", "directo", "actual", "enjambre", "canarias", "el hierro", "gnss", "so2", "índice", "indice")) or context == "canarias" or not calls:
+    if any(w in q for w in ("hoy", "directo", "actual", "enjambre", "canarias", "el hierro", "gnss", "so2", "índice", "indice", "today", "live", "now", "swarm", "canary", "unrest", "index")) or context == "canarias" or not calls:
         calls.append(ToolCall(id="det_live", name="get_canarias_live_status", arguments={"zone": _extract_zone(question)}))
 
     return calls[:3]
@@ -359,19 +359,19 @@ def _synthesize_offline(question: str, records: list[ToolExecutionRecord], hits)
             if out.get("mode") == "benchmark_63_scenes" or "summary" in out:
                 s = out["summary"]
                 parts.append(
-                    f"Prueba sintética circular derivada de CEMS, sin validación externa: "
-                    f"IoU medio {s['mean_iou']} (mediana {s['median_iou']}, precisión {s['mean_precision']}, exhaustividad {s['mean_recall']}), "
-                    f"latencia computacional media {s['mean_latency_ms']} ms por escena; sin adelanto operativo demostrado."
+                    f"Circular synthetic test derived from CEMS, no external validation: "
+                    f"mean IoU {s['mean_iou']} (median {s['median_iou']}, precision {s['mean_precision']}, recall {s['mean_recall']}), "
+                    f"mean compute latency {s['mean_latency_ms']} ms per scene; no operational lead time shown."
                 )
             elif out.get("available"):
                 c = out["comparison_vs_cems"]
                 af = out["assimilated_forecast"]
                 eta = af["sea_eta_h"]
-                eta_str = f"P50 {eta[1]} h (P10–P90 {eta[0]}–{eta[2]} h)" if eta and eta[1] is not None else "sin llegada prevista en el horizonte"
+                eta_str = f"P50 {eta[1]} h (P10–P90 {eta[0]}–{eta[2]} h)" if eta and eta[1] is not None else "no arrival expected within the horizon"
                 parts.append(
-                    f"Experimento sintético circular ({out['date']}): superficie segmentada {c['sam3_area_ha']} ha frente a {c['cems_area_ha']} ha de Copernicus EMS "
-                    f"(IoU sintético {c['iou']}, alcance {c['sam3_reach_m']} m vs {c['cems_reach_m']} m; sin adelanto operativo demostrado). "
-                    f"Tras reponderar los 600 recorridos con la máscara SAM 3.1 (ESS {af['ess']}), la probabilidad de llegada al mar es {round(100 * af['sea_p_ever'])} % ({eta_str})."
+                    f"Circular synthetic experiment ({out['date']}): segmented area {c['sam3_area_ha']} ha vs {c['cems_area_ha']} ha from Copernicus EMS "
+                    f"(synthetic IoU {c['iou']}, reach {c['sam3_reach_m']} m vs {c['cems_reach_m']} m; no operational lead time shown). "
+                    f"After reweighting the 600 paths with the SAM 3.1 mask (ESS {af['ess']}), the probability of reaching the sea is {round(100 * af['sea_p_ever'])} % ({eta_str})."
                 )
         elif rec.name == "get_lapalma_2021_forecast":
             if out.get("phase") == "pre-eruptive":
@@ -379,9 +379,9 @@ def _synthesize_offline(question: str, records: list[ToolExecutionRecord], hits)
                 if sc:
                     b = sc["buildings_30d"]
                     parts.append(
-                        f"Reconstrucción pre-eruptiva ({out['date']}): escenario desde {sc['n_vent_events']} sismos someros "
-                        f"(candidato más cercano a {sc['nearest_candidate_to_real_vent_km']} km de la boca real de Tajogaite). "
-                        f"Impacto condicional a 30 d: {round(b['expected'])} edificios de media (P10–P90 {round(b['p10_p90'][0])}–{round(b['p10_p90'][1])})."
+                        f"Pre-eruptive reconstruction ({out['date']}): scenario from {sc['n_vent_events']} shallow earthquakes "
+                        f"(nearest candidate {sc['nearest_candidate_to_real_vent_km']} km from the real Tajogaite vent). "
+                        f"Conditional 30 d impact: {round(b['expected'])} buildings on average (P10–P90 {round(b['p10_p90'][0])}–{round(b['p10_p90'][1])})."
                     )
             else:
                 sea = out.get("sea") or {}
@@ -389,40 +389,40 @@ def _synthesize_offline(question: str, records: list[ToolExecutionRecord], hits)
                 if c:
                     b, r = c["buildings"], c["road_km"]
                     parts.append(
-                        f"La Palma 2021 ({out['date']}, reconstrucción histórica): en las próximas 72 h se pronostican {b['central']} edificios nuevos "
-                        f"(P10–P90 {b['low']}–{b['high']}) y {r['central']} km de vías ({r['low']}–{r['high']} km). "
-                        f"Probabilidad de alcanzar el mar: {round(100 * sea.get('p_ever', 0))} %."
+                        f"La Palma 2021 ({out['date']}, historical reconstruction): {b['central']} new buildings forecast in the next 72 h "
+                        f"(P10–P90 {b['low']}–{b['high']}) and {r['central']} km of roads ({r['low']}–{r['high']} km). "
+                        f"Probability of reaching the sea: {round(100 * sea.get('p_ever', 0))} %."
                     )
                 else:
                     b = (out.get("unconstrained_72h") or {}).get("buildings") or {}
                     parts.append(
-                        f"La Palma 2021 ({out['date']}, antes del primer mapa Copernicus entregado): conjunto inicial desde la boca con "
-                        f"probabilidad de llegar al mar del {round(100 * sea.get('p_ever', 0))} % y {round(b.get('expected', 0))} edificios esperados en 72 h."
+                        f"La Palma 2021 ({out['date']}, before the first Copernicus map was delivered): initial ensemble from the vent with "
+                        f"a {round(100 * sea.get('p_ever', 0))} % probability of reaching the sea and {round(b.get('expected', 0))} buildings expected in 72 h."
                     )
         elif rec.name == "simulate_tenerife_scenario":
             if not out.get("unavailable"):
                 b, r = out["buildings_30d"], out["road_km_30d"]
                 top_p = ", ".join(f"{p['name']} ({round(100 * p['p'])} %)" for p in out.get("top_places", [])[:3])
                 parts.append(
-                    f"Escenario de planificación en Tenerife «{out['name']}» ({out['history']}): en 30 días alcanzaría {round(b['expected'])} edificios de media "
-                    f"(P10–P90 {round(b['p10_p90'][0])}–{round(b['p10_p90'][1])}) y {round(r['expected'], 1)} km de vías, con {round(100 * out['reach_sea_prob'])} % de recorridos llegando al mar. "
-                    f"Núcleos más expuestos: {top_p}."
+                    f"Tenerife planning scenario “{out['name']}” ({out['history']}): within 30 days it would reach {round(b['expected'])} buildings on average "
+                    f"(P10–P90 {round(b['p10_p90'][0])}–{round(b['p10_p90'][1])}) and {round(r['expected'], 1)} km of roads, with {round(100 * out['reach_sea_prob'])} % of paths reaching the sea. "
+                    f"Most exposed neighbourhoods: {top_p}."
                 )
         elif rec.name == "preview_cap_112_alert":
             parts.append(
-                f"Mensaje interoperable {out.get('standard')}: «{out.get('headline')}» con {out.get('n_probability_polygons')} polígonos de probabilidad "
-                f"({out.get('xml_bytes')} bytes XML, descargable en {out.get('download_path')})."
+                f"Interoperable {out.get('standard')} message: “{out.get('headline')}” with {out.get('n_probability_polygons')} probability polygons "
+                f"({out.get('xml_bytes')} bytes of XML, downloadable at {out.get('download_path')})."
             )
         elif rec.name == "get_canarias_live_status":
             zs = out.get("zones") or []
             if zs:
                 top_z = sorted(zs, key=lambda z: (z["unrest_index"] or -1, z["n_7d"]), reverse=True)[:3]
-                z_txt = "; ".join(f"{z['name']}: índice {z['unrest_index'] if z['unrest_index'] is not None else '—'}/10 ({z['n_7d']} sismos/7d, GNSS {z['gnss_level']})" for z in top_z)
-                parts.append(f"Vigilancia en directo en Canarias ({out['evaluated_at']}): {z_txt}.")
+                z_txt = "; ".join(f"{z['name']}: index {z['unrest_index'] if z['unrest_index'] is not None else '—'}/10 ({z['n_7d']} quakes/7d, GNSS {z['gnss_level']})" for z in top_z)
+                parts.append(f"Live monitoring in the Canaries ({out['evaluated_at']}): {z_txt}.")
 
     if hits:
-        parts.append(f"Referencias documentales consultadas: [1] {hits[0][0].doc} ({hits[0][0].section}).")
-    parts.append("Nota: VolScan es una herramienta de apoyo a la decisión; las alertas oficiales corresponden exclusivamente al PEVOLCA.")
+        parts.append(f"Documents consulted: [1] {hits[0][0].doc} ({hits[0][0].section}).")
+    parts.append("Note: VolScan is a decision-support tool; official alerts belong exclusively to PEVOLCA.")
     return "\n\n".join(parts)
 
 

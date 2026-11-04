@@ -66,13 +66,13 @@ class _BaseVisionLanguageMixin(MultimodalVisionLanguagePort):
                 timeout=self.timeout,
             )
         except Exception as e:
-            raise LLMUnavailable(f"{self.cfg.provider} vision no responde en {self.cfg.base}: {type(e).__name__}") from e
+            raise LLMUnavailable(f"{self.cfg.provider} vision not responding at {self.cfg.base}: {type(e).__name__}") from e
         if r.status_code != 200:
-            raise LLMUnavailable(f"{self.cfg.provider} vision devolvió HTTP {r.status_code}: {r.text[:200]}")
+            raise LLMUnavailable(f"{self.cfg.provider} vision returned HTTP {r.status_code}: {r.text[:200]}")
         try:
             text = _clean_text(r.json()["choices"][0]["message"].get("content") or "")
         except Exception as e:
-            raise LLMUnavailable(f"respuesta inesperada de {self.cfg.provider} vision") from e
+            raise LLMUnavailable(f"unexpected response from {self.cfg.provider} vision") from e
         dt_ms = (time.perf_counter() - t0) * 1000.0
         return ModelTurn(
             content=text,

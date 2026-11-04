@@ -413,11 +413,11 @@ class ImpactReplay:
                          pocket_xy=[(float(x), float(y)) for (x, y), f in zip(self.exp.bld_xy, W["pocket"]) if f])
         return dict(phase="eruptive", **self._public(I), constrained=C, isolation=iso[:15], truth_after=truth,
                     buildings_at_risk_xy=pts, watch=watch, map_delay_h=r.delay.total_seconds() / 3600,
-                    method="Dónde: conjunto de coladas desde la boca, reponderado con lo observado. Cuánto: crecimiento de "
-                           "área de los mapas de Copernicus ya entregados, contando desde la fecha del último mapa. Rango: "
-                           "calibrado con el error real de los pronósticos anteriores cuya verdad ya se conoce. Aislamiento: "
-                           "miembros del conjunto sobre la red de OSM. Edificios cercados: rodeados por la colada, donde va el "
-                           "crecimiento lateral.")
+                    method="Where: flow ensemble from the vent, reweighted with what was observed. How much: area growth "
+                           "from the Copernicus maps already delivered, counted from the date of the latest map. Range: "
+                           "calibrated on the real error of earlier forecasts whose outcome is already known. Isolation: "
+                           "ensemble members on the OSM road network. Hemmed-in buildings: surrounded by the flow, where "
+                           "lateral growth goes.")
 
     def scenario(self, now: dt.datetime, n_paths: int = 500) -> dict | None:
         """Pre-eruptive: vents drawn from the shallow seismicity of the last 72 h. Hours count from the (unknown) opening."""
@@ -462,9 +462,9 @@ class ImpactReplay:
                            for pl in self.exp.places if pl["cell"] >= 0],
                    overlay=dict(png=png_data_url(lava_overlay_rgba(p, None), "RGBA"), west=g.west, north=g.north, step=g.step,
                                 rows=g.shape[0], cols=g.shape[1], horizon_h=None,
-                                legend="Escenario: colada desde las bocas probables (sismicidad somera de las últimas 72 h)"),
-                   note="Escenario anticipado: no se sabe dónde abrirá la boca. Se lanzan coladas desde donde se concentra "
-                        "la sismicidad más somera (con 1 km de incertidumbre). Las horas cuentan desde una apertura hipotética.")
+                                legend="Scenario: lava from the likely vents (shallow seismicity of the last 72 h)"),
+                   note="Anticipated scenario: nobody knows where the vent will open. Flows are launched from where the "
+                        "shallowest seismicity clusters (with 1 km of uncertainty). Hours count from a hypothetical opening.")
         out["places"] = sorted([q for q in out["places"] if q["p"] >= 0.01], key=lambda q: -q["p"])[:15]
         self._scen[key] = out
         return out
@@ -601,8 +601,8 @@ def validation_payload(ir: ImpactReplay, sensitivity: dict | None = None) -> dic
     rows = ir.validation()
     return dict(rows=rows, summary=validation_summary(rows), map_delay_h=ir.r.delay.total_seconds() / 3600,
                 delay_sensitivity=sensitivity,
-                truth="Copernicus EMS EMSR546: edificios dentro de la colada observada (inventario CEMS, 2.988 destruidos al final)",
-                method="Cada día a las 23:59 UTC, con los mapas de Copernicus ya entregados (se supone que llegan 24 h después "
-                       "de la imagen), VolScan pronostica los edificios nuevos alcanzados en 72 h. Se compara con el mapa "
-                       "adquirido 72 h después. El rango P10–P90 se calibra solo con los errores de pronósticos anteriores "
-                       "cuya verdad ya se conocía ese día.")
+                truth="Copernicus EMS EMSR546: buildings inside the observed flow (CEMS inventory, 2,988 destroyed in the end)",
+                method="Every day at 23:59 UTC, with the Copernicus maps already delivered (assumed to arrive 24 h after "
+                       "the image), VolScan forecasts the new buildings reached in 72 h. It is compared with the map "
+                       "acquired 72 h later. The P10–P90 range is calibrated only on the errors of earlier forecasts "
+                       "whose outcome was already known that day.")

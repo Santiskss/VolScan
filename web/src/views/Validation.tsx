@@ -20,27 +20,27 @@ function Chart({ rows }: { rows: ValidationRow[] }) {
   return (
     <div className="chart-wrap">
       <div className="legend-row">
-        <span><i className="sw band" />Pronóstico VolScan (P10–P90 calibrado)</span>
-        <span><i className="sw line" />Pronóstico central</span>
-        <span><i className="sw dot" />Observado por Copernicus</span>
+        <span><i className="sw band" />VolScan forecast (calibrated P10–P90)</span>
+        <span><i className="sw line" />Central forecast</span>
+        <span><i className="sw dot" />Observed by Copernicus</span>
       </div>
-      <svg viewBox={`0 0 ${W} ${H}`} role="img" aria-label="Edificios nuevos alcanzados en las 72 h siguientes: pronóstico frente a observado"
+      <svg viewBox={`0 0 ${W} ${H}`} role="img" aria-label="New buildings reached in the next 72 h: forecast vs observed"
         onMouseLeave={() => setHover(null)}
         onMouseMove={(e) => { const b = (e.currentTarget as SVGSVGElement).getBoundingClientRect(); const px = ((e.clientX - b.left) / b.width) * W; setHover(Math.max(0, Math.min(n - 1, Math.round(((px - M.l) / (W - M.l - M.r)) * (n - 1))))) }}>
         {ticks.map((t) => <g key={t}><line x1={M.l} x2={W - M.r} y1={y(t)} y2={y(t)} className="grid" /><text x={M.l - 8} y={y(t) + 4} textAnchor="end" className="axis">{t}</text></g>)}
-        {months.map((m) => <text key={m.d} x={x(m.i)} y={H - 10} className="axis" textAnchor="start">{new Date(m.d + 'T12:00:00Z').toLocaleDateString('es-ES', { day: 'numeric', month: 'short', timeZone: 'UTC' })}</text>)}
+        {months.map((m) => <text key={m.d} x={x(m.i)} y={H - 10} className="axis" textAnchor="start">{new Date(m.d + 'T12:00:00Z').toLocaleDateString('en-GB', { day: 'numeric', month: 'short', timeZone: 'UTC' })}</text>)}
         <polygon points={band} className="band" />
         <path d={line} className="central" />
         {data.map((r, i) => <circle key={r.date} cx={x(i)} cy={y(r.obs_72 ?? 0)} r={hover === i ? 5.5 : 4} className="obs" />)}
         {h && <g>
           <line x1={x(hover!)} x2={x(hover!)} y1={M.t} y2={H - M.b} className="cross" />
         </g>}
-        <text x={M.l} y={M.t - 4} className="axis">edificios</text>
+        <text x={M.l} y={M.t - 4} className="axis">buildings</text>
       </svg>
       {h && <div className="tip" style={{ left: `${(x(hover!) / W) * 100}%` }}>
-        <b>{fmt.date(h.date + 'T12:00:00Z')}</b> (fin del día) → 72 h<br />
-        Pronóstico: {Math.round(h.pred_72.expected)} ({Math.round(h.pred_72.p10_p90[0])}–{Math.round(h.pred_72.p10_p90[1])})<br />
-        Observado: {h.obs_72} · ya perdidos: {h.lost_buildings}
+        <b>{fmt.date(h.date + 'T12:00:00Z')}</b> (end of day) → 72 h<br />
+        Forecast: {Math.round(h.pred_72.expected)} ({Math.round(h.pred_72.p10_p90[0])}–{Math.round(h.pred_72.p10_p90[1])})<br />
+        Observed: {h.obs_72} · already lost: {h.lost_buildings}
       </div>}
     </div>
   )
@@ -59,51 +59,51 @@ export default function Validation() {
   const sens = d?.delay_sensitivity
   return (
     <div className="page">
-      <h2>¿Cuánto acierta VolScan? La Palma 2021, día a día</h2>
-      <p className="lead">Cada día de la erupción, VolScan pronosticó cuántos edificios nuevos alcanzaría la lava en las 72 h siguientes, solo con lo que se sabía ese día. Aquí se compara con lo que Copernicus cartografió después.</p>
+      <h2>How accurate is VolScan? La Palma 2021, day by day</h2>
+      <p className="lead">Every day of the eruption, VolScan forecast how many new buildings the lava would reach in the next 72 h, using only what was known that day. Here it is compared with what Copernicus mapped afterwards.</p>
       {d && <p className="note">{d.method}</p>}
-      {err && <div className="note">No se pudo cargar la validación: {err}</div>}
-      {!d && !err && <div className="loading">Calculando 83 pronósticos y comparándolos con la realidad (un par de minutos la primera vez)…</div>}
+      {err && <div className="note">Could not load the validation: {err}</div>}
+      {!d && !err && <div className="loading">Computing 83 forecasts and comparing them with reality (a couple of minutes the first time)…</div>}
       {s && <div className="kpis kpis-page">
-        <div className="kpi"><div className="k">Días dentro del rango</div><div className="v">{s.within_p10_p90_72h}<small>/ {s.days}</small></div><div className="s">{Math.round(100 * s.within_p10_p90_72h / s.days)} % de los días (un P10–P90 bien calibrado daría 80 %)</div></div>
-        <div className="kpi"><div className="k">Sesgo total</div><div className="v">{s.bias_pct != null && s.bias_pct > 0 ? '+' : ''}{fmt.num(s.bias_pct)}<small> %</small></div><div className="s">{fmt.int(s.total_pred_72)} pronosticados frente a {fmt.int(s.total_obs_72)} observados (ventanas de 72 h, se solapan)</div></div>
-        <div className="kpi"><div className="k">Error medio</div><div className="v">{fmt.num(s.mae_72)}</div><div className="s">edificios por pronóstico de 72 h</div></div>
-        {s.watch && <div className="kpi"><div className="k">Lista de vigilancia</div><div className="v">{pc(s.watch.with_pocket.recall)}</div><div className="s">de los edificios perdidos estaban en la lista 72 h antes ({pc(s.watch.high.recall)} sin los cercados)</div></div>}
+        <div className="kpi"><div className="k">Days inside the range</div><div className="v">{s.within_p10_p90_72h}<small>/ {s.days}</small></div><div className="s">{Math.round(100 * s.within_p10_p90_72h / s.days)} % of days (a well-calibrated P10–P90 would give 80 %)</div></div>
+        <div className="kpi"><div className="k">Total bias</div><div className="v">{s.bias_pct != null && s.bias_pct > 0 ? '+' : ''}{fmt.num(s.bias_pct)}<small> %</small></div><div className="s">{fmt.int(s.total_pred_72)} forecast vs {fmt.int(s.total_obs_72)} observed (72 h windows, overlapping)</div></div>
+        <div className="kpi"><div className="k">Mean error</div><div className="v">{fmt.num(s.mae_72)}</div><div className="s">buildings per 72 h forecast</div></div>
+        {s.watch && <div className="kpi"><div className="k">Watch list</div><div className="v">{pc(s.watch.with_pocket.recall)}</div><div className="s">of lost buildings were on the list 72 h earlier ({pc(s.watch.high.recall)} without hemmed-in ones)</div></div>}
       </div>}
       {d && <Chart rows={d.rows} />}
       {d && s && <div className="cards" style={{ marginTop: 16 }}>
-        <div className="card"><h3>Dónde acierta</h3><p className="note">{(() => {
+        <div className="card"><h3>Where it works</h3><p className="note">{(() => {
           const ph = d.rows.filter((r) => r.obs_72 != null && r.date >= '2021-09-23' && r.date <= '2021-10-08')
           const inR = ph.filter((r) => r.pred_72.p10_p90[0] <= (r.obs_72 as number) && (r.obs_72 as number) <= r.pred_72.p10_p90[1]).length
-          return `En la fase de avance hacia el mar y Todoque (23 sep – 8 oct), el valor real cayó en el rango ${inR} de ${ph.length} días. `
-        })()}{first ? `Los dos primeros pronósticos con mapa sobreestiman (${fmt.date(first.date + 'T12:00:00Z')}: ${Math.round(first.pred_72.expected)} previstos frente a ${first.obs_72}): el primer ritmo de crecimiento se extrapola sin historial. ` : ''}En conjunto se queda un {fmt.num(Math.abs(s.bias_pct ?? 0))} % {(s.bias_pct ?? 0) < 0 ? 'corto' : 'largo'}.</p></div>
-        <div className="card"><h3>Dónde falla, y qué hacemos</h3><p className="note">Los saltos bruscos de crecimiento lateral rellenan el terreno entre brazos de la colada, en zona densa. Probamos tres formas de pronosticar ese «dónde» y ninguna mejoró el recuento central, así que no se mezclan; sí ampliamos el extremo alto del rango con ese relleno, lo que recupera el 12–13 de octubre. El 25–28 de octubre (unos 10 edificios por hectárea nueva) sigue fuera. Sí sirven para la <b>lista de vigilancia</b>: los edificios cercados por la colada recogieron {s.watch ? pc((s.watch.with_pocket.recall ?? 0) - (s.watch.high.recall ?? 0)) : '—'} más de lo perdido, con una precisión del {s.watch ? pc(s.watch.with_pocket.precision) : '—'}.</p></div>
-        <div className="card"><h3>Retraso de los mapas</h3><p className="note">Copernicus entrega cada mapa entre 7 h (modo rápido) y 48 h (modo estándar) después de recibir la imagen. Aquí se supone {fmt.num(d.map_delay_h)} h. {sens ? `Con 7 h: ${sens['7'].within_p10_p90_72h}/${sens['7'].days} días en rango y sesgo ${fmt.num(sens['7'].bias_pct)} %. Con 48 h: ${sens['48'].within_p10_p90_72h}/${sens['48'].days} y ${fmt.num(sens['48'].bias_pct)} %.` : ''}</p></div>
-        <div className="card"><h3>Verdad de terreno</h3><p className="note">{d.truth}. Una institución puede defender una decisión con una herramienta cuyo acierto está medido; por eso esta página existe.</p></div>
+          return `While the lava advanced towards the sea and Todoque (23 Sep – 8 Oct), the real value fell inside the range on ${inR} of ${ph.length} days. `
+        })()}{first ? `The first two forecasts with a map overestimate (${fmt.date(first.date + 'T12:00:00Z')}: ${Math.round(first.pred_72.expected)} forecast vs ${first.obs_72}): the first growth rate is extrapolated with no history. ` : ''}Overall it is {fmt.num(Math.abs(s.bias_pct ?? 0))} % {(s.bias_pct ?? 0) < 0 ? 'low' : 'high'}.</p></div>
+        <div className="card"><h3>Where it fails, and what we do</h3><p className="note">Sudden bursts of lateral growth fill the ground between flow arms in dense areas. We tried three ways to forecast that “where” and none improved the central count, so they are not mixed in; we do widen the top of the range with that infill, which recovers 12–13 October. 25–28 October (about 10 buildings per new hectare) is still outside. They do help the <b>watch list</b>: buildings hemmed in by the flow caught {s.watch ? pc((s.watch.with_pocket.recall ?? 0) - (s.watch.high.recall ?? 0)) : '—'} more of the losses, with {s.watch ? pc(s.watch.with_pocket.precision) : '—'} precision.</p></div>
+        <div className="card"><h3>Map delivery delay</h3><p className="note">Copernicus delivers each map 7 h (rush mode) to 48 h (standard mode) after receiving the image. Here we assume {fmt.num(d.map_delay_h)} h. {sens ? `With 7 h: ${sens['7'].within_p10_p90_72h}/${sens['7'].days} days in range and ${fmt.num(sens['7'].bias_pct)} % bias. With 48 h: ${sens['48'].within_p10_p90_72h}/${sens['48'].days} and ${fmt.num(sens['48'].bias_pct)} %.` : ''}</p></div>
+        <div className="card"><h3>Ground truth</h3><p className="note">{d.truth}. An institution can defend a decision made with a tool whose accuracy is measured; that is why this page exists.</p></div>
       </div>}
 
       {samVal && (
         <div style={{ marginTop: 28 }}>
-          <h3>Experimento de segmentación con escenas sintéticas derivadas de CEMS ({samVal.n_scenes} escenas EMSR546)</h3>
+          <h3>Segmentation experiment on synthetic scenes derived from CEMS ({samVal.n_scenes} EMSR546 scenes)</h3>
           <p className="note">{samVal.note}</p>
           <div className="kpis kpis-page" style={{ marginTop: 10 }}>
             <div className="kpi">
-              <div className="k">IoU medio (Jaccard)</div>
+              <div className="k">Mean IoU (Jaccard)</div>
               <div className="v">{fmt.num(samVal.summary.mean_iou, 3)}</div>
-              <div className="s">mediana {fmt.num(samVal.summary.median_iou, 3)} en {samVal.n_scenes} máscaras de referencia (prueba circular)</div>
+              <div className="s">median {fmt.num(samVal.summary.median_iou, 3)} over {samVal.n_scenes} reference masks (circular test)</div>
             </div>
             <div className="kpi">
-              <div className="k">Precisión / Recall</div>
+              <div className="k">Precision / Recall</div>
               <div className="v">{pc(samVal.summary.mean_precision)}<small> / {pc(samVal.summary.mean_recall)}</small></div>
-              <div className="s">F1 medio {fmt.num(samVal.summary.mean_f1, 3)} sobre la referencia usada para construir la entrada</div>
+              <div className="s">mean F1 {fmt.num(samVal.summary.mean_f1, 3)} against the reference used to build the input</div>
             </div>
             <div className="kpi">
-              <div className="k">Ganancia de antelación</div>
-              <div className="v">Sin demostrar</div>
-              <div className="s">No hay escenas observadas independientes ni latencia operativa medida</div>
+              <div className="k">Lead-time gain</div>
+              <div className="v">Not shown</div>
+              <div className="s">No independent observed scenes and no measured operational latency</div>
             </div>
             <div className="kpi">
-              <div className="k">Latencia por escena</div>
+              <div className="k">Latency per scene</div>
               <div className="v">{fmt.num(samVal.summary.mean_latency_ms, 1)}<small> ms</small></div>
               <div className="s">{samVal.adapter.adapter} ({samVal.adapter.model})</div>
             </div>

@@ -101,13 +101,13 @@ def context_line(cal: dict, zone: str, index: float | None) -> str | None:
     rows = [r for r in cal["table"] if r["threshold"] <= index]
     if not rows:
         lo = cal["table"][0]
-        return (f"Por debajo de {lo['threshold']}: nivel habitual. Desde {cal['start'][:4]}, el índice superó "
-                f"{lo['threshold']} en {lo['episodes']} episodios en todo el archipiélago; {lo['preceded_eruption']} "
-                f"precedieron a una erupción.")
+        return (f"Below {lo['threshold']}: usual level. Since {cal['start'][:4]}, the index exceeded "
+                f"{lo['threshold']} in {lo['episodes']} episodes across the archipelago; {lo['preceded_eruption']} "
+                f"preceded an eruption.")
     r = rows[-1]
-    return (f"Desde {cal['start'][:4]}, el índice llegó a {r['threshold']} o más en {r['episodes']} episodios en todo el "
-            f"archipiélago; {r['preceded_eruption']} de ellos precedieron a una erupción (El Hierro 2011, La Palma 2021). "
-            f"No es una probabilidad: dos erupciones no bastan para calcularla.")
+    return (f"Since {cal['start'][:4]}, the index reached {r['threshold']} or more in {r['episodes']} episodes across the "
+            f"archipelago; {r['preceded_eruption']} of them preceded an eruption (El Hierro 2011, La Palma 2021). "
+            f"It is not a probability: two eruptions are not enough to compute one.")
 
 
 def load_or_build(path: Path, zone_catalogs_fn, end_ts: float, max_age_days: float = 7) -> dict:

@@ -16,7 +16,7 @@ from .seismic import DAY, Catalog, b_value, energy_joules, unrest
 from .tides import SEMIDIURNAL_S, SPRING_NEAP_S, TidalClock, alignment_shift_test, decluster, lunar_elongation
 from .zones import BY_KEY
 
-MESES = "enero febrero marzo abril mayo junio julio agosto septiembre octubre noviembre diciembre".split()
+MESES = "January February March April May June July August September October November December".split()
 
 
 def month_bounds(month: str):
@@ -82,7 +82,7 @@ def monthly_report(cat: Catalog, events, zone_key: str, month: str, now: dt.date
             semidiurnal=alignment_shift_test(cur.t[keep], clock.phase, SEMIDIURNAL_S, n_perm=100),
             fortnightly=alignment_shift_test(cur.t[keep], lambda t: (2 * lunar_elongation(t)) % 360, SPRING_NEAP_S, n_perm=100))
     rep = dict(
-        zone=dict(key=z.key, name=z.name, note=z.note), month=month, title=f"{z.name} · {MESES[a.month - 1]} de {a.year}",
+        zone=dict(key=z.key, name=z.name, note=z.note), month=month, title=f"{z.name} · {MESES[a.month - 1]} {a.year}",
         partial=partial, generated_at=now.isoformat(), period=dict(start=a.isoformat(), end=end.isoformat()),
         stats=st, prev=prev, baseline=dict(rate_day=round(base_rate_day, 2), n_365=len(base)),
         rate_day=round(rate_day, 2), rate_ratio=round(rate_day / base_rate_day, 2) if base_rate_day > 0 else None,
@@ -92,7 +92,7 @@ def monthly_report(cat: Catalog, events, zone_key: str, month: str, now: dt.date
         top_events=[dict(t=e.time_utc.isoformat(), mag=e.mag, mag_type=e.mag_type, depth=e.depth_km, place=e.location,
                          int_max=e.int_max or None, id=e.evid) for e in top],
         felt=len(felt), tides=tides,
-        sources=["Instituto Geográfico Nacional (IGN). Catálogo de terremotos. doi:10.7419/162.03.2022"],
+        sources=["Instituto Geográfico Nacional (IGN). Earthquake catalogue. doi:10.7419/162.03.2022"],
         deformation=None, so2=None,
     )
     if indicators:
@@ -112,7 +112,7 @@ def monthly_report(cat: Catalog, events, zone_key: str, month: str, now: dt.date
 
 
 def _n(x: float, d: int = 1) -> str:
-    return f"{x:.{d}f}".replace(".", ",")
+    return f"{x:.{d}f}"
 
 
 def _pl(n: int, one: str, many: str) -> str:
@@ -123,44 +123,44 @@ def narrative(r: dict) -> str:
     """Deterministic summary from the figures. Never says anything that isn't in the figures."""
     st, prev = r["stats"], r["prev"]
     parts = []
-    period = "en lo que va de mes" if r["partial"] else "durante el mes"
-    parts.append(f"{r['zone']['name']} registró {_pl(st['n'], 'terremoto localizado', 'terremotos localizados')} por el IGN {period}"
-                 + (f", con magnitud máxima {_n(st['max_mag'])}" if st["max_mag"] is not None else "")
-                 + (f"; {_pl(r['felt'], 'fue sentido', 'fueron sentidos')} por la población" if r["felt"] else "") + ".")
+    period = "so far this month" if r["partial"] else "during the month"
+    parts.append(f"{r['zone']['name']} recorded {_pl(st['n'], 'earthquake', 'earthquakes')} located by the IGN {period}"
+                 + (f", with a maximum magnitude of {_n(st['max_mag'])}" if st["max_mag"] is not None else "")
+                 + (f"; {_pl(r['felt'], 'was', 'were')} felt by the population" if r["felt"] else "") + ".")
     if r["rate_ratio"] is not None:
         if r["rate_ratio"] >= 2:
-            parts.append(f"Es {_n(r['rate_ratio'])} veces la tasa media de los doce meses anteriores.")
+            parts.append(f"That is {_n(r['rate_ratio'])} times the mean rate of the previous twelve months.")
         elif r["rate_ratio"] <= 0.5:
-            parts.append(f"Es una actividad inferior a la habitual ({_n(r['rate_ratio'])} veces la media anual).")
+            parts.append(f"Activity is below usual ({_n(r['rate_ratio'])} times the annual mean).")
         else:
-            parts.append("La actividad está dentro de lo habitual para la zona en el último año.")
+            parts.append("Activity is within the usual range for the zone over the last year.")
     if st["depth_median"] is not None:
-        parts.append(f"La mediana de profundidad fue de {_n(st['depth_median'])} km"
-                     + (f" (el mes anterior, {_n(prev['depth_median'])} km)" if prev["depth_median"] is not None else "")
-                     + (f"; {_pl(st['shallow_lt5'], 'evento', 'eventos')} a menos de 5 km." if st["shallow_lt5"] else "."))
+        parts.append(f"Median depth was {_n(st['depth_median'])} km"
+                     + (f" (previous month, {_n(prev['depth_median'])} km)" if prev["depth_median"] is not None else "")
+                     + (f"; {_pl(st['shallow_lt5'], 'event', 'events')} shallower than 5 km." if st["shallow_lt5"] else "."))
     if st["n_m3"]:
-        parts.append(f"Hubo {_pl(st['n_m3'], 'terremoto', 'terremotos')} de magnitud 3 o superior.")
+        parts.append(f"There {'was' if st['n_m3'] == 1 else 'were'} {_pl(st['n_m3'], 'earthquake', 'earthquakes')} of magnitude 3 or more.")
     dfm = r.get("deformation")
     if dfm:
         worst = max(dfm["stations"], key=lambda x: max(x.get("z_h") or 0, abs(x.get("z_u") or 0)))
-        lvl = {"normal": "dentro de lo normal", "a vigilar": "con desviaciones a vigilar", "anómala": "anómala"}[dfm["level"]]
-        parts.append(f"Deformación (GNSS, {_pl(len(dfm['stations']), 'estación', 'estaciones')}): {lvl}; la mayor desviación, "
-                     f"en {worst['code']}, fue de {_n(worst['anom_u_mm'])} mm en vertical respecto a su tendencia "
-                     f"(datos hasta el {worst['evaluated_at']}).")
+        lvl = {"normal": "within normal", "a vigilar": "with deviations to watch", "anómala": "anomalous"}[dfm["level"]]
+        parts.append(f"Deformation (GNSS, {_pl(len(dfm['stations']), 'station', 'stations')}): {lvl}; the largest deviation, "
+                     f"at {worst['code']}, was {_n(worst['anom_u_mm'])} mm vertical against its trend "
+                     f"(data up to {worst['evaluated_at']}).")
     so2 = r.get("so2")
     if so2:
-        parts.append(f"SO2 por satélite: {'sin SO2 visible' if not so2['days_detected'] else _pl(so2['days_detected'], 'día', 'días') + ' con SO2 detectado'}"
-                     f" ({so2['days']} días con dato; máximo {_n(so2['max_kt'], 2)} kt).")
+        parts.append(f"Satellite SO2: {'no visible SO2' if not so2['days_detected'] else _pl(so2['days_detected'], 'day', 'days') + ' with SO2 detected'}"
+                     f" ({so2['days']} days with data; maximum {_n(so2['max_kt'], 2)} kt).")
     u = r["unrest_end"]["index"]
     if u is not None:
-        parts.append(f"El índice de actividad anómala de VolScan cerró el periodo en {_n(u)}/10"
-                     + (" (alto: conviene seguimiento estrecho)." if u >= 6 else "."))
+        parts.append(f"VolScan's unrest index closed the period at {_n(u)}/10"
+                     + (" (high: close monitoring advised)." if u >= 6 else "."))
     if r["tides"]:
         sig = [k for k, v in r["tides"].items() if v["p_shift"] < 0.05]
-        parts.append("Mareas y Luna: " + ("exceso de sismos en la fase de máximo para " + " y ".join(
-            "la marea semidiurna" if s == "semidiurnal" else "las mareas vivas" for s in sig) +
-            " (correlación a vigilar, no causalidad)." if sig else "sin modulación detectable este mes."))
-    parts.append("VolScan no emite niveles de alerta; la valoración oficial corresponde al PEVOLCA.")
+        parts.append("Tides and Moon: " + ("excess of earthquakes at the maximum phase for " + " and ".join(
+            "the semidiurnal tide" if s == "semidiurnal" else "spring tides" for s in sig) +
+            " (a correlation to watch, not causation)." if sig else "no detectable modulation this month."))
+    parts.append("VolScan issues no alert levels; the official assessment belongs to PEVOLCA.")
     return " ".join(parts)
 
 
@@ -180,10 +180,10 @@ def _lunar_regime(elong_deg: float) -> str:
     # 0° = Luna nueva (sizigia), 180° = Luna llena (sizigia), 90°/270° = Cuadratura
     d_syz = min(abs(elong_deg - 0), abs(elong_deg - 180), abs(elong_deg - 360))
     if d_syz <= 28:
-        return f"Sizigia / Marea viva ({round(elong_deg)}° · {'Luna llena' if abs(elong_deg - 180) <= 40 else 'Luna nueva'})"
+        return f"Syzygy / spring tide ({round(elong_deg)}° · {'full moon' if abs(elong_deg - 180) <= 40 else 'new moon'})"
     if abs(elong_deg - 90) <= 28 or abs(elong_deg - 270) <= 28:
-        return f"Cuadratura / Marea muerta ({round(elong_deg)}°)"
-    return f"Transición intermedia ({round(elong_deg)}°)"
+        return f"Quadrature / neap tide ({round(elong_deg)}°)"
+    return f"Intermediate transition ({round(elong_deg)}°)"
 
 
 def catastrophe_report_lapalma2021(ir) -> dict:
@@ -205,46 +205,46 @@ def catastrophe_report_lapalma2021(ir) -> dict:
     # 1. Explicit Provenance Table (Real vs Estimated)
     provenance = [
         dict(
-            layer="Catálogo sísmico (hipocentros, magnitud mbLg/Mw, intensidad)",
+            layer="Seismic catalogue (hypocentres, mbLg/Mw magnitude, intensity)",
             kind="REAL",
-            source="Instituto Geográfico Nacional (IGN) + respaldo EMSC FDSN",
-            usage="Localización 3D de sismos bajo la isla, cálculo de Mc, b-value y selección de bocas pre-eruptivas.",
+            source="Instituto Geográfico Nacional (IGN) + EMSC FDSN backup",
+            usage="3D location of earthquakes under the island, Mc and b-value, and selection of pre-eruptive vents.",
         ),
         dict(
-            layer="Perímetros de colada y huella de edificios/vías (63 entregas)",
+            layer="Flow perimeters and building/road footprints (63 deliveries)",
             kind="REAL",
             source="Copernicus Emergency Management Service (EMSR546) + OpenStreetMap",
-            usage="Verdad de terreno (1.219 ha, 2.988 edificios destruidos) y reponderación Bayesiana tras la entrega humana (24 h).",
+            usage="Ground truth (1,219 ha, 2,988 buildings destroyed) and Bayesian reweighting after human delivery (24 h).",
         ),
         dict(
-            layer="Deformación cortical GNSS (E, N, Vertical) y columna de SO2",
+            layer="GNSS crustal deformation (E, N, Up) and SO2 column",
             kind="REAL",
-            source="Nevada Geodetic Laboratory (estaciones LPAL, BLPA) y NASA OMPS",
-            usage="Detección de deflación sin-eruptiva (−25 a −40 mm) y penacho de dióxido de azufre (> 1 kt/día).",
+            source="Nevada Geodetic Laboratory (stations LPAL, BLPA) and NASA OMPS",
+            usage="Detection of syn-eruptive deflation (−25 to −40 mm) and the sulphur dioxide plume (> 1 kt/day).",
         ),
         dict(
-            layer="Modelo digital del terreno pre-erupción (MDE 25 m)",
+            layer="Pre-eruption digital elevation model (25 m DEM)",
             kind="REAL",
-            source="Copernicus DEM GLO-30 (previo a septiembre de 2021)",
-            usage="Topografía base sobre la que descienden los recorridos estocásticos de lava.",
+            source="Copernicus DEM GLO-30 (before September 2021)",
+            usage="Base topography the stochastic lava paths run down.",
         ),
         dict(
-            layer="Conjunto de 600 recorridos de colada y velocidad de frente",
+            layer="Ensemble of 600 lava paths and front speed",
             kind="ESTIMADO",
-            source="Motor físico VolScan (`volscan.lava` · ecuación de Jeffreys + Monte Carlo)",
-            usage="Simula viscosidad log-normal (mediana 3×10⁶ Pa·s), espesor (1,8–6 m) y perturbación topográfica.",
+            source="VolScan physics engine (`volscan.lava` · Jeffreys equation + Monte Carlo)",
+            usage="Simulates log-normal viscosity (median 3×10⁶ Pa·s), thickness (1.8–6 m) and topographic perturbation.",
         ),
         dict(
-            layer="Asimilación de datos y pronóstico de impacto a 72 h (P10–P90)",
+            layer="Data assimilation and 72 h impact forecast (P10–P90)",
             kind="ESTIMADO",
-            source="Filtro Bayesiano VolScan (`volscan.assimilation` + `volscan.replay`)",
-            usage="Repondera los 600 recorridos con el alcance y dirección observados; calibra el P10–P90 con errores pasados.",
+            source="VolScan Bayesian filter (`volscan.assimilation` + `volscan.replay`)",
+            usage="Reweights the 600 paths with the observed reach and direction; calibrates P10–P90 with past errors.",
         ),
         dict(
-            layer="Experimento térmico sintético derivado de la referencia CEMS",
+            layer="Synthetic thermal experiment derived from the CEMS reference",
             kind="ESTIMADO",
-            source="Segmentación geodésica determinista; proveedor SAM pendiente de verificación",
-            usage="Escena generada desde la propia máscara CEMS. No demuestra rendimiento externo ni adelanto operativo.",
+            source="Deterministic geodesic segmentation; SAM provider pending verification",
+            usage="Scene generated from the CEMS mask itself. Shows no external performance or operational lead time.",
         ),
     ]
 
@@ -264,47 +264,47 @@ def catastrophe_report_lapalma2021(ir) -> dict:
 
     rheology_phases = [
         dict(
-            phase="Fase 1 · Apertura y avance frontal hacia Todoque y el mar",
+            phase="Phase 1 · Opening and frontal advance towards Todoque and the sea",
             period="19 sep – 28 sep 2021",
-            lava_type="Tefrita-basanita ('a'ā escoriácea de frente alto, 4–8 m de espesor)",
-            rheology_real="Viscosidad efectiva alta en el frente enfriado (~10⁶–10⁷ Pa·s); ralentización en Todoque (22–26 sep) seguida de pulso efusivo rápido hasta caer al mar en Los Guirres el 28 sep a las 22:02 UTC.",
-            rheology_model="Conjunto log-normal con viscosidad mediana 3×10⁶ Pa·s (factor 1,5) y verosimilitud asimétrica de alcance (σ_lento = 600 m, σ_rápido = 2.500 m) para no descartar miembros rápidos durante la parada del frente.",
-            coincidence="El 20 sep VolScan daba 67 % a Todoque y 36 % al mar; el 27 sep estimó la llegada al mar en P50 +26 h (ocurrió a las +22 h reales).",
+            lava_type="Tephrite-basanite (clinkery 'a'ā with a high front, 4–8 m thick)",
+            rheology_real="High effective viscosity at the cooled front (~10⁶–10⁷ Pa·s); slowdown at Todoque (22–26 Sep) followed by a fast effusive pulse until it fell into the sea at Los Guirres on 28 Sep at 22:02 UTC.",
+            rheology_model="Log-normal ensemble with median viscosity 3×10⁶ Pa·s (factor 1.5) and an asymmetric reach likelihood (σ_slow = 600 m, σ_fast = 2,500 m) so fast members are not discarded while the front stalls.",
+            coincidence="On 27 Sep VolScan put the median sea arrival at +26 h (it happened at +22 h).",
             stats=_phase_metrics("2021-09-19", "2021-09-28"),
         ),
         dict(
-            phase="Fase 2 · Drenaje por tubos volcánicos y desbordamientos laterales Norte (La Laguna)",
+            phase="Phase 2 · Drainage through lava tubes and northern lateral overflows (La Laguna)",
             period="29 sep – 25 oct 2021",
-            lava_type="Basanita fluida en canales y tubos ('a'ā / transicional a pahoehoe proximal)",
-            rheology_real="Descenso de viscosidad en el núcleo del canal (~10⁴–5×10⁵ Pa·s) por aislamiento térmico en tubos; roturas laterales del cono (9 oct) abren nuevos brazos hacia el polígono industrial del Callejón de la Gata y La Laguna.",
-            rheology_model="El modelo topográfico desde la boca capta el corredor general, y la puntuación de embolsamiento lateral (`infill_prior`, 30 % en cota alta P90) cubre los edificios cercados entre brazos.",
-            coincidence="En la ventana crítica del 23 sep al 8 oct, el impacto real a 72 h cayó dentro de la banda P10–P90 en 15 de 16 días (94 %).",
+            lava_type="Fluid basanite in channels and tubes ('a'ā / transitional to proximal pahoehoe)",
+            rheology_real="Lower viscosity in the channel core (~10⁴–5×10⁵ Pa·s) from thermal insulation in tubes; lateral breaches of the cone (9 Oct) opened new arms towards the Callejón de la Gata industrial estate and La Laguna.",
+            rheology_model="The topographic model from the vent captures the general corridor, and the lateral infill score (`infill_prior`, 30 % at the P90 upper bound) covers buildings hemmed in between arms.",
+            coincidence="In the critical window from 23 Sep to 8 Oct, the real 72 h impact fell inside the P10–P90 band on 15 of 16 days (94 %).",
             stats=_phase_metrics("2021-09-29", "2021-10-25"),
         ),
         dict(
-            phase="Fase 3 · Apilamiento proximal-medial, relleno de kipukas y agotamiento",
+            phase="Phase 3 · Proximal-medial stacking, kipuka infill and waning",
             period="26 oct – 13 dic 2021",
-            lava_type="Basanita-tefrita en lóbulos superpuestos ('a'ā y bloques) + nueva fajana Sur",
-            rheology_real="Crecimiento lento en alcance pero engrosamiento vertical (hasta > 40 m cerca del cono) y relleno de huecos internos (Las Norias, Todoque sur) hasta alcanzar 1.219 ha el 13 de diciembre.",
-            rheology_model="Las tasas de crecimiento observadas entre mapas consecutivos de Copernicus decaen a < 0,3 ha/h; el detector de frente detenido + área creciendo activa avisos de desbordamiento.",
+            lava_type="Basanite-tephrite in stacked lobes ('a'ā and blocks) + new southern lava delta",
+            rheology_real="Slow growth in reach but vertical thickening (up to > 40 m near the cone) and infill of internal gaps (Las Norias, southern Todoque) until reaching 1,219 ha on 13 December.",
+            rheology_model="Growth rates observed between consecutive Copernicus maps fall below 0.3 ha/h; the front-stalled + area-growing detector raises overflow warnings.",
             stats=_phase_metrics("2021-10-26", "2021-12-13"),
-            coincidence="La calibración adaptativa P10–P90 ajusta el intervalo a la desaceleración real del campo de lavas.",
+            coincidence="Adaptive P10–P90 calibration fits the interval to the real slowdown of the lava field.",
         ),
     ]
 
     # 3. Day-by-Day Key Dates Comparison (Real vs VolScan Estimate + Tides)
     key_dates = [
-        ("2021-09-14", "Enjambre sísmico inicial y migración en profundidad"),
-        ("2021-09-18", "Víspera de la erupción · sismicidad a < 2 km (escenario pre-eruptivo)"),
-        ("2021-09-19", "14:10 UTC · Apertura de bocas en Cabeza de Vaca (Tajogaite)"),
-        ("2021-09-20", "Primera pasada satelital · colada hacia Todoque (SAM 3.1 vs CEMS)"),
-        ("2021-09-23", "Frente ralentizado a las puertas del casco de Todoque"),
-        ("2021-09-27", "Rotura de tubo y aceleración hacia la costa de Tazacorte"),
-        ("2021-09-28", "22:02 UTC · Entrada de la colada en el mar (fajana de Los Guirres)"),
-        ("2021-10-10", "Derrumbe parcial del cono Norte · brazo hacia el Callejón de la Gata"),
-        ("2021-10-20", "Avance del brazo Norte sobre el núcleo de La Laguna"),
-        ("2021-11-15", "Relleno de bolsas interiores y realimentación de la fajana"),
-        ("2021-12-13", "Fin de la erupción tras 85 días (último tremor volcánico)"),
+        ("2021-09-14", "Initial seismic swarm and migration at depth"),
+        ("2021-09-18", "Eve of the eruption · seismicity < 2 km deep (pre-eruptive scenario)"),
+        ("2021-09-19", "14:10 UTC · Vents open at Cabeza de Vaca (Tajogaite)"),
+        ("2021-09-20", "First satellite pass · flow towards Todoque (SAM 3.1 vs CEMS)"),
+        ("2021-09-23", "Front slows at the edge of Todoque village"),
+        ("2021-09-27", "Tube breach and acceleration towards the Tazacorte coast"),
+        ("2021-09-28", "22:02 UTC · Lava enters the sea (Los Guirres lava delta)"),
+        ("2021-10-10", "Partial collapse of the northern cone · arm towards Callejón de la Gata"),
+        ("2021-10-20", "Northern arm advances over La Laguna"),
+        ("2021-11-15", "Infill of interior pockets and renewed feeding of the lava delta"),
+        ("2021-12-13", "End of the eruption after 85 days (last volcanic tremor)"),
     ]
 
     lat_lp, lon_lp = BY_KEY["la_palma"].centroid
@@ -356,8 +356,8 @@ def catastrophe_report_lapalma2021(ir) -> dict:
                     semidiurnal_deg=round(semi_deg, 1),
                 ),
                 verdict=(
-                    f"Pre-eruptivo: bocas candidatas por sismicidad somera a {sc['nearest_candidate_to_real_vent_km']} km de la boca real"
-                    if sc else "Seguimiento sísmico pre-eruptivo (índice de anomalía)"
+                    f"Pre-eruptive: candidate vents from shallow seismicity {sc['nearest_candidate_to_real_vent_km']} km from the real vent"
+                    if sc else "Pre-eruptive seismic monitoring (unrest index)"
                 ),
             ))
         else:
@@ -384,11 +384,11 @@ def catastrophe_report_lapalma2021(ir) -> dict:
 
             inside = (obs_72 is not None) and (p10 <= obs_72 <= p90)
             verdict = (
-                f"Coincide dentro de P10–P90 (real {obs_72} vs rango {p10}–{p90})"
+                f"Matches within P10–P90 (real {obs_72} vs range {p10}–{p90})"
                 if inside
-                else f"Fuera de P10–P90 (real {obs_72} vs rango {p10}–{p90})"
+                else f"Outside P10–P90 (real {obs_72} vs range {p10}–{p90})"
                 if obs_72 is not None
-                else f"Experimento sintético: {sam_area} ha (IoU circular {sam_iou}); sin adelanto operativo demostrado"
+                else f"Synthetic experiment: {sam_area} ha (circular IoU {sam_iou}); no operational lead time shown"
             )
             timeline.append(dict(
                 date=d_str,
@@ -445,13 +445,13 @@ def catastrophe_report_lapalma2021(ir) -> dict:
             onset_regime=_lunar_regime(onset_elong),
             onset_semidiurnal_deg=round(onset_semi, 1),
             swarm_precursor=dict(
-                period="11 sep – 19 sep 2021 (enjambre de intrusión magmática)",
+                period="11 Sep – 19 Sep 2021 (magmatic intrusion swarm)",
                 n_raw=len(swarm_w),
                 n_declustered=int(keep_sw.sum()),
                 semidiurnal=alignment_shift_test(swarm_w.t[keep_sw], t_clock.phase, SEMIDIURNAL_S, n_perm=100) if int(keep_sw.sum()) >= 15 else None,
             ),
             syn_eruptive=dict(
-                period="19 sep – 13 dic 2021 (reajuste cortical y pulsos profundos 10–38 km)",
+                period="19 Sep – 13 Dec 2021 (crustal readjustment and deep pulses 10–38 km)",
                 n_raw=len(erupt_w),
                 n_declustered=int(keep_er.sum()),
                 semidiurnal=alignment_shift_test(erupt_w.t[keep_er], t_clock.phase, SEMIDIURNAL_S, n_perm=100) if int(keep_er.sum()) >= 30 else None,
@@ -463,11 +463,11 @@ def catastrophe_report_lapalma2021(ir) -> dict:
                 ) if int(keep_er.sum()) >= 30 else None,
             ),
             explanation=(
-                "La apertura eruptiva del 19 de septiembre de 2021 (14:10 UTC) se produjo con una elongación lunar de "
-                f"{round(onset_elong, 1)}° (a menos de 30 h del plenilunio del 20 de septiembre, en plena sizigia / marea viva) "
-                f"y fase semidiurna de {round(onset_semi, 1)}°. Físicamente, la marea sólida terrestre genera esfuerzos periódicos "
-                "de ~1 a 4 kPa: insuficientes por sí solos para romper roca sana, pero capaces de modular el instante de fractura "
-                "cuando el dique magmático ya ha alcanzado presión crítica a < 2 km de profundidad."
+                "The eruption began on 19 September 2021 (14:10 UTC) at a lunar elongation of "
+                f"{round(onset_elong, 1)}° (less than 30 h before the full moon of 20 September, at syzygy / spring tide) "
+                f"and a semidiurnal phase of {round(onset_semi, 1)}°. Physically, the solid Earth tide produces periodic stresses "
+                "of ~1 to 4 kPa: not enough on their own to break intact rock, but able to modulate the moment of failure "
+                "once the magmatic dyke has already reached critical pressure less than 2 km deep."
             ),
         )
 
@@ -475,8 +475,8 @@ def catastrophe_report_lapalma2021(ir) -> dict:
     val_sum = validation_summary(list(val_rows.values()))
 
     return dict(
-        title="Dossier de Catástrofe · Erupción de Tajogaite (La Palma, sep–dic 2021)",
-        subtitle="Auditoría completa de qué se midió en la realidad (IGN / Copernicus EMS) frente a qué estimó VolScan día a día, evolución reológica de la colada y modulación mareal.",
+        title="Disaster dossier · Tajogaite eruption (La Palma, Sep–Dec 2021)",
+        subtitle="Full audit of what was measured in reality (IGN / Copernicus EMS) against what VolScan estimated day by day, the rheological evolution of the flow and tidal modulation.",
         summary_kpis=dict(
             eruption_days=85,
             real_area_ha=1219.0,

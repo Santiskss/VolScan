@@ -1,47 +1,47 @@
-# Cómo leer VolScan: semáforo oficial frente a índices propios
+# How to read VolScan: the official traffic light versus our own indices
 
-## Semáforo volcánico (oficial)
-En Canarias, las alertas volcánicas a la población las gestiona el **PEVOLCA** (Gobierno de Canarias), con el asesoramiento de su comité científico (IGN, INVOLCAN y otros). Los cabildos tienen sus planes insulares (PAIV). El semáforo tiene cuatro colores (verde, amarillo, naranja y rojo), de normalidad a erupción inminente o en curso. **VolScan no emite niveles de alerta.**
+## Volcanic traffic light (official)
+In the Canary Islands, volcanic alerts to the public are run by **PEVOLCA** (Government of the Canary Islands), advised by its scientific committee (IGN, INVOLCAN and others). Island councils have their own island plans (PAIV). The traffic light has four colours (green, yellow, orange and red), from normal to imminent or ongoing eruption. **VolScan does not issue alert levels.**
 
-## Índice de actividad anómala (VolScan)
-Va de 0 a 10 y compara los últimos 7 días de cada zona con su propio año anterior (dejando 30 días de separación). Solo cuenta los sismos por encima de la **magnitud de completitud común** (Mc por máxima curvatura sobre ambos periodos), para que una red más densa no parezca más actividad:
-- **Tasa**: lo improbable del número de sismos de la semana con la tasa de la línea base (prueba de Poisson): 0 si es normal, 1 si la probabilidad es de 1 entre 10.000 millones.
-- **Energía**: energía sísmica de la semana frente a la semana más energética del año anterior (0 = igual, 1 = cien veces más).
-- **Somerización**: cuántos km más superficial es la mediana de profundidad (10 km cuentan como 1). Necesita 20 sismos localizados en cada periodo.
-Tasa y energía no puntúan con menos de 5 sismos por encima de Mc en la semana. El índice es la media de las componentes disponibles × 10. **No es una probabilidad de erupción.**
+## Unrest index (VolScan)
+It runs from 0 to 10 and compares the last 7 days of each zone with that zone's own previous year (leaving a 30-day gap). It only counts earthquakes above the **common magnitude of completeness** (Mc by maximum curvature over both periods), so a denser network does not look like more activity:
+- **Rate**: how unlikely the week's number of earthquakes is under the baseline rate (Poisson test): 0 if normal, 1 if the probability is 1 in 10 billion.
+- **Energy**: the week's seismic energy against the most energetic week of the previous year (0 = equal, 1 = a hundred times more).
+- **Shallowing**: how many km shallower the median depth is (10 km count as 1). It needs 20 located earthquakes in each period.
+Rate and energy do not score with fewer than 5 earthquakes above Mc in the week. The index is the mean of the available components × 10. **It is not an eruption probability.**
 
-### Historial (2011–2026)
-Calculado cada 2 días en las 7 zonas (cada isla con su mar hasta 25 km, sin solaparse). Con el índice anterior (cocientes sin Mc), hubo 84 episodios por encima de 4, la mayoría en zonas casi sin sismos. Con el actual:
+### Track record (2011–2026)
+Computed every 2 days in the 7 zones (each island with its sea out to 25 km, without overlap). With the previous index (ratios without Mc) there were 84 episodes above 4, most in zones with almost no earthquakes. With the current one:
 
-| Índice ≥ | Episodios | Precedieron a una erupción | Antelación |
+| Index ≥ | Episodes | Preceded an eruption | Lead time |
 |---|---|---|---|
-| 3 | 34 | 2 de 2 | El Hierro 80 días · La Palma 6 días |
-| 4 | 15 | 2 de 2 | El Hierro 80 días · La Palma 6 días |
-| 5 | 14 | 2 de 2 | El Hierro 12 días · La Palma 6 días |
-| 6 | 7 | 2 de 2 | El Hierro 10 días · La Palma 6 días |
-| 7 | 3 | 1 de 2 | La Palma 6 días |
+| 3 | 34 | 2 of 2 | El Hierro 80 days · La Palma 6 days |
+| 4 | 15 | 2 of 2 | El Hierro 80 days · La Palma 6 days |
+| 5 | 14 | 2 of 2 | El Hierro 12 days · La Palma 6 days |
+| 6 | 7 | 2 of 2 | El Hierro 10 days · La Palma 6 days |
+| 7 | 3 | 1 of 2 | La Palma 6 days |
 
-Los demás episodios fueron agitación real sin erupción (enjambres profundos de La Palma 2017–2020, El Hierro 2013). Dos erupciones no bastan para calcular una probabilidad. La tabla es una tasa de referencia, y se recalcula cada semana en la pestaña «Canarias en directo».
+The other episodes were real unrest without an eruption (deep swarms under La Palma 2017–2020, El Hierro 2013). Two eruptions are not enough to compute a probability. The table is a base rate, recomputed every week in the “Canary Islands Live” tab.
 
-## Deformación (GNSS)
-Estaciones GNSS públicas procesadas por el Nevada Geodetic Laboratory, con la placa africana fija. Para cada estación se ajusta la tendencia de los 3 años previos y se mide cuánto se aparta la mediana de los últimos 30 días (en mm), comparado con su propia dispersión (z): |z| < 3 normal, 3–6 a vigilar, > 6 anómala. Los cambios de antena se corrigen.
-- El Hierro 2011: FRON (La Frontera) estaba en nivel anómalo desde el 20 de agosto, 7 semanas antes de la erupción submarina.
-- La Palma 2021: MAZO y LPAL (a 10 y 17 km) registran el hundimiento durante la erupción (MAZO −44 mm hasta diciembre), pero **no** la hinchazón previa: la midió el IGN con estaciones junto a la boca que no son públicas. Para verla hace falta un convenio con el IGN o GRAFCAN.
-- La serie final llega con unas 4 semanas de retraso; VolScan muestra la fecha del último dato.
+## Deformation (GNSS)
+Public GNSS stations processed by the Nevada Geodetic Laboratory, with the African plate fixed. For each station the trend of the previous 3 years is fitted and we measure how far the median of the last 30 days departs from it (in mm), compared with its own scatter (z): |z| < 3 normal, 3–6 watch, > 6 anomalous. Antenna changes are corrected.
+- El Hierro 2011: FRON (La Frontera) was anomalous from 20 August, 7 weeks before the submarine eruption.
+- La Palma 2021: MAZO and LPAL (10 and 17 km away) record the subsidence during the eruption (MAZO −44 mm by December) but **not** the earlier uplift: the IGN measured that with stations next to the vent that are not public. Seeing it would need an agreement with IGN or GRAFCAN.
+- The final series arrives about 4 weeks late; VolScan shows the date of the last data point.
 
-## Gases (SO2 por satélite)
-SO2 visible desde el espacio sobre el archipiélago, del instrumento OMPS de la NASA (troposfera baja), en kilotoneladas por encima de 1 DU. En dos años tranquilos (2024–2026), el máximo diario fue de 0,13 kt; VolScan marca «SO2 detectado» desde 1 kt. En La Palma 2021: 0 antes del 19 de septiembre, decenas de kt durante la erupción y 0 desde mediados de diciembre. Detecta erupciones y desgasificación fuerte, no la desgasificación difusa (CO2, helio) que mide INVOLCAN en superficie, que necesitaría convenio.
+## Gas (satellite SO2)
+SO2 visible from space over the archipelago, from NASA's OMPS instrument (lower troposphere), in kilotonnes above 1 DU. Over two quiet years (2024–2026) the daily maximum was 0.13 kt; VolScan flags “SO2 detected” from 1 kt. On La Palma 2021: 0 before 19 September, tens of kt during the eruption and 0 from mid-December. It detects eruptions and strong degassing, not the diffuse degassing (CO2, helium) that INVOLCAN measures on the ground, which would need an agreement.
 
 ## b-value
-Pendiente de la ley de Gutenberg-Richter (Aki-Utsu, con Mc por máxima curvatura + 0,2). En zonas volcánicas, un b alto (>1,3) puede indicar fluidos o fracturación. Con menos de 50 sismos por encima de Mc no se calcula.
+Slope of the Gutenberg-Richter law (Aki-Utsu, with Mc by maximum curvature + 0.2). In volcanic zones, a high b (>1.3) can point to fluids or fracturing. It is not computed with fewer than 50 earthquakes above Mc.
 
-## Mareas y Luna
-Para cada sismo, VolScan calcula la fase de la marea terrestre (ciclo de ~12,42 h) y la de la Luna, y aplica el test de Schuster. Si p < 0,05, las fases no son uniformes. Eso **no prueba causalidad**, y los enjambres inflan la significación, así que mostramos también el resultado tras desagrupar (un sismo por cada ventana de 6 h).
+## Tides and Moon
+For each earthquake, VolScan computes the phase of the Earth tide (~12.42 h cycle) and of the Moon, and applies the Schuster test. If p < 0.05, the phases are not uniform. That **does not prove causation**, and swarms inflate significance, so we also show the result after declustering (one earthquake per 6 h window).
 
-## Pronóstico de coladas
-Es un conjunto de cientos de recorridos de máxima pendiente sobre el relieve previo, con incertidumbre en la boca, la longitud, el ancho y la viscosidad. Se reponderan con cada cartografía de Copernicus **ya entregada** (se supone que llega 24 h después de la imagen; Copernicus tarda entre 7 h y 48 h). El resultado es la **probabilidad** de cubrimiento y los cuantiles (P10/P50/P90) del tiempo de llegada a barrios y al mar. Cuando el frente se detiene durante días, la estimación de tiempo se ensancha. Así ocurrió del 22 al 26 de septiembre de 2021.
+## Lava flow forecast
+An ensemble of hundreds of steepest-descent paths over the pre-eruption terrain, with uncertainty in the vent, length, width and viscosity. They are reweighted with every Copernicus map **already delivered** (assumed to arrive 24 h after the image; Copernicus takes between 7 h and 48 h). The result is the **probability** of coverage and the quantiles (P10/P50/P90) of arrival time at neighbourhoods and the sea. When the front stalls for days, the time estimate widens. That happened from 22 to 26 September 2021.
 
-## Impacto con reloj y validación
-El dónde lo da el conjunto de coladas; el cuánto, el ritmo de crecimiento de área de los mapas ya entregados, contado desde la fecha del último mapa. El rango P10–P90 se calibra con los errores reales de los pronósticos anteriores cuya verdad ya se conocía, y su extremo alto cubre el caso de que el 30 % del área nueva rellene el terreno cercado por la colada. En 2021, el valor real cayó dentro del rango en 67 de 83 días (81 %, para un 80 % nominal) y el total se quedó un 11 % corto.
+## Impact with a clock, and validation
+The ensemble gives the where; the how much comes from the area growth rate of the maps already delivered, counted from the date of the latest map. The P10–P90 range is calibrated with the real errors of earlier forecasts whose outcome was already known, and its upper end covers the case where 30 % of the new area fills ground hemmed in by the flow. In 2021 the real value fell inside the range on 67 of 83 days (81 %, for a nominal 80 %) and the total was 11 % low.
 
-El salto del 25–28 de octubre (unos 10 edificios por hectárea nueva, en zona muy densa) sigue fuera de rango. Probamos tres formas de pronosticar dónde va ese crecimiento (desbordamientos desde los márgenes sobre el relieve ya cubierto, cercanía a márgenes activos y relleno entre brazos de la colada). Ninguna mejoró el recuento, así que no se usan para contar. Sí se usan para la **lista de vigilancia**: los edificios cercados por la colada recogieron el 21 % adicional de lo que se perdió en las 72 h siguientes.
+The burst of 25–28 October (about 10 buildings per new hectare, in a very dense area) is still out of range. We tried three ways to forecast where that growth goes (overflows from the margins over already covered ground, closeness to active margins, and infill between flow arms). None improved the count, so they are not used for counting. They are used for the **watch list**: buildings hemmed in by the flow caught an extra 21 % of what was lost in the next 72 h.

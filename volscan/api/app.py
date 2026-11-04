@@ -52,7 +52,7 @@ async def _auth_and_audit(request: Request, call_next):
     if user is None and path not in PUBLIC:
         sec.audit(dict(user=None, role=None, method=request.method, path=path, query=str(request.url.query), status=401,
                        ip=request.client.host if request.client else None))
-        return JSONResponse(dict(detail="inicia sesión"), status_code=401)
+        return JSONResponse(dict(detail="please sign in"), status_code=401)
     request.state.user = user
     resp = await call_next(request)
     if path not in NOT_AUDITED:
@@ -65,7 +65,7 @@ async def _auth_and_audit(request: Request, call_next):
 def need(request: Request, role: str):
     u = getattr(request.state, "user", None)
     if not u or not sec.role_at_least(u["role"], role):
-        raise HTTPException(403, f"necesitas el rol «{role}»")
+        raise HTTPException(403, f"you need the “{role}” role")
     return u
 
 
@@ -87,7 +87,7 @@ def auth_login(req: LoginReq, request: Request):
                    event="login_ok" if token else "login_failed", ip=request.client.host if request.client else None))
     if not token:
         time.sleep(1.0)
-        raise HTTPException(401, "usuario o contraseña incorrectos")
+        raise HTTPException(401, "wrong user name or password")
     return J(dict(token=token, user=sec.user_for(token)))
 
 
@@ -119,8 +119,36 @@ def _clean(o):
     return o
 
 
+# Enum-like values that the data layer and pre-computed data files keep in Spanish; translated at the API edge
+# (exact matches only, so names and free text are never touched).
+EN_VALUES = {
+    "normal": "normal", "a vigilar": "watch", "anómala": "anomalous", "sin datos": "no data",
+    "sin datos recientes": "no recent data", "SO2 detectado": "SO2 detected", "sin SO2 visible": "no visible SO2",
+    "pocos datos recientes o menos de un año de historia": "too few recent data or less than a year of history",
+    "fuente cambiada": "source changed", "sin conexión con el IGN": "no connection to IGN", "retrasado": "delayed",
+    "al día": "up to date", "sin erupción": "no eruption", "precedió a la erupción": "preceded the eruption",
+    "durante o tras la erupción": "during or after the eruption",
+    "Colegio": "School", "Escuela infantil": "Nursery school", "Hospital": "Hospital", "Centro de salud": "Health centre",
+    "Consultorio": "Doctor's office", "Farmacia": "Pharmacy", "Bomberos": "Fire station", "Policía": "Police",
+    "Ayuntamiento": "Town hall", "Centro social": "Social centre", "Centro cívico": "Community centre",
+    "Gasolinera": "Petrol station", "Mercado": "Market", "Templo": "Church", "Subestación eléctrica": "Electrical substation",
+    "Potabilizadora": "Water treatment plant", "Depuradora": "Wastewater plant", "Depósito de agua": "Water tank",
+    "Estanque de riego": "Irrigation pond", "Galería de agua": "Water gallery",
+}
+
+
+def _en(o):
+    if isinstance(o, str):
+        return EN_VALUES.get(o, o)
+    if isinstance(o, dict):
+        return {k: _en(v) for k, v in o.items()}
+    if isinstance(o, (list, tuple)):
+        return [_en(v) for v in o]
+    return o
+
+
 def J(o):
-    return JSONResponse(_clean(o))
+    return JSONResponse(_en(_clean(o)))
 
 
 # ------------------------------------------------------------------ status
@@ -165,7 +193,7 @@ def _terrain(name: str, texture_k: int):
              "tenerife": DATA / "canarias" / "terrain_tenerife_100m.npz",
              "archipelago": DATA / "canarias" / "terrain_archipelago_500m.npz"}
     if name not in files:
-        raise HTTPException(404, "terreno desconocido")
+        raise HTTPException(404, "unknown terrain")
     cf = CACHE / f"terrain_{name}_k{texture_k}.json"
     if cf.exists():
         try:
@@ -202,7 +230,7 @@ def _terrain_bytes(name: str, texture_k: int) -> bytes:
 @app.get("/api/terrain/{name}")
 def terrain(name: str):
     if name not in ("lapalma", "tenerife", "archipelago"):
-        raise HTTPException(404, "terreno desconocido")
+        raise HTTPException(404, "unknown terrain")
     return Response(content=_terrain_bytes(name, 2), media_type="application/json")
 
 
@@ -211,8 +239,8 @@ def terrain(name: str):
 def tf_scenarios():
     from ..tenerife import catalogue
     return J(dict(scenarios=catalogue(),
-                  note="Escenarios de planificación con el mismo motor validado en La Palma 2021. No indican que una erupción sea "
-                       "probable ni dónde ocurriría. La valoración oficial corresponde al PEVOLCA."))
+                  note="Planning scenarios run with the same engine validated on La Palma 2021. They do not mean an eruption is "
+                       "likely, or where it would happen. The official assessment belongs to PEVOLCA."))
 
 
 _tf_lock = threading.Lock()
@@ -276,10 +304,10 @@ def canarias_indicators(zone: str = "tenerife", days: int = 120):
     today = dt.datetime.now(dt.timezone.utc).date()
     return J(dict(zone=zone, deformation=D.zone_deformation(zone, today), so2=D.so2_status(today),
                   so2_series=D.so2_series(today - dt.timedelta(days=days), today),
-                  notes=dict(deformation="Estaciones GNSS públicas procesadas por NGL (placa africana fija). La serie final "
-                                         "llega con unas 4 semanas de retraso: se evalúa el último día disponible.",
-                             so2="SO2 visible por satélite (OMPS) sobre el archipiélago, por encima de 1 DU. Detecta "
-                                 "erupciones y desgasificación fuerte, no la difusa previa (CO2, He).")))
+                  notes=dict(deformation="Public GNSS stations processed by NGL (fixed African plate). The final series "
+                                         "arrives about 4 weeks late: the last available day is evaluated.",
+                             so2="Satellite-visible SO2 (OMPS) over the archipelago, above 1 DU. It detects "
+                                 "eruptions and strong degassing, not the earlier diffuse degassing (CO2, He).")))
 
 
 @lru_cache(maxsize=32)
@@ -310,7 +338,7 @@ def _canarias_zones_cached(t_bucket: int, n_cat: int) -> dict:
                         deformation=_deform_summary(D.zone_deformation(z.key, day))))
     out.sort(key=lambda d: -(d["index"] or -1))
     return _clean(dict(at=dt.datetime.fromtimestamp(t_at, dt.timezone.utc).isoformat(), zones=out, so2=D.so2_status(day),
-                       note="Índice de actividad anómala 0-10 frente a la línea base propia de cada zona. NO es probabilidad de erupción; las alertas oficiales son del PEVOLCA."))
+                       note="Unrest index 0-10 against each zone's own baseline. It is NOT an eruption probability; official alerts come from PEVOLCA."))
 
 
 @app.get("/api/canarias/zones")
@@ -381,9 +409,9 @@ def solunar(zone: str = "la_palma", start: str = "2011-01-01", end: str | None =
     lat, lon = BY_KEY[zone].centroid
     now = time.time()
     res["now"] = dict(tidal_phase=float(tidal_phase([now], lat, lon)[0]), lunar_elongation=float(lunar_elongation(now)))
-    res["note"] = ("Schuster: p<0,05 = fases no uniformes (no prueba causalidad); los enjambres inflan la significación. "
-                   "La prueba robusta es 'shift_test': exceso de sismos en fase 0 (máximo de marea / mareas vivas) frente a "
-                   "200 desplazamientos temporales del propio catálogo desagrupado (1 sismo/6 h).")
+    res["note"] = ("Schuster: p<0.05 = non-uniform phases (does not prove causation); swarms inflate significance. "
+                   "The robust test is 'shift_test': excess of earthquakes at phase 0 (tidal maximum / spring tides) against "
+                   "200 time shifts of the declustered catalogue itself (1 quake/6 h).")
     return JSONResponse(res)
 
 
@@ -401,16 +429,16 @@ def replay():
 
 
 MILESTONES = [
-    ("2021-09-11", "Empieza el enjambre sísmico bajo Cumbre Vieja"),
-    ("2021-09-13", "Semáforo amarillo en El Paso, Los Llanos, Mazo y Fuencaliente"),
-    ("2021-09-19", "14:10 UTC · Comienza la erupción en Cabeza de Vaca"),
-    ("2021-09-21", "La colada alcanza Todoque"),
-    ("2021-09-28", "22:02 UTC · La lava llega al mar (Los Guirres, Tazacorte)"),
-    ("2021-10-04", "Colapso del cono principal"),
-    ("2021-10-14", "La colada norte entra en La Laguna"),
-    ("2021-11-15", "Tercera llegada al mar"),
-    ("2021-12-13", "Cesa la actividad (85 días)"),
-    ("2021-12-25", "Fin oficial de la erupción"),
+    ("2021-09-11", "Seismic swarm begins under Cumbre Vieja"),
+    ("2021-09-13", "Yellow alert in El Paso, Los Llanos, Mazo and Fuencaliente"),
+    ("2021-09-19", "14:10 UTC · Eruption begins at Cabeza de Vaca"),
+    ("2021-09-21", "Lava reaches Todoque"),
+    ("2021-09-28", "22:02 UTC · Lava reaches the sea (Los Guirres, Tazacorte)"),
+    ("2021-10-04", "Main cone collapses"),
+    ("2021-10-14", "Northern flow enters La Laguna"),
+    ("2021-11-15", "Third sea entry"),
+    ("2021-12-13", "Activity stops (85 days)"),
+    ("2021-12-25", "Eruption officially declared over"),
 ]
 
 
@@ -430,8 +458,8 @@ def lp_meta():
         places=places, places_attribution=r.places["attribution"],
         observations=[dict(at=o.observed_at.isoformat(), area_ha=o.area_ha_reported) for o in r.obs],
         milestones=[dict(date=d, text=t) for d, t in MILESTONES],
-        sources=["Copernicus EMS EMSR546 (© 2021 EU)", "IGN · Catálogo de terremotos (doi:10.7419/162.03.2022)",
-                 "Copernicus DEM GLO-30 (pre-erupción)", "© OpenStreetMap (ODbL) · topónimos"]))
+        sources=["Copernicus EMS EMSR546 (© 2021 EU)", "IGN · Earthquake catalogue (doi:10.7419/162.03.2022)",
+                 "Copernicus DEM GLO-30 (pre-eruption)", "© OpenStreetMap (ODbL) · place names"]))
 
 
 @lru_cache(maxsize=256)
@@ -457,7 +485,7 @@ def _lp_day(date: str):
         out["overlay"] = dict(png=png_data_url(lava_overlay_rgba(fc.probability(horizon), obs), "RGBA"),
                               horizon_h=72, west=r.grid.west, north=r.grid.north, step=r.grid.step,
                               rows=r.grid.shape[0], cols=r.grid.shape[1],
-                              legend="Probabilidad de cubrimiento en las próximas 72 h · mancha oscura con borde naranja = último mapa de Copernicus ya entregado")
+                              legend="Probability of being covered in the next 72 h · dark patch with orange edge = latest Copernicus map already delivered")
     res = _clean(out)
     try:
         cf.parent.mkdir(parents=True, exist_ok=True)
@@ -487,7 +515,7 @@ def lp_day(date: str):
     try:
         dt.date.fromisoformat(date)
     except ValueError:
-        raise HTTPException(400, "fecha inválida")
+        raise HTTPException(400, "invalid date")
     return JSONResponse(_lp_day(date))
 
 
@@ -551,7 +579,7 @@ def lp_impact(date: str):
     try:
         dt.date.fromisoformat(date)
     except ValueError:
-        raise HTTPException(400, "fecha inválida")
+        raise HTTPException(400, "invalid date")
     return JSONResponse(_lp_impact(date))
 
 
@@ -585,7 +613,7 @@ def _tf(key: str):
     with _tf_lock:
         sc = scenario(key, _catalog())
     if sc is None or sc.get("unavailable"):
-        raise HTTPException(404, "escenario desconocido o sin datos")
+        raise HTTPException(404, "unknown scenario or no data")
     return sc, probability_raster(sc), tf_grid()
 
 
@@ -596,17 +624,17 @@ def cap_lapalma(date: str, request: Request):
     try:
         bands, now = _lp_bands(date)
     except ValueError:
-        raise HTTPException(400, "fecha inválida")
+        raise HTTPException(400, "invalid date")
     if not bands:
-        raise HTTPException(404, "ese día aún no hay pronóstico de colada (no hay mapa de Copernicus entregado)")
+        raise HTTPException(404, "no flow forecast for that day yet (no Copernicus map delivered)")
     imp = _lp_impact(date)
     c = imp.get("constrained") or {}
     b, r = c.get("buildings", {}), c.get("road_km", {})
     iso = [i for i in imp.get("isolation", []) if i["p_isolated"] >= 0.1]
-    desc = (f"Reconstrucción de La Palma 2021 con los datos disponibles el {date}. En las próximas 72 h se esperan "
-            f"{b.get('central')} edificios nuevos alcanzados (rango {b.get('low')}–{b.get('high')}) y {r.get('central')} km de vías. "
-            f"{len(iso)} núcleos podrían quedar aislados. Polígonos: probabilidad de que la colada cubra cada zona en 72 h.")
-    xml = cap.build(kind="lapalma2021", ref=date, sent=now, headline=f"La Palma 2021 · impacto previsto a 72 h ({date}) · simulación",
+    desc = (f"Reconstruction of La Palma 2021 with the data available on {date}. In the next 72 h, "
+            f"{b.get('central')} new buildings are expected to be reached (range {b.get('low')}–{b.get('high')}) and {r.get('central')} km of roads. "
+            f"{len(iso)} neighbourhoods could be cut off. Polygons: probability that lava covers each area within 72 h.")
+    xml = cap.build(kind="lapalma2021", ref=date, sent=now, headline=f"La Palma 2021 · expected 72 h impact ({date}) · simulation",
                     description=desc, bands=bands, isolated=iso, expires=now + dt.timedelta(hours=72),
                     parameters={"horizonte_h": 72, "edificios_central": b.get("central"), "edificios_p10": b.get("low"),
                                 "edificios_p90": b.get("high"), "vias_km_central": r.get("central"), "fuente": "VolScan"})
@@ -623,11 +651,11 @@ def cap_tenerife(key: str, request: Request):
     bands = probability_bands(g, p) if p is not None else []
     iso = [i for i in sc.get("isolation", []) if i["p_isolated"] >= 0.05]
     b = sc["buildings"]
-    desc = (f"Escenario de planificación «{sc['name']}» ({sc.get('history') or ''}). Si se abriera una boca ahí, en 30 días la "
-            f"colada alcanzaría {round(b['expected'])} edificios de media (P10–P90 {round(b['p10_p90'][0])}–{round(b['p10_p90'][1])}) "
-            f"y {round(sc['road_km']['expected'], 1)} km de vías. No indica que una erupción sea probable.")
+    desc = (f"Planning scenario “{sc['name']}” ({sc.get('history') or ''}). If a vent opened there, within 30 days the "
+            f"lava would reach {round(b['expected'])} buildings on average (P10–P90 {round(b['p10_p90'][0])}–{round(b['p10_p90'][1])}) "
+            f"and {round(sc['road_km']['expected'], 1)} km of roads. It does not mean an eruption is likely.")
     xml = cap.build(kind="tenerife", ref=key, sent=dt.datetime.now(dt.timezone.utc),
-                    headline=f"Tenerife · escenario {sc['name']} · planificación", description=desc, bands=bands, isolated=iso,
+                    headline=f"Tenerife · {sc['name']} scenario · planning", description=desc, bands=bands, isolated=iso,
                     parameters={"horizonte_h": sc["horizon_h"], "edificios_media": round(b["expected"]),
                                 "vias_km_media": round(sc["road_km"]["expected"], 1), "fuente": "VolScan"})
     return Response(xml, media_type="application/xml",
@@ -635,15 +663,15 @@ def cap_tenerife(key: str, request: Request):
 
 
 OGC_COLLECTIONS = {
-    "zonas": "Zonas volcánicas de Canarias (cada isla con su mar hasta 25 km, y el canal de Enmedio)",
-    "estaciones-gnss": "Estaciones GNSS públicas con su desviación respecto a la tendencia (NGL)",
-    "sismos-30d": "Sismos de los últimos 30 días (catálogo IGN)",
-    "lapalma2021-colada-72h": "La Palma 2021: probabilidad de colada nueva en 72 h (parámetro fecha=AAAA-MM-DD)",
-    "lapalma2021-colada-observada": "La Palma 2021: último mapa de Copernicus entregado (parámetro fecha)",
-    "lapalma2021-edificios-riesgo": "La Palma 2021: edificios con probabilidad de ser alcanzados en 72 h (parámetro fecha)",
-    "tenerife-escenario": "Tenerife: probabilidad de colada en 30 días (parámetro escenario=" +
+    "zonas": "Volcanic zones of the Canaries (each island with its sea out to 25 km, and the Enmedio channel)",
+    "estaciones-gnss": "Public GNSS stations with their deviation from trend (NGL)",
+    "sismos-30d": "Earthquakes in the last 30 days (IGN catalogue)",
+    "lapalma2021-colada-72h": "La Palma 2021: probability of new lava within 72 h (parameter fecha=YYYY-MM-DD)",
+    "lapalma2021-colada-observada": "La Palma 2021: latest delivered Copernicus map (parameter fecha)",
+    "lapalma2021-edificios-riesgo": "La Palma 2021: buildings likely to be reached within 72 h (parameter fecha)",
+    "tenerife-escenario": "Tenerife: lava probability within 30 days (parameter escenario=" +
                           "dorsal_noroeste|pico_viejo|teide_norte|dorsal_noreste|sismicidad_actual)",
-    "tenerife-servicios": "Tenerife: servicios e infraestructuras alcanzables por escenario (parámetro escenario)",
+    "tenerife-servicios": "Tenerife: services and infrastructure reachable per scenario (parameter escenario)",
 }
 
 
@@ -654,7 +682,7 @@ def _ogc_base(request: Request) -> str:
 @app.get("/ogc")
 def ogc_landing(request: Request):
     b = _ogc_base(request)
-    return J(dict(title="VolScan · OGC API Features", description="Capas de VolScan para QGIS, ArcGIS y visores OGC.",
+    return J(dict(title="VolScan · OGC API Features", description="VolScan layers for QGIS, ArcGIS and OGC viewers.",
                   links=[dict(href=b, rel="self", type="application/json"),
                          dict(href=f"{b}/conformance", rel="conformance", type="application/json"),
                          dict(href=f"{b}/collections", rel="data", type="application/json")]))
@@ -681,7 +709,7 @@ def ogc_collections(request: Request):
 @app.get("/ogc/collections/{cid}")
 def ogc_collection(cid: str, request: Request):
     if cid not in OGC_COLLECTIONS:
-        raise HTTPException(404, "colección desconocida")
+        raise HTTPException(404, "unknown collection")
     return J(_coll(request, cid))
 
 
@@ -704,7 +732,7 @@ def _zone_features():
 def ogc_items(cid: str, request: Request, fecha: str = "2021-09-25", escenario: str = "dorsal_noroeste", limit: int = 10000):
     from ..geoexport import feature_collection
     if cid not in OGC_COLLECTIONS:
-        raise HTTPException(404, "colección desconocida")
+        raise HTTPException(404, "unknown collection")
     pt = lambda lon, lat, props, fid=None: dict(type="Feature", id=fid, properties=props,
                                                 geometry=dict(type="Point", coordinates=[round(lon, 6), round(lat, 6)]))
     feats: list = []
@@ -724,7 +752,7 @@ def ogc_items(cid: str, request: Request, fecha: str = "2021-09-25", escenario: 
         try:
             d = dt.date.fromisoformat(fecha)
         except ValueError:
-            raise HTTPException(400, "fecha inválida (AAAA-MM-DD)")
+            raise HTTPException(400, "invalid date (YYYY-MM-DD)")
         now = dt.datetime(d.year, d.month, d.day, 23, 59, tzinfo=dt.timezone.utc)
         if cid == "lapalma2021-colada-72h":
             feats = _lp_bands(fecha)[0] or []
@@ -759,12 +787,12 @@ def export_report(zone: str, month: str, fmt: str, request: Request):
     need(request, "tecnico")
     from .. import pdfexport as X
     if zone not in BY_KEY or zone == "atlantico" or fmt not in ("pdf", "csv"):
-        raise HTTPException(404, "no existe")
+        raise HTTPException(404, "not found")
     try:
         from ..reports import month_bounds
         month_bounds(month)
     except Exception:
-        raise HTTPException(400, "mes inválido (AAAA-MM)")
+        raise HTTPException(400, "invalid month (YYYY-MM)")
     today = dt.datetime.now(dt.timezone.utc).date().isoformat()
     r = _report(zone, month, today, len(store.load_events()))
     if fmt == "pdf":
@@ -776,15 +804,15 @@ def export_report(zone: str, month: str, fmt: str, request: Request):
 def export_lp_impact(date: str, fmt: str, request: Request):
     need(request, "tecnico")
     if fmt not in ("pdf", "csv"):
-        raise HTTPException(404, "no existe")
+        raise HTTPException(404, "not found")
     try:
         dt.date.fromisoformat(date)
     except ValueError:
-        raise HTTPException(400, "fecha inválida")
+        raise HTTPException(400, "invalid date")
     from .. import pdfexport as X
     imp = _lp_impact(date)
     if imp.get("phase") != "eruptive":
-        raise HTTPException(404, "antes de la erupción no hay parte de impacto (ver escenario anticipado)")
+        raise HTTPException(404, "no impact report before the eruption (see the anticipated scenario)")
     fac, iso = imp.get("facilities", []), imp.get("isolation", [])
     if fmt == "csv":
         return _file(X.impact_csv(fac, iso), "text/csv; charset=utf-8", f"volscan_impacto_lapalma2021_{date}.csv")
@@ -794,7 +822,7 @@ def export_lp_impact(date: str, fmt: str, request: Request):
         b, r_ = c.get("buildings") or {}, c.get("road_km") or {}
         b_val, b_rng = str(b.get("central", "—")), f"{b.get('low', '—')}–{b.get('high', '—')}"
         r_val, r_rng = str(r_.get("central", "—")), f"{r_.get('low', '—')}–{r_.get('high', '—')}"
-        map_val, map_note = f"hace {c.get('map_age_h', '—')} h", f"se supone entregado {imp.get('map_delay_h')} h tras la imagen"
+        map_val, map_note = f"{c.get('map_age_h', '—')} h ago", f"assumed delivered {imp.get('map_delay_h')} h after the image"
     else:
         b, r_ = imp.get("buildings") or {}, imp.get("road_km") or {}
         bp, rp = b.get("p10_p90") or ["—", "—"], r_.get("p10_p90") or ["—", "—"]
@@ -802,13 +830,13 @@ def export_lp_impact(date: str, fmt: str, request: Request):
         b_rng = f"P10–P90 {round(bp[0])}–{round(bp[1])}" if isinstance(bp[0], (int, float)) else "—"
         r_val = str(round(r_["expected"], 1)) if "expected" in r_ else "—"
         r_rng = f"P10–P90 {rp[0]}–{rp[1]}"
-        map_val, map_note = "aún no entregado", "pronóstico solo con el conjunto inicial desde la boca"
-    kpis = [("Edificios nuevos en 72 h", b_val, b_rng),
-            ("Vías nuevas en 72 h (km)", r_val, r_rng),
-            ("Edificios ya perdidos", str(imp["already_lost"]["buildings"]), f"{imp['already_lost']['road_km']} km de vías"),
-            ("Lista de vigilancia", f"{w.get('high', '—')} alcanzables", f"{w.get('pocket', '—')} cercados por la colada"),
-            ("Último mapa de Copernicus", map_val, map_note)]
-    pdf = X.impact_pdf(f"La Palma 2021 · impacto previsto a 72 h · {date}", "Reconstrucción con los datos disponibles ese día (simulación, no alerta).",
+        map_val, map_note = "not delivered yet", "forecast from the initial ensemble at the vent only"
+    kpis = [("New buildings in 72 h", b_val, b_rng),
+            ("New roads in 72 h (km)", r_val, r_rng),
+            ("Buildings already lost", str(imp["already_lost"]["buildings"]), f"{imp['already_lost']['road_km']} km of roads"),
+            ("Watch list", f"{w.get('high', '—')} reachable", f"{w.get('pocket', '—')} hemmed in by the flow"),
+            ("Latest Copernicus map", map_val, map_note)]
+    pdf = X.impact_pdf(f"La Palma 2021 · expected 72 h impact · {date}", "Reconstruction with the data available that day (simulation, not an alert).",
                        kpis, fac, iso, [], imp.get("method", ""), "Copernicus EMS EMSR546, IGN, Copernicus DEM, OpenStreetMap (ODbL)")
     return _file(pdf, "application/pdf", f"volscan_impacto_lapalma2021_{date}.pdf")
 
@@ -817,46 +845,46 @@ def export_lp_impact(date: str, fmt: str, request: Request):
 def export_tf_impact(key: str, fmt: str, request: Request):
     need(request, "tecnico")
     if fmt not in ("pdf", "csv"):
-        raise HTTPException(404, "no existe")
+        raise HTTPException(404, "not found")
     from .. import pdfexport as X
     sc, _, _ = _tf(key)
     fac, iso = sc.get("facilities", []), sc.get("isolation", [])
     if fmt == "csv":
         return _file(X.impact_csv(fac, iso), "text/csv; charset=utf-8", f"volscan_escenario_tenerife_{key}.csv")
     b, r_ = sc["buildings"], sc["road_km"]
-    kpis = [("Edificios alcanzables (30 días)", str(round(b["expected"])), f"P10–P90 {round(b['p10_p90'][0])}–{round(b['p10_p90'][1])}"),
-            ("Vías (km)", f"{r_['expected']:.1f}".replace(".", ","), f"P10–P90 {r_['p10_p90'][0]:.1f}–{r_['p10_p90'][1]:.1f}"),
-            ("Edificios con P >= 5 %", str(sc.get("n_buildings_exposed", "—")), sc.get("exposure_note", "")),
-            ("Recorridos que llegan al mar", f"{round(100 * sc.get('reach_sea', 0))} %", f"{sc.get('n_paths')} recorridos de colada")]
-    pdf = X.impact_pdf(f"Tenerife · escenario {sc['name']}", f"{sc.get('history') or ''} · escenario de planificación, no pronóstico.",
+    kpis = [("Buildings reachable (30 days)", str(round(b["expected"])), f"P10–P90 {round(b['p10_p90'][0])}–{round(b['p10_p90'][1])}"),
+            ("Roads (km)", f"{r_['expected']:.1f}", f"P10–P90 {r_['p10_p90'][0]:.1f}–{r_['p10_p90'][1]:.1f}"),
+            ("Buildings with P >= 5 %", str(sc.get("n_buildings_exposed", "—")), sc.get("exposure_note", "")),
+            ("Paths reaching the sea", f"{round(100 * sc.get('reach_sea', 0))} %", f"{sc.get('n_paths')} lava flow paths")]
+    pdf = X.impact_pdf(f"Tenerife · {sc['name']} scenario", f"{sc.get('history') or ''} · planning scenario, not a forecast.",
                        kpis, fac, iso, sc.get("places", []),
-                       "Conjunto de coladas (mismo motor validado en La Palma 2021) desde los centros eruptivos históricos, con "
-                       "700–800 m de incertidumbre; impacto sobre OpenStreetMap. Parámetros basálticos.",
+                       "Flow ensemble (same engine validated on La Palma 2021) from the historical eruptive centres, with "
+                       "700–800 m of uncertainty; impact on OpenStreetMap. Basaltic parameters.",
                        "Copernicus DEM GLO-30, OpenStreetMap (ODbL), IGN")
     return _file(pdf, "application/pdf", f"volscan_escenario_tenerife_{key}.pdf")
 
 
 def _fallback_brief(day: dict) -> str:
     s, l = day.get("seismic") or {}, day.get("lava") or {}
-    lines = [f"Resumen automático sin modelo de lenguaje · {day['date']}"]
+    lines = [f"Automatic summary without a language model · {day['date']}"]
     if s:
-        lines.append(f"Sismicidad La Palma (24 h): {s['last24h']['n']} eventos, magnitud máxima "
-                     f"{s['last24h']['max_mag'] if s['last24h']['max_mag'] is not None else '—'}, profundidad mediana "
+        lines.append(f"La Palma seismicity (24 h): {s['last24h']['n']} events, max magnitude "
+                     f"{s['last24h']['max_mag'] if s['last24h']['max_mag'] is not None else '—'}, median depth "
                      f"{round(s['last24h']['depth_median_km'], 1) if s['last24h']['depth_median_km'] is not None else '—'} km. "
-                     f"Índice de actividad anómala: {s['unrest_index'] if s['unrest_index'] is not None else 'sin línea base'} / 10.")
+                     f"Unrest index: {s['unrest_index'] if s['unrest_index'] is not None else 'no baseline'} / 10.")
     if l.get("phase") == "eruptive":
         sea = l["sea"]
-        lines.append(f"Probabilidad de que la colada alcance el mar: {round(100 * sea['p_ever'])} %"
-                     + (f"; llegada estimada P10–P90: {sea['eta_h'][0]}–{sea['eta_h'][2]} h." if sea["eta_h"][1] is not None else "."))
+        lines.append(f"Probability that lava reaches the sea: {round(100 * sea['p_ever'])} %"
+                     + (f"; estimated arrival P10–P90: {sea['eta_h'][0]}–{sea['eta_h'][2]} h." if sea["eta_h"][1] is not None else "."))
         top = [p for p in l["places"] if p["p_ever"] >= 0.05][:4]
         if top:
-            lines.append("Núcleos con probabilidad ≥5 %: " + "; ".join(
+            lines.append("Neighbourhoods with probability ≥5 %: " + "; ".join(
                 f"{p['name']} {round(100 * p['p_ever'])} %" + (f" (P50 {p['eta_h'][1]} h)" if p["eta_h"][1] is not None else "")
                 for p in top) + ".")
         o = l.get("observation")
         if o and o.get("front_stalled") and o.get("area_growing"):
-            lines.append("El frente está detenido pero el área crece: posible acumulación y nuevos desbordamientos.")
-    lines.append("VolScan no emite niveles de alerta: consulte al PEVOLCA.")
+            lines.append("The front has stalled but the area is growing: possible build-up and new overflows.")
+    lines.append("VolScan issues no alert levels: refer to PEVOLCA.")
     return "\n".join(lines)
 
 
@@ -871,19 +899,19 @@ def lp_briefing(date: str, request: Request, req: BriefReq = BriefReq()):
     try:
         dt.date.fromisoformat(date)
     except ValueError:
-        raise HTTPException(400, "fecha inválida")
+        raise HTTPException(400, "invalid date")
     day = _lp_day(date)
     cfg = llm.LLMConfig.from_env()
     f = CACHE / "briefings" / f"lapalma2021_{date}_{cfg.provider}_{cfg.model.replace(':', '_').replace('/', '_')}.json"
     if f.exists() and not req.regenerate:
         return JSONResponse(json.loads(f.read_text()))
     idx = rag.get_index(store.load_events(), replay().obs)
-    hits = idx.search(f"La Palma 2021 erupción Tajogaite {date} sismos colada", k=5)
+    hits = idx.search(f"La Palma 2021 eruption Tajogaite {date} earthquakes lava flow erupción sismos colada", k=5)
     live = {k: day[k] for k in ("date", "seismic", "lava")}
-    question = (f"Redacta el parte de situación de VolScan para el {date} (fin del día, UTC), como si fuera ese día: "
-                "solo con la información disponible hasta entonces. Estructura: 1) Sismicidad, 2) Colada y pronóstico "
-                "(probabilidades y P10–P90), 3) Núcleos en riesgo, 4) Incertidumbres. Máximo 180 palabras. "
-                "No menciones hechos posteriores a esa fecha.")
+    question = (f"Write VolScan's situation report for {date} (end of day, UTC), as if it were that day: "
+                "using only the information available up to then. Structure: 1) Seismicity, 2) Lava flow and forecast "
+                "(probabilities and P10–P90), 3) Neighbourhoods at risk, 4) Uncertainties. 180 words maximum, in English. "
+                "Do not mention anything that happened after that date.")
     try:
         text = llm.chat(rag.build_prompt(question, hits, live), cfg)
         res = dict(date=date, text=text, model=cfg.public(), ai=True, citations=rag.cite(hits))
@@ -918,7 +946,7 @@ def report_monthly(zone: str = "tenerife", month: str | None = None):
         from ..reports import month_bounds
         month_bounds(month)
     except Exception:
-        raise HTTPException(400, "mes inválido (AAAA-MM)")
+        raise HTTPException(400, "invalid month (YYYY-MM)")
     today = dt.datetime.now(dt.timezone.utc).date().isoformat()
     return JSONResponse(_report(zone, month, today, len(store.load_events())))
 
@@ -950,16 +978,16 @@ def report_rewrite(req: RewriteReq, request: Request):
         from ..reports import month_bounds
         month_bounds(req.month)
     except Exception:
-        raise HTTPException(400, "mes inválido (AAAA-MM)")
+        raise HTTPException(400, "invalid month (YYYY-MM)")
     today = dt.datetime.now(dt.timezone.utc).date().isoformat()
     rep = _report(req.zone, req.month, today, len(store.load_events()))
     cfg = llm.LLMConfig.from_env()
     facts = {k: rep.get(k) for k in ("title", "partial", "stats", "prev", "baseline", "rate_ratio", "b", "unrest_end", "top_events", "felt",
                                      "tides", "deformation", "so2")}
     msgs = [dict(role="system", content=(
-        "Redactas el resumen del informe mensual de vigilancia sísmica de VolScan para un Cabildo. Español institucional, "
-        "claro, 120-170 palabras, en un párrafo. Usa EXCLUSIVAMENTE las cifras del JSON; no añadas hechos, causas ni "
-        "previsiones. Termina indicando que la valoración oficial corresponde al PEVOLCA.")),
+        "You write the summary of VolScan's monthly seismic monitoring report for an island council. Clear institutional "
+        "English, 120-170 words, one paragraph. Use ONLY the figures in the JSON; do not add facts, causes or "
+        "forecasts. End by stating that the official assessment belongs to PEVOLCA.")),
         dict(role="user", content=json.dumps(facts, ensure_ascii=False, default=str)[:6000])]
     try:
         return JSONResponse(dict(text=llm.chat(msgs, cfg, max_tokens=500), ai=True, model=cfg.public()))
@@ -986,7 +1014,7 @@ class SwitchAdapterReq(BaseModel):
 def switch_ai_adapter(req: SwitchAdapterReq, request: Request):
     need(request, "tecnico")
     if sec.public_demo():
-        raise HTTPException(403, "en la demo pública el modelo de IA es fijo")
+        raise HTTPException(403, "the AI model is fixed in the public demo")
     from ..application import META_MODEL_PRESETS, get_container
     if req.preset not in META_MODEL_PRESETS and req.preset not in ("auto", "meta", "llama", "ollama", "local", "glimmer", "meta_local"):
         raise HTTPException(400, f"preset desconocido: {req.preset}")
@@ -1002,7 +1030,7 @@ def lp_sam3_assimilation(date: str):
     try:
         dt.date.fromisoformat(date)
     except ValueError:
-        raise HTTPException(400, "fecha inválida")
+        raise HTTPException(400, "invalid date")
     from ..ai.vision_service import sam3_scene_for_date
     from ..application import get_container
     return J(sam3_scene_for_date(date, lp=replay(), port=get_container().segmentation))
@@ -1024,13 +1052,13 @@ class ChatReq(BaseModel):
 def chat(req: ChatReq, request: Request):
     need(request, "tecnico")
     if not req.question.strip():
-        raise HTTPException(400, "pregunta vacía")
+        raise HTTPException(400, "empty question")
     if req.context and req.context.startswith("lapalma2021:"):
         date_str = req.context.split(":", 1)[1]
         try:
             dt.date.fromisoformat(date_str)
         except ValueError:
-            raise HTTPException(400, "fecha inválida")
+            raise HTTPException(400, "invalid date")
     from ..application import get_container
     agent = get_container().agent()
     res = agent.run(

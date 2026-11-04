@@ -85,7 +85,7 @@ def add_user(name: str, role: str, password: str, path: Path | None = None):
     if role not in ROLES:
         raise ValueError(f"rol desconocido: {role} (use {', '.join(ROLES)})")
     if len(password) < 10:
-        raise ValueError("la contraseña debe tener al menos 10 caracteres")
+        raise ValueError("the password must be at least 10 characters long")
     users = load_users(path)
     salt = secrets.token_bytes(16)
     users[name] = dict(name=name, role=role, salt=salt.hex(), hash=_hash(password, salt), iter=ITER)
@@ -193,11 +193,11 @@ def verify_audit(path: Path | None = None) -> dict:
 
 def _main(argv):
     if len(argv) >= 3 and argv[0] == "add-user":
-        pw = getpass.getpass(f"Contraseña para {argv[1]}: ")
-        if pw != getpass.getpass("Repítela: "):
+        pw = getpass.getpass(f"Password for {argv[1]}: ")
+        if pw != getpass.getpass("Repeat it: "):
             sys.exit("no coinciden")
         add_user(argv[1], argv[2], pw)
-        print(f"usuario {argv[1]} ({argv[2]}) guardado en {USERS}")
+        print(f"user {argv[1]} ({argv[2]}) saved to {USERS}")
     elif argv[:1] == ["verify-audit"]:
         print(json.dumps(verify_audit()))
     else:

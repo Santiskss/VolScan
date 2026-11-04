@@ -129,7 +129,7 @@ export default function AtlasLaPalma() {
     if (!meta || !showLabels) return []
     const main = ['Todoque', 'La Laguna', 'Los Llanos de Aridane', 'Tazacorte', 'Puerto Naos', 'El Paso', 'Los Guirres (Tazacorte)']
     const ls: Label[] = meta.places.filter((p) => main.includes(p.name)).map((p) => ({ x: p.x, y: p.y, text: p.name.replace(' (Tazacorte)', '') }))
-    if (date && date >= '2021-09-19') ls.push({ x: meta.vent.xy[0], y: meta.vent.xy[1], text: 'Boca · 19 sep', kind: 'vent' })
+    if (date && date >= '2021-09-19') ls.push({ x: meta.vent.xy[0], y: meta.vent.xy[1], text: 'Vent · 19 Sep', kind: 'vent' })
     return ls
   }, [meta, showLabels, date])
 
@@ -166,21 +166,21 @@ export default function AtlasLaPalma() {
         <div className="canvas-wrap">
           <Atlas3D terrain={terrain} overlay={showLava ? activeOverlay : null} quakes={qpoints} labels={labels} surfacePoints={assets}
             depthScale={depthScale} terrainOpacity={opacity} focus={focus} />
-          <div className="corner tl">La Palma · Cumbre Vieja · relieve previo a 2021 · profundidad ×{depthScale.toString().replace('.', ',')}</div>
+          <div className="corner tl">La Palma · Cumbre Vieja · pre-2021 terrain · depth ×{depthScale.toString()}</div>
           {date && (
             <div className="obs-card">
-              <div className="k">{eruptive ? `Día ${Math.floor(daysSinceOnset ?? 0) + 1} de erupción` : 'Fase pre-eruptiva'}</div>
-              <div className="v"><span className="dot bad" style={{ background: eruptive ? 'var(--lava)' : 'var(--amber)' }} />{fmt.date(date + 'T12:00:00Z')} · fin del día UTC</div>
+              <div className="k">{eruptive ? `Eruption day ${Math.floor(daysSinceOnset ?? 0) + 1}` : 'Pre-eruptive phase'}</div>
+              <div className="v"><span className="dot bad" style={{ background: eruptive ? 'var(--lava)' : 'var(--amber)' }} />{fmt.date(date + 'T12:00:00Z')} · end of day UTC</div>
             </div>
           )}
           <div className="legend-strip">
-            {showQuakes && <div className="item">Sismos IGN bajo la isla · <b style={{ color: '#e23d14' }}>●</b> 24 h <b style={{ color: '#f08a35' }}>●</b> 7 d <b style={{ color: '#8f8577' }}>●</b> anteriores · tamaño = magnitud</div>}
-            {showLava && eruptive && <div className="item">Probabilidad de colada (72 h)<span className="grad" />· mancha oscura con borde naranja = {useSam3Overlay ? 'máscara sintética' : 'colada observada CEMS'}</div>}
-            <div className="item">Reconstrucción con datos reales · usa solo lo disponible ese día</div>
+            {showQuakes && <div className="item">IGN earthquakes under the island · <b style={{ color: '#e23d14' }}>●</b> 24 h <b style={{ color: '#f08a35' }}>●</b> 7 d <b style={{ color: '#8f8577' }}>●</b> older · size = magnitude</div>}
+            {showLava && eruptive && <div className="item">Lava flow probability (72 h)<span className="grad" />· dark patch with orange edge = {useSam3Overlay ? 'synthetic mask' : 'CEMS observed flow'}</div>}
+            <div className="item">Reconstruction from real data · uses only what was available that day</div>
           </div>
           <div className="controls-row">
-            <button className="btn" onClick={() => meta && setFocus({ x: meta.vent.xy[0] - 3000, y: meta.vent.xy[1], distKm: 16 })}>Foco erupción</button>
-            <button className="btn" onClick={() => terrain && setFocus({ x: terrain.west + terrain.cols * terrain.step / 2, y: terrain.north - terrain.rows * terrain.step / 2, distKm: 50 })}>Isla completa</button>
+            <button className="btn" onClick={() => meta && setFocus({ x: meta.vent.xy[0] - 3000, y: meta.vent.xy[1], distKm: 16 })}>Eruption focus</button>
+            <button className="btn" onClick={() => terrain && setFocus({ x: terrain.west + terrain.cols * terrain.step / 2, y: terrain.north - terrain.rows * terrain.step / 2, distKm: 50 })}>Whole island</button>
           </div>
         </div>
 
@@ -208,31 +208,31 @@ export default function AtlasLaPalma() {
               <input type="range" min={0} max={meta.days.length - 1} value={idx} onChange={(e) => { setPlaying(false); setIdx(+e.target.value) }} />
             </>}
           </div>
-          <div className="tl-note">Marcas rojas: hitos reales. Marcas grises: cartografías CEMS. No se interpola la colada observada.</div>
+          <div className="tl-note">Red marks: real milestones. Grey marks: CEMS maps. The observed flow is never interpolated.</div>
         </div>
 
         <div className="kpis">
           <div className="kpi">
-            <div className="k">Sismos 24 h · La Palma</div>
-            <div className="v">{fmt.int(seis?.last24h.n)}<small>eventos</small></div>
-            <div className="s">Mmáx {fmt.num(seis?.last24h.max_mag)} · prof. mediana {fmt.num(seis?.last24h.depth_median_km)} km</div>
+            <div className="k">Earthquakes 24 h · La Palma</div>
+            <div className="v">{fmt.int(seis?.last24h.n)}<small>events</small></div>
+            <div className="s">Mmax {fmt.num(seis?.last24h.max_mag)} · median depth {fmt.num(seis?.last24h.depth_median_km)} km</div>
           </div>
           <div className="kpi">
-            <div className="k">Índice de actividad anómala</div>
+            <div className="k">Unrest index</div>
             <div className="v">{seis?.unrest_index == null ? '—' : fmt.num(seis.unrest_index)}<small>/ 10</small></div>
-            <div className="s">{seis?.rate_ratio != null ? `×${fmt.int(seis.rate_ratio)} la tasa base` : 'sin línea base suficiente'}{seis?.shallowing_km != null ? ` · ${fmt.num(seis.shallowing_km)} km más somero` : ''}</div>
+            <div className="s">{seis?.rate_ratio != null ? `×${fmt.int(seis.rate_ratio)} the baseline rate` : 'not enough baseline'}{seis?.shallowing_km != null ? ` · ${fmt.num(seis.shallowing_km)} km shallower` : ''}</div>
           </div>
           <div className="kpi">
-            <div className="k">Colada observada (CEMS)</div>
+            <div className="k">Observed flow (CEMS)</div>
             <div className="v">{eruptive?.observation ? fmt.num(eruptive.observation.area_ha, 0) : '—'}<small>ha</small></div>
-            <div className="s">{eruptive?.observation ? `frente a ${fmt.num(eruptive.observation.reach_m / 1000)} km de la boca · hace ${fmt.hours(eruptive.observation.age_h)}` : 'sin erupción'}</div>
+            <div className="s">{eruptive?.observation ? `front ${fmt.num(eruptive.observation.reach_m / 1000)} km from the vent · ${fmt.hours(eruptive.observation.age_h)} ago` : 'no eruption'}</div>
           </div>
           <div className="kpi">
-            <div className="k">Lava al mar · pronóstico</div>
-            <div className="v">{eruptive ? (eruptive.sea.observed_reached ? 'Llegó' : fmt.pct(eruptive.sea.p_ever)) : '—'}</div>
+            <div className="k">Lava to the sea · forecast</div>
+            <div className="v">{eruptive ? (eruptive.sea.observed_reached ? 'Reached' : fmt.pct(eruptive.sea.p_ever)) : '—'}</div>
             <div className="s">{eruptive && !eruptive.sea.observed_reached && eruptive.sea.eta_h[1] != null
-              ? `P50 en ${fmt.hours(eruptive.sea.eta_h[1])} · P10–P90 ${fmt.hours(eruptive.sea.eta_h[0])}–${fmt.hours(eruptive.sea.eta_h[2])}`
-              : eruptive?.sea.observed_reached ? 'observado por CEMS' : ''}</div>
+              ? `P50 in ${fmt.hours(eruptive.sea.eta_h[1])} · P10–P90 ${fmt.hours(eruptive.sea.eta_h[0])}–${fmt.hours(eruptive.sea.eta_h[2])}`
+              : eruptive?.sea.observed_reached ? 'observed by CEMS' : ''}</div>
           </div>
         </div>
       </div>
@@ -242,30 +242,30 @@ export default function AtlasLaPalma() {
 
         {eruptive && (
           <section className="incident">
-            <h3>Experimento sintético de segmentación</h3><p className="note">Las escenas térmicas se generan desde la propia referencia CEMS. Su coincidencia no valida segmentación satelital ni adelanto operativo. La inferencia real requiere un proveedor verificado.</p>
+            <h3>Synthetic segmentation experiment</h3><p className="note">The thermal scenes are generated from the CEMS reference itself. A match does not validate satellite segmentation or any operational lead time. Real inference needs a verified provider.</p>
             {!sam3 && (
               <button className="btn olive" disabled={sam3Loading || !date} onClick={loadSam3}>
-                {sam3Loading ? 'Calculando experimento…' : 'Ejecutar demostración sintética'}
+                {sam3Loading ? 'Running experiment…' : 'Run synthetic demo'}
               </button>
             )}
             {sam3 && !sam3.available && <div className="note">{sam3.note}</div>}
             {sam3 && sam3.available && sam3.comparison_vs_cems && sam3.assimilated_forecast && (
               <>
                 <div className="kv" style={{ marginTop: 4 }}>
-                  <span className="k">Adaptador hexagonal</span>
+                  <span className="k">Hexagonal adapter</span>
                   <span>{sam3.segmentation?.adapter} · {sam3.segmentation?.model}</span>
-                  <span className="k">Área SAM 3.1 vs CEMS</span>
+                  <span className="k">SAM 3.1 vs CEMS area</span>
                   <span><b>{fmt.num(sam3.comparison_vs_cems.sam3_area_ha)} ha</b> vs {fmt.num(sam3.comparison_vs_cems.cems_area_ha)} ha (IoU <b>{fmt.num(sam3.comparison_vs_cems.iou, 3)}</b>)</span>
-                  <span className="k">Alcance frente</span>
+                  <span className="k">Front reach</span>
                   <span>{fmt.int(sam3.comparison_vs_cems.sam3_reach_m)} m vs {fmt.int(sam3.comparison_vs_cems.cems_reach_m)} m</span>
-                  <span className="k">Antelación a CEMS</span>
-                  <span>Sin adelanto operativo demostrado; entrada generada desde CEMS.</span>
-                  <span className="k">Mar (asimilado SAM 3.1)</span>
+                  <span className="k">Lead time over CEMS</span>
+                  <span>No operational lead time shown; input generated from CEMS.</span>
+                  <span className="k">Sea (SAM 3.1 assimilated)</span>
                   <span>{fmt.pct(sam3.assimilated_forecast.sea_p_ever)} (ESS {fmt.num(sam3.assimilated_forecast.ess)})</span>
                 </div>
                 <label className="check" style={{ marginTop: 8 }}>
                   <input type="checkbox" checked={useSam3Overlay} onChange={(e) => setUseSam3Overlay(e.target.checked)} />
-                  <span>Proyectar máscara SAM 3.1 en el relieve 3D<span className="hint">{sam3.segmentation?.n_prompt_points} prompts espaciales · {fmt.num(sam3.segmentation?.latency_ms)} ms</span></span>
+                  <span>Project the SAM 3.1 mask on the 3D terrain<span className="hint">{sam3.segmentation?.n_prompt_points} spatial prompts · {fmt.num(sam3.segmentation?.latency_ms)} ms</span></span>
                 </label>
               </>
             )}
@@ -273,24 +273,24 @@ export default function AtlasLaPalma() {
         )}
 
         <section className="incident">
-          <h3>Parte de situación · IA</h3>
-          {!brief && <button className="btn olive" disabled={briefLoading || !date} onClick={() => loadBrief()}>{briefLoading ? 'Redactando…' : 'Ver parte de este día'}</button>}
+          <h3>Situation report · AI</h3>
+          {!brief && <button className="btn olive" disabled={briefLoading || !date} onClick={() => loadBrief()}>{briefLoading ? 'Drafting…' : 'View this day’s report'}</button>}
           {brief && <>
             <div className={`brief ${brief.ai ? '' : 'na'}`}>{brief.text}</div>
             <div className="brief-meta">
-              <span>{brief.ai ? modelLabel(brief.model.provider, brief.model.model) : 'Síntesis determinista sin LLM'}</span>
-              {brief.ai && <button className="btn" style={{ padding: '2px 8px' }} onClick={() => loadBrief(true)}>Rehacer</button>}
+              <span>{brief.ai ? modelLabel(brief.model.provider, brief.model.model) : 'Deterministic summary without LLM'}</span>
+              {brief.ai && <button className="btn" style={{ padding: '2px 8px' }} onClick={() => loadBrief(true)}>Redo</button>}
             </div>
-            {brief.citations.length > 0 && <div className="note" style={{ marginTop: 6 }}>Fuentes: {brief.citations.map((c) => `[${c.n}] ${c.doc}`).join(' · ')}</div>}
+            {brief.citations.length > 0 && <div className="note" style={{ marginTop: 6 }}>Sources: {brief.citations.map((c) => `[${c.n}] ${c.doc}`).join(' · ')}</div>}
           </>}
         </section>
 
         <section className="incident">
-          <h3>Agente operativo · Tool-Calling</h3>
+          <h3>Operations agent · Tool calling</h3>
           <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 6 }}>
-            <button className="btn" style={{ fontSize: 11, padding: '2px 7px' }} onClick={() => askAgent(`¿Qué mide Meta SAM 3.1 el ${date} frente a Copernicus?`)}>SAM 3.1 hoy</button>
-            <button className="btn" style={{ fontSize: 11, padding: '2px 7px' }} onClick={() => askAgent('Simula el escenario Dorsal Noroeste en Tenerife')}>Tenerife Dorsal NO</button>
-            <button className="btn" style={{ fontSize: 11, padding: '2px 7px' }} onClick={() => askAgent(`Previsualiza la alerta CAP 1.2 para 112 del ${date}`)}>CAP 1.2 · 112</button>
+            <button className="btn" style={{ fontSize: 11, padding: '2px 7px' }} onClick={() => askAgent(`What does Meta SAM 3.1 measure on ${date} compared with Copernicus?`)}>SAM 3.1 today</button>
+            <button className="btn" style={{ fontSize: 11, padding: '2px 7px' }} onClick={() => askAgent('Simulate the north-west rift scenario on Tenerife')}>Tenerife NW rift</button>
+            <button className="btn" style={{ fontSize: 11, padding: '2px 7px' }} onClick={() => askAgent(`Preview the CAP 1.2 alert for 112 on ${date}`)}>CAP 1.2 · 112</button>
           </div>
           <div style={{ display: 'flex', gap: 6 }}>
             <input
@@ -298,88 +298,88 @@ export default function AtlasLaPalma() {
               value={agentQ}
               onChange={(e) => setAgentQ(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && askAgent()}
-              placeholder="Pregunta al agente (ejecuta herramientas reales)…"
+              placeholder="Ask the agent (runs real tools)…"
               style={{ flex: 1, fontSize: 12, padding: '5px 8px', border: '1px solid var(--line)', borderRadius: 4, background: 'var(--bg)' }}
             />
             <button className="btn olive" disabled={agentLoading || !agentQ.trim()} onClick={() => askAgent()}>
-              {agentLoading ? '…' : 'Consultar'}
+              {agentLoading ? '…' : 'Ask'}
             </button>
           </div>
           {agentRes && (
             <div style={{ marginTop: 8 }}>
               {agentRes.tool_calls && agentRes.tool_calls.length > 0 && (
                 <div className="note" style={{ marginBottom: 4 }}>
-                  <b>Herramientas ejecutadas:</b> {agentRes.tool_calls.map((t) => `${t.name} (${fmt.num(t.duration_ms, 0)} ms)`).join(' · ')}
+                  <b>Tools executed:</b> {agentRes.tool_calls.map((t) => `${t.name} (${fmt.num(t.duration_ms, 0)} ms)`).join(' · ')}
                 </div>
               )}
               <div className={`brief ${agentRes.ai ? '' : 'na'}`}>{agentRes.answer}</div>
               <div className="brief-meta">
-                <span>{agentRes.ai ? modelLabel(agentRes.model.provider, agentRes.model.model) : 'Motor determinista + RAG'}</span>
+                <span>{agentRes.ai ? modelLabel(agentRes.model.provider, agentRes.model.model) : 'Deterministic engine + RAG'}</span>
               </div>
             </div>
           )}
         </section>
 
         <section>
-          <h3>Núcleos · probabilidad y llegada</h3>
+          <h3>Neighbourhoods · probability and arrival</h3>
           {eruptive ? (
             <table className="places">
-              <thead><tr><th>Núcleo</th><th>P</th><th>Llegada P50</th></tr></thead>
+              <thead><tr><th>Neighbourhood</th><th>P</th><th>Arrival P50</th></tr></thead>
               <tbody>
                 {eruptive.places.filter((p) => p.p_ever > 0.004 || p.observed_reached).slice(0, 8).map((p) => (
                   <tr key={p.name} onClick={() => { const pl = meta?.places.find((q) => q.name === p.name); if (pl) setFocus({ x: pl.x, y: pl.y, distKm: 8 }) }} style={{ cursor: 'pointer' }}>
                     <td>{p.name}</td>
                     <td><span className="pbar" style={{ width: Math.max(2, p.p_ever * 50) }} />{fmt.pct(p.p_ever)}</td>
-                    <td>{p.observed_reached ? <span className="reached">ALCANZADO</span> : fmt.hours(p.eta_h[1])}</td>
+                    <td>{p.observed_reached ? <span className="reached">REACHED</span> : fmt.hours(p.eta_h[1])}</td>
                   </tr>
                 ))}
               </tbody>
             </table>
-          ) : <div className="note">Antes de la erupción no hay pronóstico de colada: no se sabe dónde abrirá la boca. VolScan muestra la sismicidad y su evolución en profundidad.</div>}
-          {eruptive && <div className="note" style={{ marginTop: 8 }}>Conjunto de {eruptive.n_members} recorridos reponderado con {eruptive.observation?.n_observations ?? 0} cartografías (ESS {fmt.int(eruptive.ess)}). {eruptive.observation?.front_stalled && eruptive.observation?.area_growing ? '' : ''}</div>}
-          {eruptive?.observation?.front_stalled && eruptive.observation.area_growing && <div className="flag">FRENTE DETENIDO · ÁREA CRECIENDO → POSIBLE DESBORDAMIENTO</div>}
+          ) : <div className="note">Before the eruption there is no flow forecast: nobody knows where the vent will open. VolScan shows the seismicity and how it moves at depth.</div>}
+          {eruptive && <div className="note" style={{ marginTop: 8 }}>Ensemble of {eruptive.n_members} paths reweighted with {eruptive.observation?.n_observations ?? 0} maps (ESS {fmt.int(eruptive.ess)}). {eruptive.observation?.front_stalled && eruptive.observation?.area_growing ? '' : ''}</div>}
+          {eruptive?.observation?.front_stalled && eruptive.observation.area_growing && <div className="flag">FRONT STALLED · AREA GROWING → POSSIBLE OVERFLOW</div>}
         </section>
 
         <section>
-          <h3>Capas</h3>
-          <label className="check"><input type="checkbox" checked={showQuakes} onChange={(e) => setShowQuakes(e.target.checked)} /><span>Sismos en profundidad<span className="hint">IGN · catálogo de terremotos</span></span></label>
-          <label className="check"><input type="checkbox" checked={cumulative} onChange={(e) => setCumulative(e.target.checked)} /><span>Acumulado desde el 1 sep<span className="hint">si no, últimos 7 días</span></span></label>
-          <label className="check"><input type="checkbox" checked={showLava} onChange={(e) => setShowLava(e.target.checked)} /><span>Pronóstico y colada observada<span className="hint">conjunto VolScan · Copernicus EMS EMSR546</span></span></label>
-          <label className="check"><input type="checkbox" checked={showAssets} onChange={(e) => setShowAssets(e.target.checked)} /><span>Edificios en riesgo (72 h)<span className="hint">inventario Copernicus EMS · amarillo→granate = probabilidad · azul = cercado por la colada</span></span></label>
-          <label className="check"><input type="checkbox" checked={showLabels} onChange={(e) => setShowLabels(e.target.checked)} /><span>Topónimos<span className="hint">© OpenStreetMap</span></span></label>
-          <div className="slider-row"><span>Transparencia del terreno</span><span>{Math.round((1 - opacity) * 100)} %</span></div>
+          <h3>Layers</h3>
+          <label className="check"><input type="checkbox" checked={showQuakes} onChange={(e) => setShowQuakes(e.target.checked)} /><span>Earthquakes at depth<span className="hint">IGN · earthquake catalogue</span></span></label>
+          <label className="check"><input type="checkbox" checked={cumulative} onChange={(e) => setCumulative(e.target.checked)} /><span>Cumulative since 1 Sep<span className="hint">otherwise, last 7 days</span></span></label>
+          <label className="check"><input type="checkbox" checked={showLava} onChange={(e) => setShowLava(e.target.checked)} /><span>Forecast and observed flow<span className="hint">VolScan ensemble · Copernicus EMS EMSR546</span></span></label>
+          <label className="check"><input type="checkbox" checked={showAssets} onChange={(e) => setShowAssets(e.target.checked)} /><span>Buildings at risk (72 h)<span className="hint">Copernicus EMS inventory · yellow→maroon = probability · blue = hemmed in by the flow</span></span></label>
+          <label className="check"><input type="checkbox" checked={showLabels} onChange={(e) => setShowLabels(e.target.checked)} /><span>Place names<span className="hint">© OpenStreetMap</span></span></label>
+          <div className="slider-row"><span>Terrain transparency</span><span>{Math.round((1 - opacity) * 100)} %</span></div>
           <input type="range" min={0.3} max={1} step={0.02} value={opacity} onChange={(e) => setOpacity(+e.target.value)} style={{ width: '100%' }} />
-          <div className="slider-row"><span>Escala de profundidad</span><span>×{depthScale}</span></div>
+          <div className="slider-row"><span>Depth scale</span><span>×{depthScale}</span></div>
           <input type="range" min={0.2} max={1} step={0.1} value={depthScale} onChange={(e) => setDepthScale(+e.target.value)} style={{ width: '100%' }} />
         </section>
 
         {day?.indicators && <section>
-          <h3>Deformación y gases</h3>
+          <h3>Deformation and gas</h3>
           <table className="places">
-            <thead><tr><th>GNSS</th><th>Este / Norte / Vertical</th><th>Nivel</th></tr></thead>
+            <thead><tr><th>GNSS</th><th>East / North / Up</th><th>Level</th></tr></thead>
             <tbody>{day.indicators.gnss.map((g) => <tr key={g.code}><td>{g.code}<div className="note">{g.place}</div></td>
               <td>{g.disp_mm ? `${fmt.num(g.disp_mm.e)} / ${fmt.num(g.disp_mm.n)} / ${fmt.num(g.disp_mm.u)} mm` : '—'}</td><td><LevelChip level={g.level} /></td></tr>)}</tbody>
           </table>
-          <p className="note">Desplazamiento desde el 10 sep 2021 (antes del enjambre). Estaciones públicas a 10–17 km de la boca: ven el hundimiento durante la erupción, pero no la hinchazón previa que midió el IGN junto a la boca (sus estaciones cercanas no son públicas).</p>
-          <div className="subh">SO2 por satélite (kt sobre Canarias) · <LevelChip level={day.indicators.so2.level} /></div>
+          <p className="note">Displacement since 10 Sep 2021 (before the swarm). Public stations 10–17 km from the vent see the subsidence during the eruption, but not the earlier uplift the IGN measured next to the vent (its nearby stations are not public).</p>
+          <div className="subh">Satellite SO2 (kt over the Canaries) · <LevelChip level={day.indicators.so2.level} /></div>
           <So2Bars series={day.indicators.so2_series} threshold={day.indicators.so2.threshold_kt ?? 1} />
         </section>}
 
         <section>
-          <h3>Sismicidad · detalle</h3>
+          <h3>Seismicity · detail</h3>
           <div className="kv">
             <span className="k">b-value (7 d)</span><span>{seis?.b_recent ? `${fmt.num(seis.b_recent.b, 2)} ± ${fmt.num(seis.b_recent.sigma, 2)}` : '—'}</span>
-            <span className="k">Componente tasa</span><span>{fmt.num(seis?.components.rate ?? null, 2)}</span>
-            <span className="k">Componente energía</span><span>{fmt.num(seis?.components.energy ?? null, 2)}</span>
-            <span className="k">Componente somerización</span><span>{fmt.num(seis?.components.shallow ?? null, 2)}</span>
+            <span className="k">Rate component</span><span>{fmt.num(seis?.components.rate ?? null, 2)}</span>
+            <span className="k">Energy component</span><span>{fmt.num(seis?.components.energy ?? null, 2)}</span>
+            <span className="k">Shallowing component</span><span>{fmt.num(seis?.components.shallow ?? null, 2)}</span>
           </div>
-          <p className="note">El índice compara los últimos 7 días con el año anterior de la zona. No es una probabilidad de erupción. Las alertas oficiales son del PEVOLCA.</p>
+          <p className="note">The index compares the last 7 days with the zone’s previous year. It is not an eruption probability. Official alerts come from PEVOLCA.</p>
         </section>
 
         <section>
-          <h3>Fuentes</h3>
+          <h3>Sources</h3>
           {meta?.sources.map((s) => <div key={s} className="note">· {s}</div>)}
-          <div className="note">· Relieve: {terrain?.attribution}</div>
+          <div className="note">· Terrain: {terrain?.attribution}</div>
         </section>
       </aside>
     </div>
